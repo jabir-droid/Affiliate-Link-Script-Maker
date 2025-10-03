@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Content Genie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-doc-js@1.1.0/dist/html-doc.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Handle FOUC (Flash of Unstyled Content) for dark mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+            box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+        }
+        #loader {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl relative">
+        <!-- Theme Toggle -->
+        <div class="absolute top-4 right-4">
+            <button id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:ring-offset-gray-900">
+                <!-- Icon will be inserted here by JavaScript -->
+            </button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">Affiliate Content <span class="text-indigo-600">Genie</span></h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-300">Sulap Link Produk Jadi Cuan! Dapatkan Skrip Afiliasi Viral dalam Sekejap.</p>
+        </header>
+
+        <!-- Main Card for Inputs -->
+        <div class="card p-6 md:p-8 mb-8 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Product Link -->
+                <div class="md:col-span-2">
+                    <label for="productUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Link Produk</label>
+                    <input type="url" id="productUrl" placeholder="Tempelkan link produk afiliasi Anda di sini..." class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400">
+                </div>
+                <!-- Settings -->
+                <div>
+                    <label for="generateCount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jumlah Hasil Generate</label>
+                    <input type="number" id="generateCount" value="2" min="1" max="5" class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div>
+                    <label for="languageStyle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Gaya Bahasa</label>
+                    <select id="languageStyle" class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                        <option value="Persuasif & Menjual">Persuasif & Menjual</option>
+                        <option value="Informatif & Edukatif">Informatif & Edukatif</option>
+                        <option value="Santai & Kasual">Santai & Kasual</option>
+                        <option value="Ulasan Jujur">Ulasan Jujur</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="contentLength" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Panjang Tulisan</label>
+                    <select id="contentLength" class="w-full p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                        <option value="Pendek (caption sosial media)">Pendek (~50 kata)</option>
+                        <option value="Sedang (deskripsi video)">Sedang (~150 kata)</option>
+                        <option value="Panjang (artikel blog)">Panjang (300+ kata)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <div class="mt-8 text-center">
+                <button id="generateBtn" class="btn btn-primary w-full md:w-auto px-8 py-3 text-lg">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>Generate Script Ajaib!</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="outputSection" class="space-y-6">
+            <!-- Loader -->
+            <div id="loaderContainer" class="hidden justify-center items-center flex-col text-center">
+                <div id="loader"></div>
+                <p class="mt-4 text-gray-600 dark:text-gray-400 font-medium">AI sedang meracik kata-kata... Mohon tunggu sebentar.</p>
+            </div>
+            <!-- Results will be injected here -->
+        </div>
+         <!-- Error Message -->
+        <div id="error-message" class="hidden card bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-500/30 p-4 text-center mt-6">
+            <p class="font-semibold text-red-700 dark:text-red-400">Oops, terjadi kesalahan!</p>
+            <p id="error-text" class="text-red-600 dark:text-red-400 text-sm mt-1"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        const { jsPDF } = window.jspdf;
+        const generateBtn = document.getElementById('generateBtn');
+        const outputSection = document.getElementById('outputSection');
+        const loaderContainer = document.getElementById('loaderContainer');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlEl = document.documentElement;
+
+        // --- THEME TOGGLE LOGIC ---
+        function updateThemeIcon() {
+            if (htmlEl.classList.contains('dark')) {
+                themeToggle.innerHTML = `<i data-lucide="sun" class="w-6 h-6"></i>`;
+            } else {
+                themeToggle.innerHTML = `<i data-lucide="moon" class="w-6 h-6"></i>`;
+            }
+            lucide.createIcons();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            localStorage.setItem('theme', htmlEl.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcon();
+        });
+        
+        // --- INITIALIZE ICONS ---
+        updateThemeIcon();
+
+        // --- MAIN CONTENT GENERATION LOGIC ---
+        const generateContent = async () => {
+            const productUrl = document.getElementById('productUrl').value;
+            const generateCount = document.getElementById('generateCount').value;
+            const languageStyle = document.getElementById('languageStyle').value;
+            const contentLength = document.getElementById('contentLength').value;
+
+            if (!productUrl) {
+                showError("Mohon isi Link Produk untuk melanjutkan.");
+                return;
+            }
+            try { new URL(productUrl) } catch (_) {
+                showError("Link Produk yang Anda masukkan tidak valid.");
+                return;
+            }
+            hideError();
+
+            outputSection.innerHTML = '';
+            loaderContainer.classList.remove('hidden');
+            loaderContainer.classList.add('flex');
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                const systemPrompt = "Anda adalah seorang penulis konten afiliasi profesional berbahasa Indonesia. Tugas Anda adalah membuat skrip promosi yang menarik, unik, dan menjual berdasarkan link produk yang diberikan. Anda harus mencoba menebak nama produk dan kategorinya dari URL untuk membuat konten yang relevan.";
+                const userQuery = `
+                    Buatkan ${generateCount} variasi skrip konten afiliasi yang unik untuk produk pada link berikut:
+                    - Link Produk: ${productUrl}
+                    
+                    Gunakan instruksi berikut untuk setiap skrip:
+                    - Gaya Bahasa: ${languageStyle}
+                    - Target Panjang Tulisan: ${contentLength}
+
+                    Pastikan setiap variasi skrip berbeda satu sama lain dan sertakan ajakan (call to action) untuk mengklik link afiliasi.
+                `;
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                scripts: {
+                                    type: "ARRAY",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            title: { type: "STRING" },
+                                            content: { type: "STRING" }
+                                        },
+                                        required: ["title", "content"]
+                                    }
+                                }
+                            },
+                            required: ["scripts"]
+                        }
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error(`API call failed: ${response.status}`);
+
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    const parsedJson = JSON.parse(text);
+                    renderResults(parsedJson.scripts);
+                } else {
+                    throw new Error("Gagal mendapatkan konten dari AI.");
+                }
+
+            } catch (err) {
+                console.error("Error:", err);
+                showError("Terjadi masalah saat menghubungi AI. Silakan coba lagi. Detail: " + err.message);
+            } finally {
+                loaderContainer.classList.add('hidden');
+                loaderContainer.classList.remove('flex');
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+
+        function renderResults(scripts) {
+            outputSection.innerHTML = '';
+            if (!scripts || scripts.length === 0) {
+                 outputSection.innerHTML = `<p class="text-center text-gray-500 dark:text-gray-400">AI tidak dapat menghasilkan skrip. Coba lagi atau periksa link produk Anda.</p>`;
+                 return;
+            }
+
+            scripts.forEach((script, index) => {
+                const card = document.createElement('div');
+                card.className = 'card p-6 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+                card.innerHTML = `
+                    <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-400 mb-2">${script.title}</h3>
+                    <div id="content-${index}" class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">${script.content}</div>
+                    <div class="mt-4 flex flex-wrap gap-2 justify-end">
+                        <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 copy-btn" data-index="${index}">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span class="btn-text">Salin</span>
+                        </button>
+                        <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 export-word-btn" data-index="${index}">
+                            <i data-lucide="file-down" class="w-4 h-4"></i>
+                            <span>Export Word</span>
+                        </button>
+                        <button class="btn bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 export-pdf-btn" data-index="${index}">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Export PDF</span>
+                        </button>
+                    </div>
+                `;
+                outputSection.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+        
+        generateBtn.addEventListener('click', generateContent);
+        
+        outputSection.addEventListener('click', function(e) {
+            const button = e.target.closest('button');
+            if (!button) return;
+
+            const index = button.dataset.index;
+            const contentElement = document.getElementById(`content-${index}`);
+            if (!contentElement) return;
+            const contentText = contentElement.innerText;
+            const contentTitle = contentElement.previousElementSibling.innerText;
+
+            if (button.classList.contains('copy-btn')) {
+                navigator.clipboard.writeText(contentText).then(() => {
+                    const btnText = button.querySelector('.btn-text');
+                    if (btnText.textContent === 'Tersalin!') return;
+                    const originalText = btnText.textContent;
+                    btnText.textContent = 'Tersalin!';
+                    button.classList.add('bg-green-200', 'dark:bg-green-700');
+                    setTimeout(() => {
+                        btnText.textContent = originalText;
+                        button.classList.remove('bg-green-200', 'dark:bg-green-700');
+                    }, 2000);
+                });
+            }
+
+            if (button.classList.contains('export-word-btn')) {
+                 const contentHTML = `<h1>${contentTitle}</h1><p>${contentElement.innerHTML.replace(/\n/g, '<br>')}</p>`;
+                 const doc = htmlDoc.create({ title: 'Skrip Konten Afiliasi', content: contentHTML });
+                 htmlDoc.download(doc, `skrip-${index + 1}.docx`);
+            }
+
+            if (button.classList.contains('export-pdf-btn')) {
+                const doc = new jsPDF();
+                doc.setFontSize(16);
+                const titleLines = doc.splitTextToSize(contentTitle, 180);
+                doc.text(titleLines, 15, 20);
+                
+                doc.setFontSize(12);
+                const bodyLines = doc.splitTextToSize(contentText, 180);
+                doc.text(bodyLines, 15, 20 + (titleLines.length * 7) + 5);
+
+                doc.save(`skrip-konten-afiliasi-${index + 1}.pdf`);
+            }
+        });
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
+
+
+
