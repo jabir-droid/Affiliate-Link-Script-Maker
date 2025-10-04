@@ -1,7 +1,9 @@
 // api/generate.js
+// Output: judul catchy + naskah Gen Z (tanpa bullet/markdown) + CTA "Klik link ini 👉 <link>"
+
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash"; // bisa set ke gemini-2.5-pro di ENV
-const VERSION = "genz-v3-nosi"; // penanda versi deploy
+const VERSION = "v1-genz-cta";
 
 export default async function handler(req, res) {
   // CORS
@@ -24,51 +26,43 @@ export default async function handler(req, res) {
 
     const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
 
+    // Preferensi panjang → target kata sederhana
     const prefer = String(panjang || "").toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
-    // Semua aturan dimasukkan sebagai "user" message—TANPA system_instruction
-    const rulesGenZ = `
-Tulis skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
-BATASAN:
-- Tanpa markdown (tidak ada **, *, #, -, 1., >).
-- Tanpa bullet/list; gunakan paragraf mengalir.
-- Gunakan emoji secukupnya (maks 2–3).
-- Buat 1 judul singkat & catchy.
-- Tutup dengan CTA persis: "Klik link ini 👉 ${linkProduk}"
-- Hindari klaim berlebihan; fokus manfaat nyata & pengalaman pengguna.
-`.trim();
-
-    const example = {
-      title: "Jangan Sampai Ketinggalan Trend! ✨",
-      content: `Lagi cari item yang bikin look kamu upgrade tanpa ribet? Ini jawabannya. Kualitasnya oke, harga masuk akal, dan banyak yang sudah pakai. Cobain sendiri biar kamu yang ngerasain bedanya.
-
-Siap upgrade? Klik link ini 👉 ${linkProduk}`
-    };
-
-    const userBrief = `
-Buat 1 skrip untuk link berikut:
-- Link Produk: ${linkProduk}
-- Gaya bahasa: ${gaya || "Gen Z natural & persuasif"}
+    // ——— Prompt aturan + contoh (semua via user message; v1 tidak punya system field)
+    const rules = `
+Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif, tidak kaku.
+BATASAN FORMAT:
+- Dilarang markdown (tanpa **, *, #, -, 1., >, dll).
+- Dilarang bullet/list; gunakan paragraf mengalir.
+- Gunakan emoji secukupnya (maks 2–3) untuk nuansa akrab, jangan berlebihan.
+- Beri 1 judul singkat & catchy di baris pertama.
+- Tutup dengan CTA PERSIS: "Klik link ini 👉 ${linkProduk}"
+- Hindari klaim berlebihan; fokus manfaat nyata & pengalaman pemakai.
+KONTEKS:
+- Link produk: ${linkProduk}
+- Gaya bahasa diminta: ${gaya || "Gen Z natural & persuasif"}
 - Target panjang: ${targetKata}
 - Info gambar: ${fotoUrl ? "ada, gunakan konteks seperlunya" : "tidak ada, abaikan"}
+HASIL:
+- Keluarkan teks biasa (bukan JSON/markdown), berupa judul diikuti 1–3 paragraf konten, akhiri CTA persis di atas.
+`.trim();
 
-KELUARAN WAJIB berupa JSON VALID (bukan markdown) dengan format:
-{
-  "title": "Judul singkat & catchy",
-  "content": "Naskah 1–3 paragraf, TANPA bullet/markdown. Akhiri dengan CTA persis: 'Klik link ini 👉 ${linkProduk}'"
-}
-Pastikan link produk TERCANTUM dalam "content".
+    // (Opsional) contoh nuansa sebagai inspirasi
+    const example = `
+Contoh nuansa (jangan disalin mentah):
+Jangan Sampai Ketinggalan Trend! ✨
+Lagi cari item yang bikin look kamu naik level tanpa ribet? Ini bisa jadi andalan. Kualitasnya oke, harganya masuk akal, dan sudah banyak yang pakai. Cobain biar kamu yang ngerasain bedanya. 
+Klik link ini 👉 ${linkProduk}
 `.trim();
 
     const body = {
       contents: [
-        { role: "user", parts: [{ text: rulesGenZ }] },
-        { role: "user", parts: [{ text: "Contoh gaya (jangan disalin mentah):" }] },
-        { role: "model", parts: [{ text: JSON.stringify(example) }] },
-        { role: "user", parts: [{ text: userBrief }] }
+        { role: "user", parts: [{ text: rules }] },
+        { role: "user", parts: [{ text: example }] }
       ],
       generationConfig: {
         temperature: 0.95,
@@ -92,33 +86,34 @@ Pastikan link produk TERCANTUM dalam "content".
       return res.status(resp.status).json({ error: "Gemini error", detail: raw.slice(0, 1200), version: VERSION });
     }
 
+    // Ambil teks dari kandidat
     let data = null;
     try { data = JSON.parse(raw); } catch {}
-    const textJson = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    const aiText = parts.map(p => p.text || "").join("\n").trim();
 
-    let payload = null;
-    try { payload = JSON.parse(textJson); } catch {}
-
-    if (!payload?.title || !payload?.content) {
-      return res.status(500).json({ error: "Format AI tidak sesuai", detail: textJson || raw.slice(0, 1200), version: VERSION });
+    if (!aiText) {
+      return res.status(500).json({ error: "Gagal mengambil hasil dari Gemini", version: VERSION });
     }
 
+    // ——— Bersihkan sisa simbol/bullet kalau masih lolos
     const tidy = s => (s || "")
-      .replace(/^\s*[-*•]\s+/gm, "")
-      .replace(/[`*_~#>]+/g, "")
-      .replace(/\n{3,}/g, "\n\n")
+      .replace(/^\s*[-*•]\s+/gm, "")  // hapus bullet
+      .replace(/[`*_~#>]+/g, "")      // hapus simbol markdown umum
+      .replace(/\n{3,}/g, "\n\n")     // normalisasi spasi/break
       .trim();
 
-    let title = tidy(payload.title);
-    let content = tidy(payload.content);
+    let clean = tidy(aiText);
 
+    // ——— Pastikan CTA persis ada di akhir
     const desiredCTA = `Klik link ini 👉 ${linkProduk}`;
-    if (!content.includes(desiredCTA)) {
-      content = content.replace(/Klik link ini.+$/m, "").trim();
-      content = `${content}\n\n${desiredCTA}`;
+    if (!clean.includes(desiredCTA)) {
+      // hapus varian CTA lain jika ada
+      clean = clean.replace(/Klik link ini.+$/m, "").trim();
+      clean = `${clean}\n\n${desiredCTA}`;
     }
 
-    return res.status(200).json({ version: VERSION, result: `${title}\n\n${content}` });
+    return res.status(200).json({ version: VERSION, result: clean });
   } catch (e) {
     return res.status(500).json({ error: "Server error", detail: String(e), version: VERSION });
   }
