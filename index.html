@@ -2,68 +2,61 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Affiliate Link Script Maker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-doc-js@1.1.0/dist/html-doc.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .card { transition: all .3s; border:1px solid rgba(255,255,255,.1); }
+    .card { transition: .2s; border:1px solid rgba(255,255,255,.08); }
     .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px rgba(0,0,0,.1); }
-    .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.6rem 1.2rem; border-radius:.5rem; font-weight:500; transition:.2s; }
-    .btn-primary { background:#4f46e5; color:white; }
-    .btn-primary:hover { background:#4338ca; box-shadow:0 4px 14px rgba(79,70,229,.39); }
-    #loader { border:4px solid #4a5568; border-top:4px solid #4f46e5; border-radius:50%; width:40px; height:40px; animation: spin 1s linear infinite; }
-    @keyframes spin {0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem 1rem; border-radius:.6rem; font-weight:500; }
+    .btn-ghost { background:#1f2937; color:#e5e7eb; }
+    .btn-ghost:hover { background:#374151; }
+    .btn-primary { background:#4f46e5; color:#fff; }
+    .btn-primary:hover { background:#4338ca; }
+    #loader { border:4px solid #4a5568; border-top:4px solid #4f46e5; border-radius:50%; width:40px; height:40px; animation:spin 1s linear infinite; }
+    @keyframes spin { from { transform:rotate(0)} to { transform:rotate(360deg)} }
   </style>
 </head>
 <body class="bg-slate-900 text-gray-200">
   <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-    <!-- Header -->
     <header class="text-center mb-8">
       <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
         Affiliate Link Script Maker
       </h1>
-      <p class="mt-2 text-lg text-gray-300">Tempel link produk, tambahkan detail singkat, lalu biarkan AI bikin skrip promosi yang keren & variatif ✨</p>
+      <p class="mt-2 text-gray-300">Generator skrip afiliasi vibes Gen Z. Pilih jumlah variasi untuk dibandingkan 🔥</p>
     </header>
 
-    <!-- Input Card -->
-    <div class="card bg-slate-800/50 p-6 md:p-8 backdrop-blur-xl border-slate-700 mb-8">
+    <div class="card bg-slate-800/50 border-slate-700 p-6 md:p-8 mb-8">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Link Produk -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Link Produk (wajib)</label>
-          <input type="url" id="productUrl" placeholder="https://contoh.toko/produk-x" 
-            class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 placeholder-gray-400">
+          <label class="block text-sm text-gray-300 mb-1">Link Produk (wajib)</label>
+          <input id="productUrl" type="url" placeholder="https://contoh.toko/produk-x"
+                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400">
         </div>
-
-        <!-- Topic Hint -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Link ini bahas apa?</label>
-          <input type="text" id="topicHint" 
-            placeholder="Contoh: Sepatu lari Nike / Blender portable 300W / Earbuds gaming"
-            class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 placeholder-gray-400">
+          <label class="block text-sm text-gray-300 mb-1">Link ini bahas apa?</label>
+          <input id="topicHint" type="text" placeholder="Contoh: Polo shirt pria / Blender portable 300W"
+                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400">
         </div>
-
-        <!-- Custom Summary -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Deskripsi singkat (1–2 kalimat)</label>
+          <label class="block text-sm text-gray-300 mb-1">Deskripsi singkat (1–2 kalimat)</label>
           <textarea id="customSummary" rows="2"
-            placeholder="Contoh: Bantalan empuk, nyaman dipakai long run. Desain modern, ukuran 39–44."
-            class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 placeholder-gray-400"></textarea>
+                 placeholder="Contoh: Bahan adem, jatuh rapi, cocok buat daily casual & ngantor."
+                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400"></textarea>
         </div>
-
-        <!-- Jumlah -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Jumlah Hasil</label>
-          <input type="number" id="generateCount" value="2" min="1" max="5"
-            class="w-full p-2 border border-slate-600 rounded-md bg-slate-700">
+          <label class="block text-sm text-gray-300 mb-1">Jumlah Hasil</label>
+          <input id="generateCount" type="number" min="1" max="5" value="3"
+                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600">
         </div>
-        <!-- Gaya -->
         <div>
-          <label class="block text-sm font-medium text-gray-300 mb-1">Gaya Bahasa</label>
-          <select id="languageStyle" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700">
+          <label class="block text-sm text-gray-300 mb-1">Gaya Bahasa</label>
+          <select id="languageStyle" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600">
             <option>Gen Z</option>
             <option>Persuasif & Menjual</option>
             <option>Informatif & Edukatif</option>
@@ -71,10 +64,9 @@
             <option>Ulasan Jujur</option>
           </select>
         </div>
-        <!-- Panjang -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-300 mb-1">Panjang Tulisan</label>
-          <select id="contentLength" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700">
+          <label class="block text-sm text-gray-300 mb-1">Panjang Tulisan</label>
+          <select id="contentLength" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600">
             <option>Pendek (~50 kata)</option>
             <option>Sedang (~150 kata)</option>
             <option>Panjang (300+ kata)</option>
@@ -83,77 +75,132 @@
       </div>
 
       <div class="mt-8 text-center">
-        <button id="generateBtn" class="btn btn-primary w-full md:w-auto">
+        <button id="generateBtn" class="btn btn-primary">
           <i data-lucide="sparkles" class="w-5 h-5"></i>
           <span>Generate Script!</span>
         </button>
       </div>
     </div>
 
-    <!-- Output -->
-    <div id="outputSection" class="space-y-6"></div>
-    <div id="loaderContainer" class="hidden flex-col items-center text-center">
+    <div id="loaderWrap" class="hidden flex-col items-center text-center">
       <div id="loader"></div>
       <p class="mt-3 text-gray-400">AI sedang meracik kata-kata...</p>
     </div>
-    <div id="error-message" class="hidden card bg-red-900/20 border-red-500/30 p-4 text-center mt-6">
+
+    <div id="output" class="space-y-6"></div>
+
+    <div id="errBox" class="hidden card bg-red-900/20 border-red-500/30 p-4 text-center">
       <p class="font-semibold text-red-400">Oops, terjadi kesalahan!</p>
-      <p id="error-text" class="text-red-400 text-sm mt-1"></p>
+      <p id="errText" class="text-red-400 text-sm mt-1"></p>
     </div>
   </div>
 
   <script type="module">
+    const { jsPDF } = window.jspdf;
     lucide.createIcons();
-    const outputSection = document.getElementById("outputSection");
-    const loaderContainer = document.getElementById("loaderContainer");
-    const errorBox = document.getElementById("error-message");
-    const errorText = document.getElementById("error-text");
-    const btn = document.getElementById("generateBtn");
 
-    function showError(msg){ errorText.textContent = msg; errorBox.classList.remove("hidden"); }
-    function hideError(){ errorBox.classList.add("hidden"); }
+    const el = (id)=>document.getElementById(id);
+    const out = el('output'), loader = el('loaderWrap'), errBox = el('errBox'), errText = el('errText');
 
-    async function generateContent(){
-      const linkProduk = document.getElementById("productUrl").value.trim();
-      const gaya = document.getElementById("languageStyle").value;
-      const panjang = document.getElementById("contentLength").value;
-      const generateCount = document.getElementById("generateCount").value;
-      const topicHint = document.getElementById("topicHint").value.trim();
-      const customSummary = document.getElementById("customSummary").value.trim();
+    const showErr = (m)=>{ errText.textContent=m; errBox.classList.remove('hidden'); };
+    const hideErr = ()=>errBox.classList.add('hidden');
 
-      if(!linkProduk){ showError("Link produk wajib diisi."); return; }
-      hideError();
+    el('generateBtn').addEventListener('click', async ()=>{
+      hideErr();
+      out.innerHTML='';
+      loader.classList.remove('hidden');
 
-      outputSection.innerHTML = "";
-      loaderContainer.classList.remove("hidden");
-      btn.disabled = true;
+      const payload = {
+        linkProduk: el('productUrl').value.trim(),
+        gaya: el('languageStyle').value,
+        panjang: el('contentLength').value,
+        topicHint: el('topicHint').value.trim(),
+        customSummary: el('customSummary').value.trim(),
+        count: Number(el('generateCount').value || 1)
+      };
+      if(!payload.linkProduk){ loader.classList.add('hidden'); return showErr('Link produk wajib diisi.'); }
 
       try{
-        const resp = await fetch("/api/generate", {
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body: JSON.stringify({ linkProduk, gaya, panjang, topicHint, customSummary, count: generateCount })
-        });
-        const data = await resp.json();
-        loaderContainer.classList.add("hidden");
-        btn.disabled = false;
+        const r = await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        const data = await r.json();
+        loader.classList.add('hidden');
+        if(!r.ok || data.error){ return showErr(data.error || 'Gagal memproses.'); }
 
-        if(!resp.ok || data.error){
-          showError(data.error || "Gagal memproses.");
-          return;
-        }
-
-        const card = document.createElement("div");
-        card.className="card p-6 bg-slate-800/50 border-slate-700";
-        card.innerHTML = `<pre class="whitespace-pre-wrap text-gray-200">${data.result}</pre>`;
-        outputSection.appendChild(card);
+        // data.results = array
+        renderResults(data.results, payload.linkProduk);
       }catch(e){
-        showError("Error: "+e.message);
-        loaderContainer.classList.add("hidden");
-        btn.disabled = false;
+        loader.classList.add('hidden');
+        showErr(String(e));
       }
+    });
+
+    function renderResults(results, linkProduk){
+      out.innerHTML='';
+      if(!Array.isArray(results) || results.length===0){
+        out.innerHTML = `<p class="text-center text-gray-400">Tidak ada hasil.</p>`;
+        return;
+      }
+      results.forEach((text, idx)=>{
+        const {title, body} = splitTitle(text);
+        const card = document.createElement('div');
+        card.className='card bg-slate-800/50 border-slate-700 p-6';
+        card.innerHTML = `
+          <h3 class="text-xl md:text-2xl font-semibold text-indigo-400 mb-2">Variasi • ${escapeHtml(title)} <span class="align-middle">🔥</span></h3>
+          <div id="content-${idx}" class="text-gray-200 whitespace-pre-wrap">${escapeHtml(body)}</div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button class="btn btn-ghost copy-btn" data-idx="${idx}">
+              <i data-lucide="copy" class="w-4 h-4"></i><span>Salin</span>
+            </button>
+            <button class="btn btn-ghost word-btn" data-idx="${idx}">
+              <i data-lucide="file-down" class="w-4 h-4"></i><span>Export Word</span>
+            </button>
+            <button class="btn btn-ghost pdf-btn" data-idx="${idx}">
+              <i data-lucide="file-text" class="w-4 h-4"></i><span>Export PDF</span>
+            </button>
+          </div>`;
+        out.appendChild(card);
+      });
+      lucide.createIcons();
+
+      // event delegation
+      out.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button'); if(!btn) return;
+        const i = btn.dataset.idx; const contentEl = el(`content-${i}`);
+        const full = `${contentEl.previousElementSibling.textContent}\n\n${contentEl.textContent}`;
+        if(btn.classList.contains('copy-btn')){
+          navigator.clipboard.writeText(full);
+          btn.classList.add('bg-green-700/40'); setTimeout(()=>btn.classList.remove('bg-green-700/40'),800);
+        }
+        if(btn.classList.contains('word-btn')){
+          const html = `<h1>${contentEl.previousElementSibling.textContent}</h1><p>${contentEl.innerHTML.replace(/\n/g,'<br>')}</p>`;
+          const doc = htmlDoc.create({ title:'Skrip Afiliasi', content: html });
+          htmlDoc.download(doc, `skrip-${Number(i)+1}.docx`);
+        }
+        if(btn.classList.contains('pdf-btn')){
+          const doc = new jsPDF({ unit:'mm', format:'a4' });
+          doc.setFontSize(16);
+          const title = contentEl.previousElementSibling.textContent;
+          const titleLines = doc.splitTextToSize(title,180);
+          doc.text(titleLines, 15,20);
+          doc.setFontSize(12);
+          const bodyLines = doc.splitTextToSize(contentEl.textContent,180);
+          doc.text(bodyLines, 15, 20 + titleLines.length*7 + 5);
+          doc.save(`skrip-${Number(i)+1}.pdf`);
+        }
+      }, { once:true });
     }
-    btn.addEventListener("click",generateContent);
+
+    function splitTitle(text){
+      const t = text || '';
+      const [first, ...rest] = t.split(/\r?\n/);
+      const title = (first || 'Variasi').trim();
+      const body = rest.join('\n').trim();
+      return { title, body };
+    }
+
+    function escapeHtml(s){
+      return (s||'').replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+    }
   </script>
 </body>
 </html>
