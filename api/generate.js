@@ -1,11 +1,11 @@
 // api/generate.js
 // v1-compliant, Gen Z tone, forced CTA, resilient parsing
-// r4: switch default model -> gemini-2.0-flash + responseModalities + maxOutputTokens 1024
+// r5: remove responseModalities (tidak didukung v1)
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
-// Bisa override di Vercel ENV: GEMINI_MODEL=gemini-2.5-flash-lite (jika mau 2.5 cepat)
+// Bisa override di Vercel: GEMINI_MODEL=gemini-2.5-flash-lite atau gemini-2.0-flash-001
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-const VERSION = "v1-genz-cta-r4";
+const VERSION = "v1-genz-cta-r5";
 
 export default async function handler(req, res) {
   // CORS
@@ -13,7 +13,6 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(204).end();
-
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST, OPTIONS");
     return res.status(405).json({ error: "Method not allowed", version: VERSION });
@@ -28,13 +27,11 @@ export default async function handler(req, res) {
 
     const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
 
-    // preferensi panjang
     const prefer = String(panjang || "").toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
-    // prompt (tanpa system_instruction; semua via user message)
     const rules = `
 Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
 BATASAN:
@@ -66,8 +63,6 @@ Klik link ini 👉 ${linkProduk}
         { role: "user", parts: [{ text: rules }] },
         { role: "user", parts: [{ text: example }] }
       ],
-      // Minta hanya TEXT
-      responseModalities: ["TEXT"],
       generationConfig: {
         temperature: 0.9,
         topK: 40,
@@ -113,7 +108,7 @@ Klik link ini 👉 ${linkProduk}
     if (!aiText) {
       return res.status(502).json({
         error: "Gagal mengambil hasil dari Gemini",
-        hint: "Model tidak mengembalikan parts[].text. Coba model berbeda via ENV GEMINI_MODEL (contoh: gemini-2.5-flash-lite).",
+        hint: "Tidak ada parts[].text di response; coba set ENV GEMINI_MODEL=gemini-2.5-flash-lite atau gemini-2.0-flash-001.",
         responseSnippet: raw.slice(0, 1400),
         version: VERSION
       });
