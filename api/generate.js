@@ -1,9 +1,9 @@
 // api/generate.js
-// v1-compliant, Gen Z tone, forced CTA, resilient parsing
+// v1-compliant, Gen Z tone, forced CTA, resilient parsing (tanpa safetySettings)
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const VERSION = "v1-genz-cta-r2";
+const VERSION = "v1-genz-cta-r3";
 
 export default async function handler(req, res) {
   // CORS
@@ -26,11 +26,13 @@ export default async function handler(req, res) {
 
     const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
 
+    // preferensi panjang
     const prefer = String(panjang || "").toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
+    // prompt (tanpa system_instruction, semua via user message)
     const rules = `
 Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
 BATASAN:
@@ -67,13 +69,7 @@ Klik link ini 👉 ${linkProduk}
         topK: 40,
         topP: 0.9,
         maxOutputTokens: 900
-      },
-      safetySettings: [
-        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-        { category: "HARM_CATEGORY_SEXUAL_CONTENT", threshold: "BLOCK_NONE" }
-      ]
+      }
     };
 
     const resp = await fetch(url, {
@@ -90,20 +86,22 @@ Klik link ini 👉 ${linkProduk}
       return res.status(resp.status).json({ error: "Gemini error", detail: raw.slice(0, 1400), version: VERSION });
     }
 
+    // --- Robust extract ---
     let data = null;
     try { data = JSON.parse(raw); } catch {}
     const candidates = data?.candidates || [];
 
     const extractText = (candArr) => {
       for (const c of candArr) {
-        const p = c?.content?.parts;
-        if (Array.isArray(p)) {
-          const t = p.map(x => x?.text || "").join("\n").trim();
+        // 1) gabung semua parts[].text
+        const parts = c?.content?.parts;
+        if (Array.isArray(parts)) {
+          const t = parts.map(x => x?.text || "").join("\n").trim();
           if (t) return t;
         }
+        // 2) fallback satu part
         const t2 = c?.content?.parts?.[0]?.text;
         if (t2 && t2.trim()) return t2.trim();
-        if (c?.finishReason === "SAFETY") return "";
       }
       return "";
     };
@@ -113,12 +111,13 @@ Klik link ini 👉 ${linkProduk}
     if (!aiText) {
       return res.status(502).json({
         error: "Gagal mengambil hasil dari Gemini",
-        hint: "Tidak ada parts[].text di response (mungkin kena safety atau model mengembalikan format berbeda).",
+        hint: "Tidak ada parts[].text di response; kirimkan responseSnippet ke pengembang.",
         responseSnippet: raw.slice(0, 1400),
         version: VERSION
       });
     }
 
+    // --- Tidy + enforce CTA ---
     const tidy = s => (s || "")
       .replace(/^\s*[-*•]\s+/gm, "")
       .replace(/[`*_~#>]+/g, "")
