@@ -1,10 +1,10 @@
 // api/generate.js
 // v1-compliant, Gen Z tone, forced CTA, resilient parsing
-// r7: fetch page info (title, meta description, fallback h1/p)
+// r8: fetch page info (title/meta/h1/p) + support topicHint & customSummary + anti-monoton wording
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash"; 
-const VERSION = "v1-genz-cta-r7-fetch-fallback";
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const VERSION = "v1-genz-cta-r8-topic-summary";
 
 export default async function handler(req, res) {
   // CORS
@@ -19,13 +19,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { linkProduk, gaya, panjang } = req.body || {};
+    const { linkProduk, gaya, panjang, topicHint, customSummary } = req.body || {};
     if (!linkProduk) return res.status(400).json({ error: "linkProduk wajib diisi", version: VERSION });
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: "Server belum diset GEMINI_API_KEY", version: VERSION });
 
-    // --- STEP 1: Fetch konten halaman produk (title + meta + fallback)
+    // --- STEP 1: Fetch konten halaman produk
     let pageInfo = "";
     try {
       const pageResp = await fetch(linkProduk, { headers: { "User-Agent": "Mozilla/5.0" } });
@@ -46,41 +46,52 @@ export default async function handler(req, res) {
       if (!metaDesc && h1Text) pageInfo += `Heading utama: ${h1Text}\n`;
       if (!metaDesc && !h1Text && pText) pageInfo += `Paragraf awal: ${pText}\n`;
 
-      if (pageInfo.length > 600) pageInfo = pageInfo.slice(0, 600) + "...";
-    } catch (err) {
-      pageInfo = "(Gagal mengambil isi halaman, gunakan tebakan dari URL saja)";
+      if (pageInfo.length > 700) pageInfo = pageInfo.slice(0, 700) + "...";
+    } catch {
+      pageInfo = "(Gagal mengambil isi halaman, gunakan petunjuk dari pengguna & URL)";
     }
 
-    // --- STEP 2: Prompt untuk Gemini
+    // --- STEP 2: Susun brief user
     const prefer = String(panjang || "").toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
+    const topicLine = topicHint ? `Topik/jenis produk (dari pengguna): ${topicHint}\n` : "";
+    const customLine = customSummary ? `Deskripsi singkat (dari pengguna): ${customSummary}\n` : "";
+
     const rules = `
-Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
-Gunakan informasi halaman produk (jika ada):
-${pageInfo}
+Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif, dan tidak kaku.
+Gunakan informasi halaman produk (jika ada) + petunjuk pengguna berikut untuk menyesuaikan isi:
+${topicLine}${customLine}${pageInfo}
 
 BATASAN:
 - Tanpa markdown (tanpa **, *, #, -, 1., >).
 - Tanpa bullet/list; gunakan paragraf mengalir.
-- Emoji secukupnya (maks 2–3).
+- Emoji secukupnya (maks 2–3), jangan berlebihan.
 - Baris pertama adalah judul singkat & catchy.
 - Akhiri dengan CTA PERSIS: "Klik link ini 👉 ${linkProduk}"
-- Hindari klaim berlebihan; fokus manfaat nyata.
+- Hindari klaim berlebihan; fokus manfaat nyata & pengalaman pemakai.
+
+GAYA & KEMAMPUAN BAHASA:
+- Hindari kata-kata monoton atau templatey seperti "auto stylish", "bikin percaya diri" secara berulang.
+- Variasikan diksi dan frasa (gunakan sinonim yang modern namun sopan).
+- Sesuaikan tone dengan topik/jenis produk: kalau elektronik → sedikit teknis ringan; kalau fashion → deskriptif visual; kalau dapur → fungsi-praktis.
+- Jika info produk minim, tebak wajar dari URL & petunjuk pengguna, tanpa mengarang spesifikasi teknis.
+
 KONTEKS:
 - Link produk: ${linkProduk}
-- Gaya bahasa: ${gaya || "Gen Z natural & persuasif"}
+- Gaya bahasa yang diminta: ${gaya || "Gen Z natural & persuasif"}
 - Target panjang: ${targetKata}
+
 HASIL:
-- Keluarkan teks biasa (judul lalu 1–3 paragraf, akhiri CTA).
+- Keluarkan teks biasa (bukan JSON/markdown): judul di baris pertama, lalu 1–3 paragraf konten, akhiri CTA di atas.
 `.trim();
 
     const example = `
 Contoh nuansa (jangan disalin mentah):
-Bikin Hidup Makin Simple ✨
-Sejak pakai produk ini, banyak aktivitas jadi lebih gampang. Kualitas oke, desain kece, cocok buat anak muda aktif. Gak perlu repot, langsung bawa perubahan positif.
+Bikin Aktivitas Makin Ringkas ⚡
+Kalau kamu sering mobile dan butuh perangkat yang responsif, ini bisa jadi teman andalan. Fokusnya ke kemudahan pakai, build yang rapi, dan desain kekinian tanpa gimmick berlebihan. Coba rasakan sendiri perbedaannya.
 
 Klik link ini 👉 ${linkProduk}
 `.trim();
@@ -91,21 +102,18 @@ Klik link ini 👉 ${linkProduk}
         { role: "user", parts: [{ text: example }] }
       ],
       generationConfig: {
-        temperature: 0.9,
-        topK: 40,
+        temperature: 0.95,
+        topK: 50,
         topP: 0.9,
         maxOutputTokens: 1024
       }
     };
 
-    // --- STEP 3: Panggil Gemini API
+    // --- STEP 3: Panggil Gemini
     const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
     const resp = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey
-      },
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
       body: JSON.stringify(body)
     });
 
@@ -155,7 +163,7 @@ Klik link ini 👉 ${linkProduk}
       clean = `${clean}\n\n${desiredCTA}`;
     }
 
-    return res.status(200).json({ version: VERSION, result: clean, pageInfo });
+    return res.status(200).json({ version: VERSION, result: clean, pageInfo, usedHints: { topicHint, customSummary } });
   } catch (e) {
     return res.status(500).json({ error: "Server error", detail: String(e), version: VERSION });
   }
