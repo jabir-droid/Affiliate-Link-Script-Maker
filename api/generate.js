@@ -1,48 +1,73 @@
 // api/generate.js
-export default async function handler(req, res) {
-  try {
-    if (req.method !== 'POST') {
-      res.setHeader('Allow', 'POST');
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
+// Endpoint utama: menerima payload dari UI dan minta tulisan ke Gemini
 
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*"; // set ke domain kamu utk lebih aman
+
+export default async function handler(req, res) {
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") return res.status(204).end();
+
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
     const { linkProduk, fotoUrl, gaya, panjang } = req.body || {};
-    if (!linkProduk) return res.status(400).json({ error: 'linkProduk wajib diisi' });
+    if (!linkProduk) return res.status(400).json({ error: "linkProduk wajib diisi" });
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'Server belum diset GEMINI_API_KEY' });
+    if (!apiKey) return res.status(500).json({ error: "Server belum diset GEMINI_API_KEY" });
 
-    const model = 'gemini-1.5-flash';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const model = "gemini-1.5-flash"; // atau "gemini-1.5-flash-latest"
+    const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent`;
 
     const prompt = `
-Tugasmu: tulis skrip promosi affiliate yang persuasif dan jelas.
+Tugasmu: tulis skrip promosi affiliate yang persuasif, jelas, dan bebas spam.
 Link produk: ${linkProduk}
-Foto: ${fotoUrl || '-'}
-Gaya: ${gaya || '-'} | Panjang: ${panjang || '-'}
-Format: 1 paragraf pembuka, 3 bullet keunggulan, CTA kuat + link.
-Gunakan bahasa Indonesia yang natural.
-`;
+Foto: ${fotoUrl || "-"}
+Gaya: ${gaya || "-"} | Panjang: ${panjang || "-"}
+Format:
+1) Pembuka singkat yang hook.
+2) 3 bullet keunggulan utama (ringkas).
+3) CTA kuat + sisipkan link produk di akhir.
+Bahasa: Indonesia natural, sopan, ajak pembaca action tanpa berlebihan.
+    `.trim();
 
     const resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+      }),
     });
 
+    const bodyText = await resp.text();
+
     if (!resp.ok) {
-      const t = await resp.text();
-      return res.status(500).json({ error: 'Gemini error', detail: t });
+      return res.status(resp.status).json({
+        error: "Gemini error",
+        detail: bodyText.slice(0, 1000),
+      });
     }
 
-    const data = await resp.json();
-    const text =
-      data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('\n') ||
-      'Gagal mengambil hasil dari Gemini.';
+    // parsing aman
+    let data = null;
+    try { data = JSON.parse(bodyText); } catch {}
 
-    return res.status(200).json({ result: text });
+    const result =
+      data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join("\n") ||
+      "Gagal mengambil hasil dari Gemini.";
+
+    return res.status(200).json({ result });
   } catch (e) {
-    return res.status(500).json({ error: 'Server error', detail: String(e) });
+    return res.status(500).json({ error: "Server error", detail: String(e) });
   }
 }
-// serverless function 
