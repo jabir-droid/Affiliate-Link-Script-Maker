@@ -1,9 +1,16 @@
 // api/generate.js
-// v1-compliant, Gen Z tone, CTA wajib, ambil info halaman, MULTI-VARIASI (N hasil)
+// v1 REST — Multi-variations (1..5), product-aware, CTA enforced, robust parsing
+// Field yang didukung dari UI: linkProduk, deskripsi, gaya, panjang, jumlah
+// Back-compat: topicHint/customSummary/count juga tetap diterima
+//
+// ENV yang dibutuhkan (Vercel -> Settings -> Environment Variables):
+// - GEMINI_API_KEY (WAJIB)
+// - GEMINI_MODEL (opsional, default: "gemini-2.0-flash"; bisa pakai "gemini-2.5-flash-lite")
+// - ALLOWED_ORIGIN (opsional, default: "*")
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-const VERSION = "v1-genz-cta-r9-multi";
+const VERSION = "v1-multi-r10";
 
 export default async function handler(req, res) {
   // CORS
@@ -17,67 +24,81 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { linkProduk, gaya, panjang, topicHint, customSummary, count } = req.body || {};
+    // ----- input dari UI -----
+    const body = req.body || {};
+    const linkProduk = body.linkProduk;
     if (!linkProduk) return res.status(400).json({ error: "linkProduk wajib diisi", version: VERSION });
+
+    // alias/back-compat
+    const deskripsi  = body.deskripsi || body.customSummary || "";
+    const topicHint  = body.topicHint || "";            // opsional (kalau suatu saat dipakai lagi)
+    const gaya       = body.gaya || "Gen Z";
+    const panjang    = body.panjang || "Sedang";
+    const totalReq   = Number(body.jumlah || body.count || 1);
+    const total      = Math.max(1, Math.min(totalReq, 5)); // batasi 1..5
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: "Server belum diset GEMINI_API_KEY", version: VERSION });
 
-    const total = Math.max(1, Math.min(Number(count || 1), 5)); // 1..5
-
-    // ---------- STEP 1: Ambil info halaman ----------
+    // ----- ambil info halaman (title/meta/h1/p) -----
     const pageInfo = await getPageInfo(linkProduk);
 
-    // ---------- STEP 2: Siapkan brief dasar ----------
-    const prefer = String(panjang || "").toLowerCase();
+    // ----- prefer panjang -----
+    const prefer = String(panjang).toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
-    const topicLine = topicHint ? `Topik/jenis (pengguna): ${topicHint}\n` : "";
-    const customLine = customSummary ? `Deskripsi singkat (pengguna): ${customSummary}\n` : "";
+    // helper untuk satu variasi
+    const makeOne = async (idx) => {
+      const variationNote = `Ini variasi ke-${idx} dengan sudut pandang & diksi yang berbeda. Hindari pengulangan frasa dari variasi lain.`;
 
-    // fungsi yang generate satu variasi
-    const generateOne = async (idx) => {
-      const variationNote = `Ini variasi ke-${idx}. Gunakan diksi/angle berbeda dibanding variasi lain.`;
       const rules = `
-Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif, tidak kaku.
-Gunakan informasi halaman (jika ada) + petunjuk pengguna berikut:
-${topicLine}${customLine}${pageInfo}
+Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes ${gaya}: santai, hangat, persuasif, tidak kaku.
+Gunakan konteks berikut (prioritas: deskripsi pengguna > info halaman > penalaran URL):
 
-BATASAN:
-- Tanpa markdown (tanpa **, *, #, -, 1., >).
-- Tanpa bullet/list; paragraf mengalir.
-- Emoji secukupnya (maks 2–3).
-- Baris pertama adalah JUDUL singkat & catchy.
-- Akhiri dengan CTA PERSIS: "Klik link ini 👉 ${linkProduk}"
-- Hindari klaim berlebihan; fokus manfaat nyata.
+DARI PENGGUNA:
+- Topik/jenis (opsional): ${topicHint || "-"}
+- Deskripsi singkat: ${deskripsi || "-"}
+
+DARI HALAMAN:
+${pageInfo}
+
+BATASAN GAYA:
+- Tanpa markdown (tanpa **, *, #, -, 1., >) dan tanpa bullet/list.
+- Gunakan paragraf mengalir.
+- Emoji maksimal 2.
+- Baris pertama HARUS judul singkat & catchy (1 baris).
+- Akhiri PERSIS dengan: "Klik link ini 👉 ${linkProduk}"
+- Hindari klaim berlebihan atau spesifikasi yang tidak disebut.
+
+DIVERSIFIKASI & DIKSI:
 - ${variationNote}
+- Hindari kata-kata templatey yang berulang (mis. “auto stylish”, “bikin pede”) kecuali relevan alami.
+- Gunakan sinonim modern namun wajar; sesuaikan tone dengan kategori produk (fashion/elektronik/peralatan rumah/dll).
 
-KONTEKS:
-- Link produk: ${linkProduk}
-- Gaya: ${gaya || "Gen Z natural & persuasif"}
+PANJANG:
 - Target panjang: ${targetKata}
 
-HASIL:
-- Keluarkan TEKS biasa (bukan JSON/markdown): judul pada baris pertama, lalu 1–3 paragraf, akhiri CTA.
+OUTPUT:
+- Keluarkan TEKS BIASA: 1) Judul (baris 1), 2) 1–3 paragraf isi, 3) CTA persis di atas.
 `.trim();
 
       const example = `
 Contoh nuansa (jangan disalin mentah):
-Upgrade Gaya Tanpa Ribet ✨
-Buat kamu yang pengin tampil fresh setiap hari, ini pilihan yang pas. Fokusnya kenyamanan, tampilan clean, dan gampang dipadu-padankan. Rasakan bedanya pas dipakai.
+Gaya Naik Level Tanpa Drama ✨
+Buat yang pengin tampil rapi tapi tetap nyaman, ini pilihan aman. Detailnya bersih, potongannya enak dilihat, dan gampang di-mix & match. Rasakan bedanya waktu dipakai harian.
 
 Klik link ini 👉 ${linkProduk}
 `.trim();
 
-      const body = {
+      const payload = {
         contents: [
           { role: "user", parts: [{ text: rules }] },
           { role: "user", parts: [{ text: example }] }
         ],
         generationConfig: {
-          temperature: 0.85 + Math.random() * 0.15, // sedikit variasi
+          temperature: 0.85 + Math.random() * 0.15, // variasi halus antar hasil
           topK: 50,
           topP: 0.9,
           maxOutputTokens: 1024
@@ -87,8 +108,8 @@ Klik link ini 👉 ${linkProduk}
       const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
       const resp = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
-        body: JSON.stringify(body)
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        body: JSON.stringify(payload)
       });
 
       const raw = await resp.text();
@@ -97,41 +118,40 @@ Klik link ini 👉 ${linkProduk}
       let data = null;
       try { data = JSON.parse(raw); } catch {}
       const text = extractText(data);
-      if (!text) throw new Error(`No text from Gemini: ${raw.slice(0, 600)}`);
+      if (!text) throw new Error(`No text in response: ${raw.slice(0, 600)}`);
 
-      // rapikan + enforce CTA
+      // Bersihkan & pastikan CTA ada
       const tidy = s => (s || "")
-        .replace(/^\s*[-*•]\s+/gm, "")
-        .replace(/[`*_~#>]+/g, "")
-        .replace(/\n{3,}/g, "\n\n")
+        .replace(/^\s*[-*•]\s+/gm, "")   // buang bullet kalau ada
+        .replace(/[`*_~#>]+/g, "")       // buang markup
+        .replace(/\n{3,}/g, "\n\n")      // rapikan enter
         .trim();
 
       let clean = tidy(text);
-      const desiredCTA = `Klik link ini 👉 ${linkProduk}`;
-      if (!clean.includes(desiredCTA)) {
+      const CTA = `Klik link ini 👉 ${linkProduk}`;
+      if (!clean.includes(CTA)) {
         clean = clean.replace(/Klik link ini.+$/m, "").trim();
-        clean = `${clean}\n\n${desiredCTA}`;
+        clean = `${clean}\n\n${CTA}`;
       }
-
       return clean;
     };
 
-    // ---------- STEP 3: Generate N variasi (berurutan agar stabil kuota) ----------
+    // Generate beberapa variasi (berurutan agar stabil)
     const results = [];
     for (let i = 1; i <= total; i++) {
       try {
-        results.push(await generateOne(i));
+        results.push(await makeOne(i));
       } catch (e) {
-        results.push(`(Variasi ${i} gagal: ${String(e).slice(0, 300)})\n\nKlik link ini 👉 ${linkProduk}`);
+        results.push(`(Variasi ${i} gagal: ${String(e).slice(0,300)})\n\nKlik link ini 👉 ${linkProduk}`);
       }
     }
 
     return res.status(200).json({
       version: VERSION,
       count: total,
-      results,
+      result: results,         // <-- UI kamu membaca data.result (array)
       pageInfo,
-      usedHints: { topicHint, customSummary }
+      used: { deskripsi, topicHint, gaya, panjang }
     });
 
   } catch (e) {
@@ -139,13 +159,14 @@ Klik link ini 👉 ${linkProduk}
   }
 }
 
-// -------- helpers --------
+/* -------------------- Helpers -------------------- */
+
 function extractText(data) {
   const cands = data?.candidates || [];
   for (const c of cands) {
     const parts = c?.content?.parts;
     if (Array.isArray(parts)) {
-      const t = parts.map(x => x?.text || "").join("\n").trim();
+      const t = parts.map(p => p?.text || "").join("\n").trim();
       if (t) return t;
     }
     const t2 = c?.content?.parts?.[0]?.text;
@@ -156,29 +177,24 @@ function extractText(data) {
 
 async function getPageInfo(url) {
   try {
-    const resp = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    const html = await resp.text();
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    const html = await r.text();
 
-    const titleMatch = html.match(/<title>(.*?)<\/title>/i);
-    const metaMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i);
-    const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
-    const pMatch = html.match(/<p[^>]*>(.*?)<\/p>/i);
-
-    const title = titleMatch ? titleMatch[1].trim() : "";
-    const metaDesc = metaMatch ? metaMatch[1].trim() : "";
-    const h1Text = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
-    const pText = pMatch ? pMatch[1].replace(/<[^>]+>/g, "").trim() : "";
+    const title = (html.match(/<title>(.*?)<\/title>/i)?.[1] || "").trim();
+    const meta  = (html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i)?.[1] || "").trim();
+    const h1    = (html.match(/<h1[^>]*>(.*?)<\/h1>/i)?.[1] || "").replace(/<[^>]+>/g,"").trim();
+    const p1    = (html.match(/<p[^>]*>(.*?)<\/p>/i)?.[1] || "").replace(/<[^>]+>/g,"").trim();
 
     let info = "";
     if (title) info += `Judul halaman: ${title}\n`;
-    if (metaDesc) info += `Deskripsi: ${metaDesc}\n`;
-    if (!metaDesc && h1Text) info += `Heading utama: ${h1Text}\n`;
-    if (!metaDesc && !h1Text && pText) info += `Paragraf awal: ${pText}\n`;
+    if (meta)  info += `Deskripsi: ${meta}\n`;
+    if (!meta && h1) info += `Heading utama: ${h1}\n`;
+    if (!meta && !h1 && p1) info += `Paragraf awal: ${p1}\n`;
 
-    if (!info) info = "(Tidak ada meta yang jelas; gunakan petunjuk pengguna & URL)";
+    if (!info) info = "(Tidak ada meta yang jelas; gunakan deskripsi dari pengguna & tebak dari URL)";
     if (info.length > 700) info = info.slice(0, 700) + "...";
     return info;
   } catch {
-    return "(Gagal mengambil isi halaman; gunakan petunjuk pengguna & URL)";
+    return "(Gagal mengambil isi halaman; gunakan deskripsi dari pengguna & tebak dari URL)";
   }
 }
