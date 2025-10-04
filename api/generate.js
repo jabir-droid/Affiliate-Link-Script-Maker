@@ -1,9 +1,9 @@
 // api/generate.js
-// Output: judul catchy + naskah Gen Z (tanpa bullet/markdown) + CTA "Klik link ini 👉 <link>"
+// v1-compliant, Gen Z tone, forced CTA, resilient parsing
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash"; // bisa set ke gemini-2.5-pro di ENV
-const VERSION = "v1-genz-cta";
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const VERSION = "v1-genz-cta-r2";
 
 export default async function handler(req, res) {
   // CORS
@@ -26,36 +26,34 @@ export default async function handler(req, res) {
 
     const url = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent`;
 
-    // Preferensi panjang → target kata sederhana
     const prefer = String(panjang || "").toLowerCase();
     const targetKata =
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
-    // ——— Prompt aturan + contoh (semua via user message; v1 tidak punya system field)
     const rules = `
-Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif, tidak kaku.
-BATASAN FORMAT:
-- Dilarang markdown (tanpa **, *, #, -, 1., >, dll).
-- Dilarang bullet/list; gunakan paragraf mengalir.
-- Gunakan emoji secukupnya (maks 2–3) untuk nuansa akrab, jangan berlebihan.
-- Beri 1 judul singkat & catchy di baris pertama.
-- Tutup dengan CTA PERSIS: "Klik link ini 👉 ${linkProduk}"
+Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
+BATASAN:
+- Tanpa markdown (tanpa **, *, #, -, 1., >).
+- Tanpa bullet/list; gunakan paragraf mengalir.
+- Emoji secukupnya (maks 2–3), jangan berlebihan.
+- Baris pertama adalah judul singkat & catchy.
+- Akhiri dengan CTA PERSIS: "Klik link ini 👉 ${linkProduk}"
 - Hindari klaim berlebihan; fokus manfaat nyata & pengalaman pemakai.
 KONTEKS:
 - Link produk: ${linkProduk}
-- Gaya bahasa diminta: ${gaya || "Gen Z natural & persuasif"}
+- Gaya bahasa: ${gaya || "Gen Z natural & persuasif"}
 - Target panjang: ${targetKata}
 - Info gambar: ${fotoUrl ? "ada, gunakan konteks seperlunya" : "tidak ada, abaikan"}
 HASIL:
-- Keluarkan teks biasa (bukan JSON/markdown), berupa judul diikuti 1–3 paragraf konten, akhiri CTA persis di atas.
+- Keluarkan teks biasa (bukan JSON/markdown): judul lalu 1–3 paragraf, akhiri CTA di atas.
 `.trim();
 
-    // (Opsional) contoh nuansa sebagai inspirasi
     const example = `
 Contoh nuansa (jangan disalin mentah):
 Jangan Sampai Ketinggalan Trend! ✨
-Lagi cari item yang bikin look kamu naik level tanpa ribet? Ini bisa jadi andalan. Kualitasnya oke, harganya masuk akal, dan sudah banyak yang pakai. Cobain biar kamu yang ngerasain bedanya. 
+Lagi cari item yang bikin look kamu naik level tanpa ribet? Ini bisa jadi andalan. Kualitasnya oke, harga masuk akal, dan banyak yang sudah pakai. Cobain dulu biar kamu yang ngerasain bedanya.
+
 Klik link ini 👉 ${linkProduk}
 `.trim();
 
@@ -69,7 +67,13 @@ Klik link ini 👉 ${linkProduk}
         topK: 40,
         topP: 0.9,
         maxOutputTokens: 900
-      }
+      },
+      safetySettings: [
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_SEXUAL_CONTENT", threshold: "BLOCK_NONE" }
+      ]
     };
 
     const resp = await fetch(url, {
@@ -83,32 +87,47 @@ Klik link ini 👉 ${linkProduk}
 
     const raw = await resp.text();
     if (!resp.ok) {
-      return res.status(resp.status).json({ error: "Gemini error", detail: raw.slice(0, 1200), version: VERSION });
+      return res.status(resp.status).json({ error: "Gemini error", detail: raw.slice(0, 1400), version: VERSION });
     }
 
-    // Ambil teks dari kandidat
     let data = null;
     try { data = JSON.parse(raw); } catch {}
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    const aiText = parts.map(p => p.text || "").join("\n").trim();
+    const candidates = data?.candidates || [];
+
+    const extractText = (candArr) => {
+      for (const c of candArr) {
+        const p = c?.content?.parts;
+        if (Array.isArray(p)) {
+          const t = p.map(x => x?.text || "").join("\n").trim();
+          if (t) return t;
+        }
+        const t2 = c?.content?.parts?.[0]?.text;
+        if (t2 && t2.trim()) return t2.trim();
+        if (c?.finishReason === "SAFETY") return "";
+      }
+      return "";
+    };
+
+    let aiText = extractText(candidates);
 
     if (!aiText) {
-      return res.status(500).json({ error: "Gagal mengambil hasil dari Gemini", version: VERSION });
+      return res.status(502).json({
+        error: "Gagal mengambil hasil dari Gemini",
+        hint: "Tidak ada parts[].text di response (mungkin kena safety atau model mengembalikan format berbeda).",
+        responseSnippet: raw.slice(0, 1400),
+        version: VERSION
+      });
     }
 
-    // ——— Bersihkan sisa simbol/bullet kalau masih lolos
     const tidy = s => (s || "")
-      .replace(/^\s*[-*•]\s+/gm, "")  // hapus bullet
-      .replace(/[`*_~#>]+/g, "")      // hapus simbol markdown umum
-      .replace(/\n{3,}/g, "\n\n")     // normalisasi spasi/break
+      .replace(/^\s*[-*•]\s+/gm, "")
+      .replace(/[`*_~#>]+/g, "")
+      .replace(/\n{3,}/g, "\n\n")
       .trim();
 
     let clean = tidy(aiText);
-
-    // ——— Pastikan CTA persis ada di akhir
     const desiredCTA = `Klik link ini 👉 ${linkProduk}`;
     if (!clean.includes(desiredCTA)) {
-      // hapus varian CTA lain jika ada
       clean = clean.replace(/Klik link ini.+$/m, "").trim();
       clean = `${clean}\n\n${desiredCTA}`;
     }
