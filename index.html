@@ -2,284 +2,89 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Affiliate Link Script Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Affiliate Link Script Maker – Landing</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html-doc-js@1.1.0/dist/html-doc.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
     :root{
-      --ink:#0b1220;           /* dasar slate gelap */
-      --blue-1:#0b1f3a;        /* nuansa kebiruan */
-      --blue-2:#142d52;
-      --cyan:#31c9ff;
-      --indigo:#6366f1;
+      --ink:#0b1220; --blue-1:#0b1f3a; --blue-2:#142d52; --indigo:#6366f1; --cyan:#31c9ff;
     }
-    html, body { scroll-behavior: smooth; }
+    html,body{scroll-behavior:smooth;}
     body{
-      font-family:'Inter',sans-serif;
-      color:#e5e7eb;
+      font-family:'Inter',sans-serif; color:#e5e7eb;
       background: radial-gradient(1200px 650px at 20% -10%, rgba(99,102,241,.20), transparent 60%),
                   radial-gradient(900px 500px at 110% 10%, rgba(49,201,255,.18), transparent 60%),
                   linear-gradient(180deg, var(--blue-1), var(--ink) 40%, var(--blue-2));
-      overflow-x: hidden;
+      overflow-x:hidden;
     }
-
-    /* --- layer dekoratif: grid halus --- */
     .bg-grid:before{
-      content:"";
-      position:fixed; inset:0; pointer-events:none;
+      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
       background:
         linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
         linear-gradient(0deg,  rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size: 40px 40px;
+      background-size:40px 40px; opacity:.35;
       mask-image: radial-gradient(1200px 600px at 50% 0%, #000 60%, transparent 100%);
-      opacity:.35;
-      z-index:-1;
     }
-
-    /* --- layer dekoratif: constellation (garis & node anim) --- */
-    .constellation{
-      position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background:
-        radial-gradient(600px 300px at 10% 20%, rgba(99,102,241,.25), transparent 60%),
-        radial-gradient(800px 400px at 90% 30%, rgba(49,201,255,.20), transparent 65%);
+    /* page transition */
+    .page { opacity:0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
+    .page.active { opacity:1; transform: translateY(0); }
+    .page.exit { opacity:0; transform: translateY(-8px); }
+    /* CTA fancy */
+    .btn{
+      display:inline-flex; align-items:center; gap:.5rem; padding:.9rem 1.3rem; border-radius:.9rem;
+      background: linear-gradient(90deg, var(--indigo), #3b82f6); color:#fff; font-weight:700;
+      box-shadow:0 14px 34px rgba(59,130,246,.35); position:relative; overflow:hidden;
+      transition: transform .18s ease, box-shadow .18s ease;
     }
-    .constellation svg{
-      position:absolute; inset:0; width:100%; height:100%;
-      opacity:.35;
+    .btn:hover{ transform: translateY(-1px) scale(1.01); box-shadow:0 18px 40px rgba(59,130,246,.42); }
+    .btn:after{
+      content:""; position:absolute; inset:0; transform:translateX(-120%);
+      background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,.22) 50%, transparent 100%);
+      transition:transform .7s ease;
     }
-    .dash {
-      stroke-dasharray: 6 10;
-      animation: dash 14s linear infinite;
-    }
-    @keyframes dash { to{ stroke-dashoffset: -800; } }
-
-    /* --- kartu & tombol --- */
-    .card { border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(10px); }
-    .card:hover { box-shadow: 0 16px 40px rgba(0,0,0,.25); transform: translateY(-2px); transition:.25s; }
-
-    .btn {
-      display:inline-flex; align-items:center; gap:.5rem; 
-      padding:.8rem 1.2rem; border-radius:.75rem; font-weight:600;
-      background: linear-gradient(90deg, var(--indigo), #3b82f6);
-      color:#fff; position:relative; overflow:hidden; transform: translateZ(0);
-      box-shadow: 0 8px 26px rgba(99,102,241,.35);
-      transition: transform .2s ease, box-shadow .2s ease;
-      will-change: transform;
-    }
-    .btn:focus { outline: none; transform: translateY(-1px) scale(1.01); }
-    .btn:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 12px 30px rgba(59,130,246,.38); }
-    .btn::after{
-      /* shine */
-      content:""; position:absolute; inset:0;
-      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.22) 50%, transparent 100%);
-      transform: translateX(-120%);
-      transition: transform .7s ease;
-    }
-    .btn:hover::after{ transform: translateX(120%); }
-
-    /* loader */
-    #loader{ width:44px; height:44px; border-radius:50%;
-      border:4px solid rgba(226,232,240,.25); border-top-color: var(--indigo);
-      animation:spin 1s linear infinite;
-    }
-    @keyframes spin{ to{ transform: rotate(360deg);} }
-
-    /* kecilkan scrollbars di desktop */
-    *::-webkit-scrollbar{ height:10px; width:10px }
-    *::-webkit-scrollbar-thumb{ background:#1f2937; border-radius:8px }
+    .btn:hover:after{ transform:translateX(120%); }
   </style>
 </head>
-
 <body>
-  <!-- dekorasi -->
   <div class="bg-grid"></div>
-  <div class="constellation">
-    <!-- SVG garis/network tipis agar mirip reference gambar -->
-    <svg viewBox="0 0 1200 800" preserveAspectRatio="none">
-      <defs>
-        <filter id="glow"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      <!-- beberapa garis acak -->
-      <g filter="url(#glow)" stroke="#7dd3fc" stroke-width="1">
-        <polyline class="dash" points="80,120 240,180 420,110 640,190 820,130 1000,220" fill="none"/>
-        <polyline class="dash" points="100,420 280,360 520,420 740,360 980,410 1120,340" fill="none"/>
-        <polyline class="dash" points="60,650 260,540 520,600 760,520 980,600 1140,560" fill="none"/>
-      </g>
-      <!-- node -->
-      <g fill="#93c5fd">
-        <circle cx="240" cy="180" r="2.8"/>
-        <circle cx="420" cy="110" r="2.4"/>
-        <circle cx="640" cy="190" r="3"/>
-        <circle cx="820" cy="130" r="2.2"/>
-        <circle cx="1000" cy="220" r="2.6"/>
-        <circle cx="280" cy="360" r="3"/>
-        <circle cx="520" cy="420" r="2.2"/>
-        <circle cx="740" cy="360" r="2.8"/>
-        <circle cx="980" cy="410" r="2.4"/>
-      </g>
-    </svg>
+
+  <!-- Badge mode perangkat -->
+  <div class="fixed top-3 right-3 z-10 text-xs px-2 py-1 rounded-md bg-white/10 backdrop-blur border border-white/10">
+    <span class="md:hidden">Mode: Mobile</span>
+    <span class="hidden md:inline">Mode: Desktop</span>
   </div>
 
-  <!-- HERO -->
-  <section class="relative container mx-auto px-6 pt-16 pb-20 text-center">
-    <div class="max-w-3xl mx-auto card bg-slate-800/50 rounded-2xl p-10">
-      <div class="flex justify-center mb-4">
-        <i data-lucide="sparkles" class="w-10 h-10 text-indigo-400"></i>
-      </div>
-      <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent drop-shadow">
+  <main class="min-h-screen container mx-auto px-6 flex items-center justify-center">
+    <section id="page" class="page max-w-3xl text-center bg-white/5 border border-white/10 rounded-2xl backdrop-blur p-10">
+      <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">
         Affiliate Link Script Maker
       </h1>
-      <p class="mt-4 text-lg text-gray-300">
+      <p class="mt-5 text-lg md:text-xl text-gray-300">
         Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
       </p>
-      <div class="mt-8">
-        <a href="#generator" class="btn text-lg px-7 py-3 inline-flex items-center">
-          <span>Mulai Generate</span>
-        </a>
-      </div>
-    </div>
-  </section>
 
-  <!-- GENERATOR -->
-  <div id="generator" class="container mx-auto px-6 pb-20 max-w-4xl">
-    <div class="card bg-slate-800/50 rounded-2xl p-6 md:p-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="md:col-span-2">
-          <label class="block text-sm text-gray-300 mb-1" for="productUrl">Link Produk (Wajib)</label>
-          <input id="productUrl" type="url" placeholder="Tempel link produk afiliasi di sini…"
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm text-gray-300 mb-1" for="customDesc">Deskripsi Singkat Produk (Opsional)</label>
-          <input id="customDesc" type="text" placeholder="Contoh: Kaos adem, potongan rapi, cocok harian."
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-sm text-gray-300 mb-1" for="languageStyle">Gaya Bahasa</label>
-          <select id="languageStyle" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
-            <option value="Gen Z">Gen Z</option>
-            <option value="Persuasif & Menjual">Persuasif & Menjual</option>
-            <option value="Santai & Kasual">Santai & Kasual</option>
-            <option value="Informatif & Edukatif">Informatif & Edukatif</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm text-gray-300 mb-1" for="contentLength">Panjang Tulisan</label>
-          <select id="contentLength" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
-            <option value="Pendek">Pendek (~50 kata)</option>
-            <option value="Sedang">Sedang (~150 kata)</option>
-            <option value="Panjang">Panjang (300+ kata)</option>
-          </select>
-        </div>
-        <div class="md:col-span-2">
-          <label class="block text-sm text-gray-300 mb-1" for="generateCount">Jumlah Variasi</label>
-          <input id="generateCount" type="number" min="1" max="5" value="2"
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
-        </div>
-      </div>
-
-      <div class="mt-8 text-center">
-        <button id="generateBtn" class="btn px-8 py-3 text-lg">
-          <i data-lucide="sparkles" class="w-5 h-5"></i>
-          <span>Generate Script!</span>
+      <div class="mt-10 flex items-center justify-center gap-3">
+        <button id="toGenerator" class="btn text-base md:text-lg">
+          Mulai Generate
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </button>
+        <a href="https://affiliate-link-script-maker.vercel.app" target="_blank"
+           class="text-sm md:text-base text-sky-300 hover:text-sky-200 underline underline-offset-4">Buka versi publik</a>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <div id="outputSection" class="space-y-6 mt-8"></div>
+  <script>
+    // aktifkan animasi masuk
+    const page = document.getElementById('page');
+    requestAnimationFrame(()=> page.classList.add('active'));
 
-    <div id="loaderContainer" class="hidden justify-center items-center flex-col text-center mt-6">
-      <div id="loader"></div>
-      <p class="mt-3 text-gray-400">AI sedang menulis…</p>
-    </div>
-
-    <div id="error-message" class="hidden card bg-red-900/25 border border-red-500/30 rounded-2xl p-4 text-center mt-6">
-      <p class="font-semibold text-red-300">Oops, terjadi kesalahan!</p>
-      <p id="error-text" class="text-red-300/90 text-sm mt-1"></p>
-    </div>
-  </div>
-
-  <script type="module">
-    const { jsPDF } = window.jspdf;
-    const generateBtn = document.getElementById('generateBtn');
-    const outputSection = document.getElementById('outputSection');
-    const loaderContainer = document.getElementById('loaderContainer');
-    const errorMessage = document.getElementById('error-message');
-    const errorText = document.getElementById('error-text');
-    lucide.createIcons();
-
-    const showError = (m)=>{ errorText.textContent=m; errorMessage.classList.remove('hidden'); }
-    const hideError = ()=> errorMessage.classList.add('hidden');
-
-    generateBtn.addEventListener('click', async () => {
-      const linkProduk = document.getElementById('productUrl').value.trim();
-      const deskripsi  = document.getElementById('customDesc').value.trim();
-      const gaya       = document.getElementById('languageStyle').value;
-      const panjang    = document.getElementById('contentLength').value;
-      const jumlah     = document.getElementById('generateCount').value;
-
-      if(!linkProduk){ showError("Mohon isi Link Produk."); return; }
-      hideError();
-      loaderContainer.classList.remove('hidden');
-
-      try{
-        const resp = await fetch('/api/generate', {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify({ linkProduk, deskripsi, gaya, panjang, jumlah })
-        });
-        const data = await resp.json();
-        loaderContainer.classList.add('hidden');
-        outputSection.innerHTML = '';
-
-        if(!resp.ok) throw new Error(data.error || 'Gagal memanggil API');
-
-        if(Array.isArray(data.result)){
-          data.result.forEach((txt, idx)=>{
-            const card = document.createElement('div');
-            card.className = 'card bg-slate-800/60 rounded-2xl p-6';
-            card.innerHTML = `
-              <h3 class="text-lg font-semibold text-indigo-400 mb-2">Variasi ${idx+1}</h3>
-              <div class="text-gray-300 whitespace-pre-wrap">${txt}</div>
-              <div class="mt-4 flex gap-2 justify-end">
-                <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-copy="${idx}">Salin</button>
-                <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-pdf="${idx}">Export PDF</button>
-              </div>
-            `;
-            outputSection.appendChild(card);
-          });
-        } else {
-          outputSection.innerHTML = `<div class="card bg-slate-800/60 rounded-2xl p-6">${data.result}</div>`;
-        }
-      }catch(e){
-        loaderContainer.classList.add('hidden');
-        showError(e.message);
-      }
-    });
-
-    // copy & pdf
-    outputSection.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return;
-      const idxCopy = btn.getAttribute('data-copy');
-      const idxPdf  = btn.getAttribute('data-pdf');
-      if(idxCopy !== null){
-        const el = outputSection.querySelectorAll('.text-gray-300')[idxCopy];
-        navigator.clipboard.writeText(el.innerText);
-        btn.textContent = 'Tersalin!';
-        setTimeout(()=> btn.textContent='Salin', 1200);
-      }
-      if(idxPdf !== null){
-        const el = outputSection.querySelectorAll('.text-gray-300')[idxPdf];
-        const doc = new jsPDF({ unit:'mm', format:'a4' });
-        const lines = doc.splitTextToSize(el.innerText, 180);
-        doc.text(lines, 15, 20);
-        doc.save(`skrip-${Number(idxPdf)+1}.pdf`);
-      }
+    // transisi keluar lalu pindah ke halaman generator
+    document.getElementById('toGenerator').addEventListener('click', ()=>{
+      page.classList.remove('active');
+      page.classList.add('exit');
+      setTimeout(()=>{ window.location.href = 'generator.html'; }, 420);
     });
   </script>
 </body>
