@@ -1,9 +1,11 @@
 // api/generate.js
-// v1-compliant, Gen Z tone, forced CTA, resilient parsing (tanpa safetySettings)
+// v1-compliant, Gen Z tone, forced CTA, resilient parsing
+// r4: switch default model -> gemini-2.0-flash + responseModalities + maxOutputTokens 1024
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
-const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const VERSION = "v1-genz-cta-r3";
+// Bisa override di Vercel ENV: GEMINI_MODEL=gemini-2.5-flash-lite (jika mau 2.5 cepat)
+const MODEL_NAME = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const VERSION = "v1-genz-cta-r4";
 
 export default async function handler(req, res) {
   // CORS
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
       prefer.includes("pendek") ? "≈ 50 kata" :
       prefer.includes("panjang") ? "≥ 300 kata" : "≈ 150 kata";
 
-    // prompt (tanpa system_instruction, semua via user message)
+    // prompt (tanpa system_instruction; semua via user message)
     const rules = `
 Tulis satu skrip promosi afiliasi berbahasa Indonesia dengan vibes Gen Z: santai, hangat, persuasif.
 BATASAN:
@@ -64,11 +66,13 @@ Klik link ini 👉 ${linkProduk}
         { role: "user", parts: [{ text: rules }] },
         { role: "user", parts: [{ text: example }] }
       ],
+      // Minta hanya TEXT
+      responseModalities: ["TEXT"],
       generationConfig: {
-        temperature: 0.95,
+        temperature: 0.9,
         topK: 40,
         topP: 0.9,
-        maxOutputTokens: 900
+        maxOutputTokens: 1024
       }
     };
 
@@ -93,13 +97,11 @@ Klik link ini 👉 ${linkProduk}
 
     const extractText = (candArr) => {
       for (const c of candArr) {
-        // 1) gabung semua parts[].text
         const parts = c?.content?.parts;
         if (Array.isArray(parts)) {
           const t = parts.map(x => x?.text || "").join("\n").trim();
           if (t) return t;
         }
-        // 2) fallback satu part
         const t2 = c?.content?.parts?.[0]?.text;
         if (t2 && t2.trim()) return t2.trim();
       }
@@ -111,7 +113,7 @@ Klik link ini 👉 ${linkProduk}
     if (!aiText) {
       return res.status(502).json({
         error: "Gagal mengambil hasil dari Gemini",
-        hint: "Tidak ada parts[].text di response; kirimkan responseSnippet ke pengembang.",
+        hint: "Model tidak mengembalikan parts[].text. Coba model berbeda via ENV GEMINI_MODEL (contoh: gemini-2.5-flash-lite).",
         responseSnippet: raw.slice(0, 1400),
         version: VERSION
       });
