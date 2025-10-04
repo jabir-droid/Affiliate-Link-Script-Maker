@@ -10,12 +10,14 @@
     :root{
       --ink:#0b1220; --blue-1:#0b1f3a; --blue-2:#142d52; --indigo:#6366f1; --cyan:#31c9ff;
     }
-    html,body{scroll-behavior:smooth;}
     body{
       font-family:'Inter',sans-serif; color:#e5e7eb;
       background: radial-gradient(1200px 650px at 20% -10%, rgba(99,102,241,.20), transparent 60%),
                   radial-gradient(900px 500px at 110% 10%, rgba(49,201,255,.18), transparent 60%),
+                  url('circuit-board.png'),
                   linear-gradient(180deg, var(--blue-1), var(--ink) 40%, var(--blue-2));
+      background-blend-mode: overlay;
+      background-size: cover;
       overflow-x:hidden;
     }
     .bg-grid:before{
@@ -24,13 +26,12 @@
         linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
         linear-gradient(0deg,  rgba(255,255,255,.04) 1px, transparent 1px);
       background-size:40px 40px; opacity:.35;
-      mask-image: radial-gradient(1200px 600px at 50% 0%, #000 60%, transparent 100%);
     }
-    /* page transition */
-    .page { opacity:0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease; }
+    /* TRANSISI HALAMAN */
+    .page { opacity:0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; }
     .page.active { opacity:1; transform: translateY(0); }
     .page.exit { opacity:0; transform: translateY(-8px); }
-    /* CTA fancy */
+    /* CTA */
     .btn{
       display:inline-flex; align-items:center; gap:.5rem; padding:.9rem 1.3rem; border-radius:.9rem;
       background: linear-gradient(90deg, var(--indigo), #3b82f6); color:#fff; font-weight:700;
@@ -69,21 +70,18 @@
           Mulai Generate
           <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
         </button>
-        <a href="https://affiliate-link-script-maker.vercel.app" target="_blank"
-           class="text-sm md:text-base text-sky-300 hover:text-sky-200 underline underline-offset-4">Buka versi publik</a>
       </div>
     </section>
   </main>
 
   <script>
-    // aktifkan animasi masuk
+    // Entry fade-in
     const page = document.getElementById('page');
     requestAnimationFrame(()=> page.classList.add('active'));
 
-    // transisi keluar lalu pindah ke halaman generator
+    // Exit then navigate
     document.getElementById('toGenerator').addEventListener('click', ()=>{
-      page.classList.remove('active');
-      page.classList.add('exit');
+      page.classList.remove('active'); page.classList.add('exit');
       setTimeout(()=>{ window.location.href = 'generator.html'; }, 420);
     });
   </script>

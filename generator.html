@@ -12,18 +12,21 @@
     :root{ --ink:#0b1220; --blue-1:#0b1f3a; --blue-2:#142d52; --indigo:#6366f1; }
     body{
       font-family:'Inter',sans-serif; color:#e5e7eb;
-      background: radial-gradient(1100px 600px at -10% -10%, rgba(99,102,241,.18), transparent 55%),
-                  radial-gradient(900px 480px at 110% 0%, rgba(56,189,248,.18), transparent 60%),
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(99,102,241,.25), transparent 60%),
+                  radial-gradient(900px 500px at 110% 10%, rgba(56,189,248,.25), transparent 60%),
                   linear-gradient(180deg, var(--blue-1), var(--ink) 35%, var(--blue-2));
       overflow-x:hidden;
     }
+    .glow-blob { position: fixed; border-radius: 50%; filter: blur(120px); opacity:.25; z-index:-1; }
+    .glow-blob.blue { background: #3b82f6; width: 400px; height: 400px; top: -100px; left: -80px; }
+    .glow-blob.cyan { background: #06b6d4; width: 350px; height: 350px; bottom: -120px; right: -80px; }
     .bg-grid:before{
       content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
       background:
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
-        linear-gradient(0deg,  rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size:40px 40px; opacity:.35;
-      mask-image: radial-gradient(1400px 650px at 50% 0%, #000 60%, transparent 100%);
+        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+        linear-gradient(0deg,  rgba(255,255,255,.03) 1px, transparent 1px);
+      background-size:40px 40px; opacity:.2;
+      mask-image: radial-gradient(1200px 600px at 50% 0%, #000 70%, transparent 100%);
     }
     .card{ border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(10px); }
     .btn{
@@ -34,22 +37,29 @@
     .btn:hover{ transform: translateY(-1px) scale(1.01); box-shadow:0 18px 40px rgba(59,130,246,.42); }
     #loader{ width:44px;height:44px;border-radius:50%;border:4px solid rgba(226,232,240,.25);border-top-color:var(--indigo);animation:spin 1s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
+    /* TRANSISI HALAMAN */
+    .page { opacity:0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; }
+    .page.active { opacity:1; transform: translateY(0); }
+    .page.exit { opacity:0; transform: translateY(-8px); }
   </style>
 </head>
 <body>
+  <!-- background -->
+  <div class="glow-blob blue"></div>
+  <div class="glow-blob cyan"></div>
   <div class="bg-grid"></div>
 
-  <!-- Header sederhana + badge perangkat -->
+  <!-- Header + badge -->
   <header class="container mx-auto px-6 py-6 flex items-center justify-between">
-    <a href="index.html" class="text-sm text-sky-300 hover:text-sky-200 underline underline-offset-4">← Kembali</a>
+    <a id="backBtn" href="#" class="text-sm text-sky-300 hover:text-sky-200 underline underline-offset-4">← Kembali</a>
     <div class="text-xs px-2 py-1 rounded-md bg-white/10 backdrop-blur border border-white/10">
       <span class="md:hidden">Mode: Mobile</span>
       <span class="hidden md:inline">Mode: Desktop</span>
     </div>
   </header>
 
-  <main class="container mx-auto px-6 pb-20 max-w-4xl">
-    <!-- Generator Card -->
+  <!-- Page wrapper untuk transisi -->
+  <main id="page" class="page container mx-auto px-6 pb-20 max-w-4xl">
     <section class="card bg-white/5 rounded-2xl p-6 md:p-8">
       <h1 class="text-2xl md:text-3xl font-extrabold mb-2">Buat Skrip Afiliasi</h1>
       <p class="text-gray-300 mb-6">Tempel link produk, isi deskripsi singkat (opsional), pilih gaya & panjang, lalu klik Generate.</p>
@@ -116,11 +126,23 @@
 
   <script type="module">
     const { jsPDF } = window.jspdf;
+    const pageEl          = document.getElementById('page');
+    const backBtn         = document.getElementById('backBtn');
     const outputSection   = document.getElementById('outputSection');
     const generateBtn     = document.getElementById('generateBtn');
     const loaderContainer = document.getElementById('loaderContainer');
     const errorBox        = document.getElementById('error-message');
     const errorText       = document.getElementById('error-text');
+
+    // Entry fade-in
+    requestAnimationFrame(()=> pageEl.classList.add('active'));
+
+    // Back with exit transition
+    backBtn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      pageEl.classList.remove('active'); pageEl.classList.add('exit');
+      setTimeout(()=>{ window.location.href='index.html'; }, 420);
+    });
 
     const showError = (m)=>{ errorText.textContent=m; errorBox.classList.remove('hidden'); }
     const hideError = ()=> errorBox.classList.add('hidden');
@@ -158,12 +180,12 @@
               <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-copy="${i}">Salin</button>
               <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-pdf="${i}">Export PDF</button>
             </div>`;
-          // animasi masuk
-          card.style.opacity = 0; card.style.transform = 'translateY(6px)';
+          // animasi masuk tiap kartu
+          card.style.opacity=0; card.style.transform='translateY(6px)';
           outputSection.appendChild(card);
           requestAnimationFrame(()=>{
-            card.style.transition = 'all .35s ease';
-            card.style.opacity = 1; card.style.transform = 'translateY(0)';
+            card.style.transition='all .35s ease';
+            card.style.opacity=1; card.style.transform='translateY(0)';
           });
         });
       }catch(e){
