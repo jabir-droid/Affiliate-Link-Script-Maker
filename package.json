@@ -1,0 +1,26 @@
+{
+  "name": "affiliate-link-script-maker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jabir-droid/Affiliate-Link-Script-Maker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jabir-droid/Affiliate-Link-Script-Maker/issues"
+  },
+  "homepage": "https://github.com/jabir-droid/Affiliate-Link-Script-Maker#readme",
+  "dependencies": {
+    "@upstash/redis": "^1.35.4"
+  }
+}

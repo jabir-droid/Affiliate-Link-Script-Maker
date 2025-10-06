@@ -1,217 +1,102 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Affiliate Link Script Maker – Generator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/html-doc-js@1.1.0/dist/html-doc.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    :root{ --ink:#0b1220; --blue-1:#0b1f3a; --blue-2:#142d52; --indigo:#6366f1; }
-    body{
-      font-family:'Inter',sans-serif; color:#e5e7eb;
-      background: radial-gradient(1200px 700px at 20% -10%, rgba(99,102,241,.25), transparent 60%),
-                  radial-gradient(900px 500px at 110% 10%, rgba(56,189,248,.25), transparent 60%),
-                  linear-gradient(180deg, var(--blue-1), var(--ink) 35%, var(--blue-2));
-      overflow-x:hidden;
-    }
-    .glow-blob { position: fixed; border-radius: 50%; filter: blur(120px); opacity:.25; z-index:-1; }
-    .glow-blob.blue { background: #3b82f6; width: 400px; height: 400px; top: -100px; left: -80px; }
-    .glow-blob.cyan { background: #06b6d4; width: 350px; height: 350px; bottom: -120px; right: -80px; }
-    .bg-grid:before{
-      content:""; position:fixed; inset:0; pointer-events:none; z-index:-1;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
-        linear-gradient(0deg,  rgba(255,255,255,.03) 1px, transparent 1px);
-      background-size:40px 40px; opacity:.2;
-      mask-image: radial-gradient(1200px 600px at 50% 0%, #000 70%, transparent 100%);
-    }
-    .card{ border:1px solid rgba(255,255,255,.08); backdrop-filter: blur(10px); }
-    .btn{
-      display:inline-flex; align-items:center; gap:.5rem; padding:.8rem 1.2rem; border-radius:.85rem;
-      background:linear-gradient(90deg, var(--indigo), #3b82f6); color:#fff; font-weight:700;
-      box-shadow:0 14px 34px rgba(59,130,246,.35); transition: transform .18s ease, box-shadow .18s ease;
-    }
-    .btn:hover{ transform: translateY(-1px) scale(1.01); box-shadow:0 18px 40px rgba(59,130,246,.42); }
-    #loader{ width:44px;height:44px;border-radius:50%;border:4px solid rgba(226,232,240,.25);border-top-color:var(--indigo);animation:spin 1s linear infinite;}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    /* TRANSISI HALAMAN */
-    .page { opacity:0; transform: translateY(8px); transition: opacity .45s ease, transform .45s ease; }
-    .page.active { opacity:1; transform: translateY(0); }
-    .page.exit { opacity:0; transform: translateY(-8px); }
-  </style>
+  <title>Generator • Affiliate Link Script Maker</title>
+  <link rel="stylesheet" href="./assets/style.css" />
 </head>
-<body>
-  <!-- background -->
-  <div class="glow-blob blue"></div>
-  <div class="glow-blob cyan"></div>
-  <div class="bg-grid"></div>
-
-  <!-- Header + badge -->
-  <header class="container mx-auto px-6 py-6 flex items-center justify-between">
-    <a id="backBtn" href="#" class="text-sm text-sky-300 hover:text-sky-200 underline underline-offset-4">← Kembali</a>
-    <div class="text-xs px-2 py-1 rounded-md bg-white/10 backdrop-blur border border-white/10">
-      <span class="md:hidden">Mode: Mobile</span>
-      <span class="hidden md:inline">Mode: Desktop</span>
-    </div>
+<body class="bg">
+  <header class="nav">
+    <a class="brand link" href="./">← Kembali</a>
+    <div class="spacer"></div>
+    <button id="refreshQuota" class="btn ghost">Refresh Kuota</button>
   </header>
 
-  <!-- Page wrapper untuk transisi -->
-  <main id="page" class="page container mx-auto px-6 pb-20 max-w-4xl">
-    <section class="card bg-white/5 rounded-2xl p-6 md:p-8">
-      <h1 class="text-2xl md:text-3xl font-extrabold mb-2">Buat Skrip Afiliasi</h1>
-      <p class="text-gray-300 mb-6">Tempel link produk, isi deskripsi singkat (opsional), pilih gaya & panjang, lalu klik Generate.</p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="md:col-span-2">
-          <label for="productUrl" class="block text-sm text-gray-300 mb-1">Link Produk (Wajib)</label>
-          <input id="productUrl" type="url" placeholder="https://contoh.toko/produk-x"
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500">
+  <!-- Kartu Kuota -->
+  <section class="container quota-wrap">
+    <div class="card quota">
+      <div class="quota-row">
+        <div class="quota-card">
+          <div class="quota-title">Kuota Global (per hari)</div>
+          <div id="qGlobal" class="quota-value">—</div>
         </div>
-
-        <div class="md:col-span-2">
-          <label for="customDesc" class="block text-sm text-gray-300 mb-1">Deskripsi Singkat Produk (Opsional)</label>
-          <input id="customDesc" type="text" placeholder="Contoh: Kaos adem, potongan rapi, cocok harian."
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500">
-        </div>
-
-        <div>
-          <label for="languageStyle" class="block text-sm text-gray-300 mb-1">Gaya Bahasa</label>
-          <select id="languageStyle" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
-            <option value="Gen Z">Gen Z</option>
-            <option value="Persuasif & Menjual">Persuasif & Menjual</option>
-            <option value="Santai & Kasual">Santai & Kasual</option>
-            <option value="Informatif & Edukatif">Informatif & Edukatif</option>
-          </select>
-        </div>
-
-        <div>
-          <label for="contentLength" class="block text-sm text-gray-300 mb-1">Panjang Tulisan</label>
-          <select id="contentLength" class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
-            <option value="Pendek">Pendek (~50 kata)</option>
-            <option value="Sedang">Sedang (~150 kata)</option>
-            <option value="Panjang">Panjang (300+ kata)</option>
-          </select>
-        </div>
-
-        <div class="md:col-span-2">
-          <label for="generateCount" class="block text-sm text-gray-300 mb-1">Jumlah Variasi</label>
-          <input id="generateCount" type="number" min="1" max="5" value="2"
-                 class="w-full p-2 rounded-md bg-slate-700 border border-slate-600 focus:ring-2 focus:ring-indigo-500">
+        <div class="quota-card">
+          <div class="quota-title">Per Pengguna (estimasi/hari)</div>
+          <div id="qUser" class="quota-value">—</div>
         </div>
       </div>
-
-      <div class="mt-7 text-center">
-        <button id="generateBtn" class="btn text-base md:text-lg">
-          Generate Script!
-        </button>
+      <div class="bar-wrap">
+        <div class="bar" id="qBar"></div>
       </div>
-    </section>
-
-    <!-- Output -->
-    <section id="outputSection" class="space-y-6 mt-8"></section>
-
-    <!-- Loader & Error -->
-    <div id="loaderContainer" class="hidden justify-center items-center flex-col text-center mt-6">
-      <div id="loader"></div>
-      <p class="mt-3 text-gray-400">AI sedang menulis…</p>
+      <div class="bar-note">Bar menggambarkan proporsi kuota per pengguna terhadap kuota global.</div>
     </div>
-    <div id="error-message" class="hidden bg-red-900/25 border border-red-500/30 rounded-2xl p-4 text-center mt-6">
-      <p class="font-semibold text-red-300">Oops, terjadi kesalahan!</p>
-      <p id="error-text" class="text-red-300/90 text-sm mt-1"></p>
+  </section>
+
+  <!-- Form -->
+  <section class="container">
+    <div class="card">
+      <form id="genForm" class="form-grid">
+        <label class="field">
+          <span>Link Produk <b>(wajib)</b></span>
+          <input type="url" id="link" placeholder="Tempelkan link produk afiliasi…" required />
+        </label>
+
+        <label class="field">
+          <span>Poin Utama Produk <b>(wajib)</b></span>
+          <input type="text" id="mainPoint" placeholder="Contoh: polo shirt bahan adem / Tecno Spark 2" required />
+        </label>
+
+        <div class="field">
+          <div class="flex-between">
+            <span>Deskripsi Singkat <b>(minimal 2)</b></span>
+            <button type="button" class="btn xs ghost" id="btnAddDesc">+ Tambah deskripsi</button>
+          </div>
+          <div id="descList" class="desc-list">
+            <!-- input deskripsi dinamis -->
+          </div>
+        </div>
+
+        <div class="field two">
+          <label>
+            <span>Gaya Bahasa</span>
+            <select id="style">
+              <option>Gen Z</option>
+              <option>Friendly</option>
+              <option>Formal</option>
+              <option>Informatif</option>
+            </select>
+          </label>
+          <label>
+            <span>Panjang</span>
+            <select id="length">
+              <option>Pendek</option>
+              <option selected>Sedang</option>
+              <option>Panjang</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Jumlah Variasi</span>
+          <input type="number" id="variations" min="1" max="5" value="3" />
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn cta">Generate Script</button>
+          <span id="status" class="muted"></span>
+        </div>
+      </form>
     </div>
-  </main>
+  </section>
 
-  <script type="module">
-    const { jsPDF } = window.jspdf;
-    const pageEl          = document.getElementById('page');
-    const backBtn         = document.getElementById('backBtn');
-    const outputSection   = document.getElementById('outputSection');
-    const generateBtn     = document.getElementById('generateBtn');
-    const loaderContainer = document.getElementById('loaderContainer');
-    const errorBox        = document.getElementById('error-message');
-    const errorText       = document.getElementById('error-text');
+  <!-- Hasil -->
+  <section class="container" id="resultWrap" style="display:none">
+    <div id="results" class="results"></div>
+  </section>
 
-    // Entry fade-in
-    requestAnimationFrame(()=> pageEl.classList.add('active'));
-
-    // Back with exit transition
-    backBtn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      pageEl.classList.remove('active'); pageEl.classList.add('exit');
-      setTimeout(()=>{ window.location.href='index.html'; }, 420);
-    });
-
-    const showError = (m)=>{ errorText.textContent=m; errorBox.classList.remove('hidden'); }
-    const hideError = ()=> errorBox.classList.add('hidden');
-
-    generateBtn.addEventListener('click', async ()=>{
-      const linkProduk = document.getElementById('productUrl').value.trim();
-      const deskripsi  = document.getElementById('customDesc').value.trim();
-      const gaya       = document.getElementById('languageStyle').value;
-      const panjang    = document.getElementById('contentLength').value;
-      const jumlah     = document.getElementById('generateCount').value;
-
-      if(!linkProduk){ showError('Mohon isi Link Produk.'); return; }
-      hideError(); loaderContainer.classList.remove('hidden');
-
-      try{
-        const r = await fetch('/api/generate',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ linkProduk, deskripsi, gaya, panjang, jumlah })
-        });
-        const data = await r.json();
-        loaderContainer.classList.add('hidden');
-        outputSection.innerHTML = '';
-
-        if(!r.ok) throw new Error(data.error || 'Gagal memanggil API');
-
-        const results = Array.isArray(data.result) ? data.result : [data.result];
-        results.forEach((txt, i)=>{
-          const card = document.createElement('div');
-          card.className = 'card bg-white/5 rounded-2xl p-6';
-          card.innerHTML = `
-            <h3 class="text-lg font-semibold text-indigo-300 mb-2">Variasi ${i+1}</h3>
-            <div class="text-gray-200 whitespace-pre-wrap">${txt}</div>
-            <div class="mt-4 flex flex-wrap gap-2 justify-end">
-              <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-copy="${i}">Salin</button>
-              <button class="px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-600" data-pdf="${i}">Export PDF</button>
-            </div>`;
-          // animasi masuk tiap kartu
-          card.style.opacity=0; card.style.transform='translateY(6px)';
-          outputSection.appendChild(card);
-          requestAnimationFrame(()=>{
-            card.style.transition='all .35s ease';
-            card.style.opacity=1; card.style.transform='translateY(0)';
-          });
-        });
-      }catch(e){
-        loaderContainer.classList.add('hidden');
-        showError(e.message);
-      }
-    });
-
-    // salin & pdf
-    outputSection.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return;
-      const idxCopy = btn.getAttribute('data-copy');
-      const idxPdf  = btn.getAttribute('data-pdf');
-      if(idxCopy !== null){
-        const el = outputSection.querySelectorAll('.text-gray-200')[idxCopy];
-        navigator.clipboard.writeText(el.innerText);
-        btn.textContent='Tersalin!'; setTimeout(()=> btn.textContent='Salin',1100);
-      }
-      if(idxPdf !== null){
-        const el = outputSection.querySelectorAll('.text-gray-200')[idxPdf];
-        const doc = new jsPDF({ unit:'mm', format:'a4' });
-        const lines = doc.splitTextToSize(el.innerText, 180);
-        doc.text(lines, 15, 20);
-        doc.save(`skrip-${Number(idxPdf)+1}.pdf`);
-      }
-    });
-  </script>
+  <footer class="footer">© <span id="y"></span> – Afiliasi makin gampang.</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+  <script src="./assets/generator.js"></script>
 </body>
 </html>

@@ -1,39 +1,19 @@
-// /api/quota.js
-import { NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";
+// api/quota.js
+const { MAX_GLOBAL_PER_DAY, ESTIMATED_USERS } = require('../config/quota');
 
-// Buat koneksi ke database Upstash Redis
-const redis = new Redis({
-  url: process.env.AFFILIATE_SCRIPT_KV_REST_API_URL,
-  token: process.env.AFFILIATE_SCRIPT_KV_REST_API_TOKEN,
-});
-
-export async function GET() {
+module.exports = async (req, res) => {
   try {
-    const MAX_GLOBAL_PER_DAY = parseInt(process.env.MAX_GLOBAL_PER_DAY || "1000");
-    const ESTIMATED_USERS = parseInt(process.env.ESTIMATED_USERS || "100");
+    const perUser = Math.floor(MAX_GLOBAL_PER_DAY / Math.max(1, ESTIMATED_USERS));
 
-    const currentDate = new Date().toISOString().split("T")[0];
-    const usageKey = `daily_usage_${currentDate}`;
-    let usage = await redis.get(usageKey);
-    if (!usage) usage = 0;
-
-    // Hitung sisa kuota per user
-    const remainingGlobal = MAX_GLOBAL_PER_DAY - usage;
-    const perUserQuota = Math.floor(remainingGlobal / ESTIMATED_USERS);
-
-    return NextResponse.json({
-      success: true,
-      date: currentDate,
-      usageToday: usage,
-      remainingGlobal,
-      estimatedUsers: ESTIMATED_USERS,
-      quotaPerUser: perUserQuota,
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({
+      ok: true,
+      globalQuota: MAX_GLOBAL_PER_DAY,
+      users: ESTIMATED_USERS,
+      perUser,
+      ts: Date.now()
     });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, message: "Error fetching quota", error: error.message },
-      { status: 500 }
-    );
+  } catch (e) {
+    res.status(500).json({ ok: false, error: 'QUOTA_READ_ERROR', detail: String(e) });
   }
-}
+};

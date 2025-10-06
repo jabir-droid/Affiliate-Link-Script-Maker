@@ -1,212 +1,26 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Affiliate Link Script Maker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    html,body{font-family:Inter,system-ui,-apple-system}
-    .glass{background:rgba(15,23,42,.6);backdrop-filter:blur(10px);border:1px solid rgba(148,163,184,.2)}
-  </style>
+  <link rel="stylesheet" href="./assets/style.css" />
 </head>
-<body class="min-h-screen bg-slate-900 text-slate-200">
+<body class="bg">
+  <header class="nav">
+    <div class="brand">Affiliate Link Script Maker</div>
+    <a class="btn ghost" href="https://github.com/jabir-droid/Affiliate-Link-Script-Maker" target="_blank" rel="noreferrer">GitHub</a>
+  </header>
 
-  <div class="relative">
-    <!-- background dekoratif -->
-    <div class="absolute inset-0 -z-10 opacity-30">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" class="w-full h-full">
-        <defs>
-          <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
-            <stop stop-color="#22d3ee" offset="0"/>
-            <stop stop-color="#6366f1" offset="1"/>
-          </linearGradient>
-        </defs>
-        <g fill="none" stroke="url(#g1)" stroke-width="1">
-          <path d="M0 300 Q200 250 400 300 T800 300" />
-          <path d="M0 340 Q200 290 400 340 T800 340" />
-          <path d="M0 380 Q200 330 400 380 T800 380" />
-        </g>
-      </svg>
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>Generator skrip affiliasi tercepat ⚡</h1>
+      <p>Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.</p>
+      <a class="btn cta pulse" href="./generator.html">Mulai Generate →</a>
     </div>
+  </section>
 
-    <header class="container mx-auto px-6 pt-10 pb-6">
-      <h1 class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-cyan-300 to-indigo-400 bg-clip-text text-transparent">
-        Affiliate Link Script Maker
-      </h1>
-      <p id="subtitle" class="mt-3 text-slate-300 max-w-3xl">
-        Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
-      </p>
-    </header>
-
-    <!-- Info Kuota -->
-    <section class="container mx-auto px-6">
-      <div id="quotaCard" class="glass rounded-xl p-4 flex flex-wrap gap-4 items-center">
-        <div>
-          <div class="text-sm text-slate-400">Sisa kuota global hari ini</div>
-          <div class="text-xl font-semibold"><span id="qRemain">—</span> dari <span id="qCap">—</span></div>
-        </div>
-        <div class="w-px h-10 bg-slate-700 hidden md:block"></div>
-        <div>
-          <div class="text-sm text-slate-400">Perkiraan batas per pengguna</div>
-          <div class="text-xl font-semibold"><span id="qPerCap">—</span> / hari</div>
-        </div>
-        <button id="btnRefreshQuota" class="ml-auto px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600">
-          Refresh
-        </button>
-      </div>
-    </section>
-
-    <!-- Form -->
-    <main class="container mx-auto px-6 py-8">
-      <form id="formGen" class="glass rounded-2xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Link produk -->
-        <div class="md:col-span-2">
-          <label class="block text-sm mb-1">Link Produk (wajib)</label>
-          <input required type="url" id="linkProduk" placeholder="https://tokopedia.com/.... atau link konten/produk lainnya"
-                 class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-
-        <!-- Kolom Wajib Baru -->
-        <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label class="block text-sm mb-1">Link ini bahas apa? (wajib)</label>
-            <input required type="text" id="namaLink"
-                   placeholder="Contoh: Polo Shirt pria viral di TikTok"
-                   class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Deskripsi singkat / kelebihan #1 (wajib)</label>
-            <input required type="text" id="desk1"
-                   placeholder="Contoh: Bahan adem & nyaman dipakai harian"
-                   class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Deskripsi singkat / kelebihan #2 (wajib)</label>
-            <input required type="text" id="desk2"
-                   placeholder="Contoh: Model simple kekinian, gampang dipadu-padankan"
-                   class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
-        </div>
-
-        <!-- Preferensi -->
-        <div>
-          <label class="block text-sm mb-1">Gaya Bahasa</label>
-          <select id="gaya" class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
-            <option>Gen Z</option>
-            <option>Santai & kasual</option>
-            <option>Persuasif & menjual</option>
-            <option>Informatif</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm mb-1">Panjang</label>
-          <select id="panjang" class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
-            <option>Sedang</option>
-            <option>Pendek</option>
-            <option>Panjang</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm mb-1">Jumlah variasi</label>
-          <input type="number" id="jumlah" min="1" max="5" value="2"
-                 class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2">
-        </div>
-
-        <div class="md:col-span-2 flex gap-3">
-          <button id="btnGen" type="submit"
-                  class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold">
-            Generate Script
-          </button>
-          <span id="status" class="self-center text-slate-400"></span>
-        </div>
-      </form>
-
-      <!-- Hasil -->
-      <section id="hasil" class="mt-8 grid grid-cols-1 gap-6"></section>
-    </main>
-  </div>
-
-  <script>
-    const el = s => document.querySelector(s);
-    const hasil = el('#hasil');
-    const statusEl = el('#status');
-
-    async function loadQuota() {
-      try {
-        const r = await fetch('/api/quota');
-        const j = await r.json();
-        if (!j.ok) throw new Error('gagal');
-        el('#qRemain').textContent = j.global_remaining;
-        el('#qCap').textContent = j.global_cap;
-        el('#qPerCap').textContent = j.per_user_cap;
-      } catch {
-        el('#qRemain').textContent = '—';
-        el('#qCap').textContent = '—';
-        el('#qPerCap').textContent = '—';
-      }
-    }
-
-    el('#btnRefreshQuota').addEventListener('click', loadQuota);
-    loadQuota();
-
-    function cardHTML(title, body) {
-      return `
-      <article class="glass rounded-2xl p-5">
-        <h3 class="text-lg font-semibold text-indigo-300 mb-2">${title}</h3>
-        <div class="whitespace-pre-wrap leading-relaxed">${body}</div>
-      </article>`;
-    }
-
-    el('#formGen').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hasil.innerHTML = '';
-      statusEl.textContent = 'Menghubungi AI…';
-
-      const linkProduk = el('#linkProduk').value.trim();
-      const namaLink = el('#namaLink').value.trim();
-      const deskripsiSingkat1 = el('#desk1').value.trim();
-      const deskripsiSingkat2 = el('#desk2').value.trim();
-
-      if (!linkProduk || !namaLink || !deskripsiSingkat1 || !deskripsiSingkat2) {
-        statusEl.textContent = 'Mohon lengkapi semua kolom wajib.';
-        return;
-      }
-
-      const body = {
-        linkProduk,
-        gaya: el('#gaya').value,
-        panjang: el('#panjang').value,
-        jumlah: Number(el('#jumlah').value) || 2,
-        namaLink,
-        deskripsiSingkat1,
-        deskripsiSingkat2
-      };
-
-      try {
-        const r = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
-        });
-        const j = await r.json();
-        if (!r.ok || !j.ok) {
-          statusEl.textContent = (j && j.msg) ? j.msg : 'Gagal generate.';
-          return;
-        }
-
-        // Model mengembalikan 1 blok teks berisi beberapa variasi.
-        // Tampilkan apa adanya.
-        hasil.innerHTML = cardHTML('Hasil', j.result);
-
-        statusEl.textContent = `Sukses. Sisa kuota kamu: ${j.quota.personal_remaining}, global: ${j.quota.global_remaining}`;
-        loadQuota();
-      } catch (err) {
-        statusEl.textContent = 'Terjadi kesalahan jaringan.';
-      }
-    });
-  </script>
+  <footer class="footer">© <span id="y"></span> – Dibangun untuk memudahkan promosi afiliasi.</footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
 </body>
 </html>
