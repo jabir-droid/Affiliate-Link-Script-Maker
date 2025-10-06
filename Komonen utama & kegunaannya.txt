@@ -1,0 +1,154 @@
+1️⃣ Gemini API (Google AI Studio / Google Generative Language API)
+🔹 Fungsi:
+
+Merupakan otak AI yang menulis skrip promosi otomatis.
+
+Model seperti gemini-2.5-flash atau gemini-2.5-pro digunakan untuk generate content (kalimat, paragraf, caption).
+
+Kamu mengirim permintaan berisi data (link produk, gaya bahasa, panjang tulisan, dll), dan Gemini mengembalikan hasil teksnya.
+
+🔹 Kegunaan di web kamu:
+
+Dipanggil di serverless function /api/generate.js.
+
+Web front-end (generator.html) mengirim data → fungsi /api/generate memanggil Gemini API → hasil dikembalikan ke browser dan ditampilkan di layar.
+
+🔹 Hubungan:
+
+Gemini = penyedia AI yang memproses teks.
+
+Butuh API key pribadi agar web kamu bisa “bicara” dengan server Gemini.
+
+☁️ 2️⃣ Vercel
+🔹 Fungsi:
+
+Tempat hosting (menjalankan dan men-deploy) seluruh website kamu.
+
+Menyediakan dua hal:
+
+Hosting static files — HTML, CSS, JS, gambar.
+
+Serverless Function — kode Node.js (/api/*.js) yang berjalan otomatis saat ada request (contohnya /api/generate).
+
+🔹 Kegunaan di web kamu:
+
+Menyimpan dan melayani index.html, generator.html, CSS, JS, gambar, dll.
+
+Menjalankan API /api/generate, /api/models, dan /api/selfcheck untuk komunikasi dengan Gemini.
+
+Mengatur domain gratis affiliate-link-script-maker.vercel.app.
+
+🔹 Hubungan:
+
+Vercel adalah rumah besar tempat GitHub code kamu “dijalankan”.
+
+Saat kamu push ke GitHub, Vercel otomatis mendownload versi terbaru, membangunnya, dan membuat link publik.
+
+🧩 3️⃣ GitHub
+🔹 Fungsi:
+
+Tempat menyimpan kode sumber (source code) website kamu.
+
+Menyimpan file:
+
+index.html (halaman depan)
+
+generator.html (halaman AI generator)
+
+/api/generate.js (fungsi AI)
+
+vercel.json (pengaturan deploy)
+
+Menggunakan sistem version control (Git) agar semua perubahan bisa dilacak.
+
+🔹 Kegunaan di web kamu:
+
+Kamu membuat repo bernama Affiliate-Link-Script-Maker.
+
+Setiap kali kamu git push, perubahan kode dikirim ke GitHub.
+
+Vercel terhubung otomatis ke repo itu, jadi tiap push = langsung redeploy.
+
+🔹 Hubungan:
+
+GitHub = tempat penyimpanan kode
+
+Vercel = tempat menjalankan kode
+
+Gemini = penyedia kecerdasan AI
+
+Urutannya kira-kira begini:
+Kamu ubah file di laptop → git push ke GitHub → Vercel auto-build → Vercel panggil Gemini untuk AI-nya.
+
+⚙️ 4️⃣ Browser (Front-End / Client Side)
+🔹 Fungsi:
+
+Tempat pengguna berinteraksi dengan web kamu.
+
+Semua UI (index.html, generator.html) dijalankan di browser pengguna.
+
+Saat klik “Generate”, browser:
+
+Mengambil data dari input form (link, deskripsi, gaya, panjang, dll).
+
+Mengirim request ke server Vercel (/api/generate).
+
+Menampilkan hasil skrip dari Gemini di layar.
+
+🔹 Hubungan:
+
+Front-end = antarmuka pengguna.
+
+Back-end (Vercel API + Gemini) = mesin yang memproses logika.
+
+🔐 5️⃣ Environment Variables (.env atau di dashboard Vercel)
+🔹 Fungsi:
+
+Menyimpan kunci rahasia seperti GEMINI_API_KEY.
+
+Disimpan di dashboard Vercel agar tidak bocor ke publik GitHub.
+
+Saat serverless function berjalan, Vercel otomatis menanamkan kunci ini ke variabel lingkungan (process.env.GEMINI_API_KEY).
+
+🔹 Hubungan:
+
+Front-end tidak bisa langsung akses API key (karena alasan keamanan).
+
+Jadi semua permintaan harus lewat /api/generate di Vercel, yang punya akses ke GEMINI_API_KEY.
+
+
+
+🔹 Ringkasan Hubungan keseluruhan:
+
+[Browser User]
+   ↓ isi form + klik Generate
+   ↓
+(HTML/JS Front-End di Vercel)
+   ↓ kirim data
+   ↓
+[Vercel Serverless Function /api/generate]
+   ↓ fetch ke Gemini API pakai GEMINI_API_KEY
+   ↓
+[Google Gemini AI]
+   ↓ hasil teks
+   ↓
+[Vercel] kirim balik ke Front-End
+   ↓
+[Browser User melihat hasil]
+
+
+
+✨ Kesimpulan Akhir
+
+Gemini API → Otak AI penulis skrip.
+
+Vercel → Menjalankan web & API.
+
+GitHub → Menyimpan dan mengelola kode.
+
+Browser → Tempat user berinteraksi.
+
+Environment Variable → Menjaga keamanan kunci API.
+
+Semua komponen itu saling terhubung dan membentuk alur otomatis penuh:
+💻 kamu ubah → push ke GitHub → ⚙️ Vercel deploy → 🤖 Gemini hasilkan teks → 🌐 user pakai web tanpa login.
