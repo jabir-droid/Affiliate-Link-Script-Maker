@@ -23,10 +23,16 @@
       border:1px solid rgba(148,163,184,.15);
     }
     .btn-primary{
-      @apply bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl px-5 py-3 transition;
+      background-color:#6366f1;
+      color:white;
+      font-weight:600;
+      border-radius:0.75rem;
+      padding:0.75rem 1.5rem;
+      transition:all .2s ease;
     }
-    .pill{
-      @apply inline-flex items-center gap-2 rounded-xl border border-slate-700/60 bg-slate-800/60 px-4 py-2 text-sm;
+    .btn-primary:hover{
+      background-color:#4f46e5;
+      transform:translateY(-1px);
     }
   </style>
 </head>
@@ -39,104 +45,101 @@
       </p>
     </header>
 
-    <!-- Quota panel -->
-    <section id="quotaPanel" class="glass rounded-2xl p-5 md:p-6 mb-8 hidden">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div class="space-y-1">
-          <p class="text-slate-400 text-sm">Sisa kuota Anda hari ini</p>
-          <div class="text-2xl font-bold">
-            <span id="quotaRemain">—</span> <span class="text-slate-400 text-base">/ hari</span>
-          </div>
+    <!-- Kuota -->
+    <section class="glass rounded-2xl p-4 md:p-6 mb-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center text-indigo-300 bg-indigo-500/10 px-4 py-1.5 rounded-full font-semibold text-sm">Sisa kuota hari ini</span>
+          <span id="quota-today" class="text-xl font-bold">—</span>
         </div>
-        <div class="flex flex-wrap gap-2">
-          <span class="pill">
-            Batas per orang: <span id="quotaCap" class="font-semibold text-slate-100"></span>/hari
-          </span>
-          <button id="refreshQuota" class="pill hover:bg-slate-700/60">
-            Refresh
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 4v6h6M20 20v-6h-6M5 19a9 9 0 0014-7 9 9 0 00-9-9c-2.5 0-4.77 1.02-6.4 2.66"/>
-            </svg>
-          </button>
-        </div>
+        <button id="btn-refresh" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition">
+          Refresh
+        </button>
       </div>
     </section>
 
     <!-- Form -->
     <section class="glass rounded-2xl p-6 md:p-8">
-      <form id="genForm" class="space-y-6">
+      <form id="genForm" class="grid grid-cols-1 gap-6">
         <div>
-          <label for="linkProduk" class="block text-sm font-medium text-slate-300 mb-2">Link Produk (wajib)</label>
-          <input id="linkProduk" type="url" required
-                 placeholder="Contoh: https://vt.tiktok.com/..., atau https://tokopedia.com/..., atau https://shopee.co.id/..."
-                 class="w-full rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-semibold mb-1">Link Produk (wajib)</label>
+          <input id="productUrl" type="url"
+            class="w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+            placeholder="Contoh: https://www.tiktok.com/..., https://tokopedia.com/..., atau https://shopee.co.id/..." required>
         </div>
 
         <div>
-          <label for="poinUtama" class="block text-sm font-medium text-slate-300 mb-2">Poin Utama Produk (wajib)</label>
-          <input id="poinUtama" type="text" required
-                 placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll"
-                 class="w-full rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-semibold mb-1">Poin utama produk (wajib)</label>
+          <input id="productTopic" type="text"
+            class="w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+            placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll" required>
         </div>
 
-        <div id="descGroup">
-          <div class="flex items-center justify-between mb-2">
-            <label class="text-sm font-medium text-slate-300">Deskripsi singkat (minimal 2)</label>
-            <div class="text-xs text-slate-400">Gunakan kalimat pendek & jelas</div>
+        <div id="descWrap">
+          <div class="flex items-center justify-between">
+            <label class="block text-sm font-semibold">Deskripsi singkat <span class="text-pink-400">*</span></label>
+            <div class="flex gap-2">
+              <button type="button" id="btnAddDesc"
+                      class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 text-sm font-semibold rounded-md">
+                + Tambah
+              </button>
+              <button type="button" id="btnRemoveDesc"
+                      class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 text-sm font-semibold rounded-md">
+                − Hapus
+              </button>
+            </div>
           </div>
 
-          <div id="descList" class="space-y-3">
-            <!-- dua kolom default -->
+          <div id="descList" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <input class="desc-input rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+                   placeholder="Deskripsi singkat 1 (mis. nyaman dipakai seharian)" required>
+            <input class="desc-input rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+                   placeholder="Deskripsi singkat 2 (mis. bahan awet & kuat)" required>
           </div>
-
-          <div class="flex gap-2 mt-2">
-            <button type="button" id="addDesc" class="btn-primary bg-slate-700 hover:bg-slate-600">+ Tambah deskripsi</button>
-            <button type="button" id="resetDesc" class="pill">Reset</button>
-          </div>
+          <p class="text-xs mt-2 text-slate-400">Minimal 2 deskripsi, bisa tambah lebih banyak.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Gaya Bahasa</label>
-            <select id="gaya" class="w-full rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold mb-1">Gaya bahasa</label>
+            <select id="style"
+              class="w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
               <option>Gen Z</option>
-              <option>Persuasif & Menjual</option>
-              <option>Informatif & Edukatif</option>
-              <option>Santai & Kasual</option>
-              <option>Ulasan Jujur</option>
+              <option>Persuasif</option>
+              <option>Santai</option>
+              <option>Informatif</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Panjang</label>
-            <select id="panjang" class="w-full rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold mb-1">Panjang</label>
+            <select id="length"
+              class="w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
+              <option>Sedang</option>
               <option>Pendek</option>
-              <option selected>Sedang</option>
               <option>Panjang</option>
             </select>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Jumlah variasi</label>
-            <input id="jumlah" type="number" min="1" max="5" value="3"
-                   class="w-full rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          </div>
         </div>
 
-        <div class="pt-4 text-center">
-          <button id="btnGen" class="btn-primary inline-flex items-center gap-2">
+        <div>
+          <label class="block text-sm font-semibold mb-1">Jumlah variasi</label>
+          <input id="count" type="number" min="1" max="5" value="3"
+            class="w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
+        </div>
+
+        <div class="pt-2 flex justify-center">
+          <button type="submit"
+            class="btn-primary inline-flex items-center gap-3 text-lg font-semibold">
             Generate Script
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/>
             </svg>
           </button>
-          <p id="formError" class="hidden mt-3 text-sm text-rose-400"></p>
         </div>
       </form>
     </section>
 
-    <!-- Results -->
-    <section id="resultWrap" class="mt-8 space-y-4"></section>
+    <section id="results" class="mt-8 space-y-6"></section>
 
     <footer class="text-center text-slate-400 mt-10">
       © 2025 – Dibangun untuk memudahkan promosi afiliasi
@@ -144,190 +147,95 @@
   </main>
 
   <script>
-    // ===== Helpers =====
-    const $ = (sel) => document.querySelector(sel);
-    const createDescItem = (value = "") => {
-      const row = document.createElement('div');
-      row.className = "flex gap-3 items-center";
-      row.innerHTML = `
-        <input type="text" value="${value.replaceAll('"','&quot;')}" placeholder="Tulis deskripsi singkat..."
-          class="flex-1 rounded-lg bg-slate-800/60 border border-slate-700/60 px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <button type="button" class="pill removeDesc hover:bg-rose-900/30 hover:border-rose-700/60">Hapus</button>
-      `;
-      return row;
-    };
-
-    const descList = $('#descList');
-    const ensureMinDesc = () => {
-      while (descList.children.length < 2) descList.appendChild(createDescItem());
-    };
-    const resetDesc = () => {
-      descList.innerHTML = '';
-      descList.appendChild(createDescItem());
-      descList.appendChild(createDescItem());
-    };
-
-    // init deskripsi list
-    resetDesc();
-
-    // Add/Remove
-    $('#addDesc').addEventListener('click', () => {
-      if (descList.children.length >= 6) return;
-      descList.appendChild(createDescItem());
-    });
-    $('#resetDesc').addEventListener('click', resetDesc);
-    descList.addEventListener('click', (e) => {
-      if (e.target.classList.contains('removeDesc')) {
-        if (descList.children.length <= 2) return; // minimal 2
-        e.target.parentElement.remove();
-      }
-    });
-
-    // ===== Quota fetch =====
-    async function fetchQuota() {
+    async function loadQuota() {
       try {
-        const res = await fetch('/api/quota');
-        if (!res.ok) throw new Error('quota error');
-        const data = await res.json();
-        // compatible keys:
-        const remain = data.remainingPerUser ?? data.remaining_per_user ?? data.remaining ?? null;
-        const cap = data.perUserCap ?? data.per_user_cap ?? data.cap ?? null;
-
-        if (remain != null) $('#quotaRemain').textContent = remain;
-        if (cap != null) $('#quotaCap').textContent = cap;
-
-        $('#quotaPanel').classList.remove('hidden');
+        const r = await fetch('/api/quota');
+        const j = await r.json();
+        document.getElementById('quota-today').textContent =
+          (j && (j.remaining ?? j.sisa ?? j.left)) ?? '—';
       } catch (e) {
-        // quietly ignore; keep panel hidden
+        document.getElementById('quota-today').textContent = '—';
       }
     }
-    fetchQuota();
-    $('#refreshQuota').addEventListener('click', fetchQuota);
+    document.getElementById('btn-refresh').addEventListener('click', loadQuota);
+    loadQuota();
 
-    // ===== Generate =====
-    const btn = $('#btnGen');
-    const formError = $('#formError');
-    const resultWrap = $('#resultWrap');
-
-    const setBusy = (busy) => {
-      btn.disabled = busy;
-      btn.classList.toggle('opacity-60', busy);
-    };
-
-    function validate() {
-      formError.classList.add('hidden');
-      const link = $('#linkProduk').value.trim();
-      const poin = $('#poinUtama').value.trim();
-      const deskripsi = [...descList.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
-
-      if (!link) return "Link produk wajib diisi.";
-      try { new URL(link) } catch { return "Link produk tidak valid."; }
-      if (!poin) return "Poin utama produk wajib diisi.";
-      if (deskripsi.length < 2) return "Minimal 2 deskripsi singkat.";
-      return null;
-    }
-
-    function renderScripts(scripts) {
-      resultWrap.innerHTML = '';
-      if (!scripts || scripts.length === 0) {
-        resultWrap.innerHTML = `<div class="glass rounded-2xl p-6 text-center">Tidak ada hasil. Coba lagi.</div>`;
-        return;
-      }
-      scripts.forEach((it, idx) => {
-        const card = document.createElement('div');
-        card.className = "glass rounded-2xl p-6";
-        const title = it.title || `Variasi #${idx+1}`;
-        const content = (it.content || it.text || '').toString();
-
-        card.innerHTML = `
-          <h3 class="text-xl font-bold text-indigo-300 mb-2">${title}</h3>
-          <div class="whitespace-pre-wrap leading-relaxed text-slate-200" id="c${idx}">${content}</div>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <button class="pill copyBtn" data-target="c${idx}">Salin</button>
-            <button class="pill saveBtn" data-target="c${idx}">Simpan .txt</button>
-          </div>
-        `;
-        resultWrap.appendChild(card);
-      });
-    }
-
-    resultWrap.addEventListener('click', (e) => {
-      const copyBtn = e.target.closest('.copyBtn');
-      const saveBtn = e.target.closest('.saveBtn');
-      if (copyBtn) {
-        const id = copyBtn.dataset.target;
-        const txt = document.getElementById(id)?.innerText || '';
-        navigator.clipboard.writeText(txt).then(()=> {
-          copyBtn.textContent = 'Tersalin!';
-          setTimeout(()=> copyBtn.textContent = 'Salin', 1500);
-        });
-      }
-      if (saveBtn) {
-        const id = saveBtn.dataset.target;
-        const txt = document.getElementById(id)?.innerText || '';
-        const blob = new Blob([txt], {type:'text/plain'});
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'skrip-afiliasi.txt';
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
+    const descList = document.getElementById('descList');
+    document.getElementById('btnAddDesc').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.className = 'desc-input rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3';
+      input.placeholder = 'Deskripsi singkat lainnya...';
+      input.required = true;
+      descList.appendChild(input);
+    });
+    document.getElementById('btnRemoveDesc').addEventListener('click', () => {
+      const inputs = descList.querySelectorAll('.desc-input');
+      if (inputs.length > 2) descList.lastElementChild.remove();
     });
 
-    $('#genForm').addEventListener('submit', async (e) => e.preventDefault());
-    btn.addEventListener('click', async () => {
-      const err = validate();
-      if (err) {
-        formError.textContent = err;
-        formError.classList.remove('hidden');
+    const genForm = document.getElementById('genForm');
+    const results = document.getElementById('results');
+
+    genForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      results.innerHTML = '';
+
+      const productUrl   = document.getElementById('productUrl').value.trim();
+      const productTopic = document.getElementById('productTopic').value.trim();
+      const style        = document.getElementById('style').value;
+      const length       = document.getElementById('length').value;
+      const count        = Math.max(1, Math.min(5, Number(document.getElementById('count').value || 3)));
+      const descriptions = Array.from(document.querySelectorAll('.desc-input')).map(i => i.value.trim()).filter(Boolean);
+
+      if (!productUrl || !productTopic || descriptions.length < 2) {
+        alert('Isi link produk, poin utama, dan minimal 2 deskripsi ya.');
         return;
       }
-      setBusy(true);
-      resultWrap.innerHTML = '';
-
-      const payload = {
-        linkProduk: $('#linkProduk').value.trim(),
-        gaya: $('#gaya').value,
-        panjang: $('#panjang').value,
-        poinUtama: $('#poinUtama').value.trim(),
-        deskripsi: [...descList.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean),
-        jumlah: Math.max(1, Math.min(5, parseInt($('#jumlah').value || '3', 10)))
-      };
 
       try {
-        const res = await fetch('/api/generate', {
+        const r = await fetch('/api/generate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ linkProduk: productUrl, topik: productTopic, deskripsi: descriptions, gaya: style, panjang: length, jumlah: count })
         });
-        if (!res.ok) throw new Error(`API ${res.status}`);
-        const data = await res.json();
-
-        // Robust parsing for different API shapes:
-        if (Array.isArray(data.scripts)) {
-          renderScripts(data.scripts);
-        } else if (data.result) {
-          renderScripts([{ title: 'Hasil', content: data.result }]);
-        } else if (typeof data === 'string') {
-          renderScripts([{ title: 'Hasil', content: data }]);
+        const j = await r.json();
+        if (r.ok && (j.result || j.scripts)) {
+          const items = j.scripts || [{title:'Hasil',content:j.result}];
+          items.forEach((s, idx) => {
+            const card = document.createElement('article');
+            card.className = 'glass rounded-2xl p-6';
+            card.innerHTML = `
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-xl font-bold text-indigo-300">Variasi ${idx+1}</h3>
+                <button class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold copy-btn">Salin</button>
+              </div>
+              <p class="mt-3 whitespace-pre-wrap leading-relaxed">${escapeHTML(s.content || '')}</p>
+            `;
+            results.appendChild(card);
+          });
+          results.querySelectorAll('.copy-btn').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              const p = btn.closest('article').querySelector('p');
+              navigator.clipboard.writeText(p.textContent);
+              btn.textContent = 'Tersalin!';
+              setTimeout(()=>btn.textContent='Salin',1500);
+            });
+          });
+          loadQuota();
         } else {
-          renderScripts([]);
+          throw new Error(j.error || 'Gagal membuat skrip.');
         }
-      } catch (e) {
-        formError.textContent = `Terjadi masalah: ${e.message}`;
-        formError.classList.remove('hidden');
-      } finally {
-        setBusy(false);
+      } catch (err) {
+        const card = document.createElement('div');
+        card.className = 'glass rounded-xl p-4 border border-rose-500/30 text-rose-300';
+        card.textContent = 'Terjadi masalah: ' + (err.message || err);
+        results.appendChild(card);
       }
     });
 
-    // allow enter to submit
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) btn.click();
-    });
-
-    // pastikan minimal 2 deskripsi saat load
-    ensureMinDesc();
+    function escapeHTML(str=''){
+      return str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
   </script>
 </body>
 </html>
