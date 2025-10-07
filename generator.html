@@ -11,7 +11,7 @@
       background:
         radial-gradient(1000px 400px at 0% -20%,rgba(99,102,241,.25),transparent 60%),
         radial-gradient(900px 450px at 110% 10%,rgba(56,189,248,.18),transparent 60%),
-        url('public/bg/ai-network-2.jpg') center/cover no-repeat;
+        url('https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
       filter:saturate(1.05) contrast(1.05) brightness(.9);
       z-index:-2;
     }
@@ -27,7 +27,7 @@
 
   <main class="relative z-10 max-w-5xl mx-auto px-6 pt-10 pb-24">
     <header class="mb-8">
-      <h2 class="title-grad text-3xl md:text-4xl font-extrabold text-center">Generator Skrip</h2>
+      <h2 class="title-grad text-3xl md:text-4xl font-extrabold text-center">Generator Skrip Afiliasi</h2>
       <p class="text-center text-slate-300/90 mt-3">
         Tempel link produk, isi data singkat di bawah ini, lalu klik “Generate Script”.
       </p>
@@ -48,20 +48,20 @@
         <div>
           <label class="block text-sm font-medium text-slate-300 mb-2">Link Produk <span class="text-rose-400">*</span></label>
           <input id="productUrl" type="url"
-                 placeholder="Contoh: tautan TikTok/Tokopedia/Shopee"
+                 placeholder="Contoh: tautan TikTok / Tokopedia / Shopee"
                  class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Poin Utama Produk <span class="text-rose-400">*</span></label>
+          <label class="block text-sm font-medium text-slate-300 mb-2">Nama / Jenis Produk <span class="text-rose-400">*</span></label>
           <input id="productTopic" type="text"
-                 placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll"
+                 placeholder="Contoh: Samsung A16, sandal kulit, kaos distro pria, dll"
                  class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
         <div>
           <div class="flex items-center justify-between mb-2">
-            <label class="block text-sm font-medium text-slate-300">Deskripsi singkat <span class="text-rose-400">*</span></label>
+            <label class="block text-sm font-medium text-slate-300">Poin Keunggulan <span class="text-rose-400">*</span></label>
             <div class="flex gap-2">
               <button id="btnAddDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-white btn-primary">+ Tambah</button>
               <button id="btnRemoveDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-slate-100/95 btn-soft">– Hapus</button>
@@ -69,9 +69,9 @@
           </div>
           <div id="descWrap" class="grid md:grid-cols-2 gap-4">
             <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
-                   placeholder="Deskripsi singkat 1 (mis. nyaman dipakai seharian)" />
+                   placeholder="Contoh: Harga ramah dikantong" />
             <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
-                   placeholder="Deskripsi singkat 2 (mis. bahan awet & kuat)" />
+                   placeholder="Contoh: Tahan banting" />
           </div>
         </div>
 
@@ -105,7 +105,7 @@
         <div class="mt-2">
           <button id="btnGenerate"
             class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold btn-primary">
-            Generate Script
+            Buat Skrip
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
             </svg>
@@ -117,20 +117,27 @@
 
     <section id="results" class="mt-8 grid gap-6"></section>
 
-    <!-- FOOTER khusus halaman 2 -->
+    <!-- Footer khusus halaman 2 -->
     <p class="text-center text-slate-400/80 text-sm mt-10">
-      © 2025 – Dibangun untuk memudahkan promosi afiliasi.
+      © 2025 – Dibuat Untuk Mempermudah Promosi Afiliasi.
     </p>
   </main>
 
   <script>
+    // ----- Kuota (UI saja; sambungkan ke /api/quota jika sudah ada) -----
     async function loadQuota() {
       const q = document.getElementById('quotaLabel');
-      try { q.textContent = '—'; } catch { q.textContent = '—'; }
+      try {
+        // contoh dummy: tampilkan '—'
+        // kalau ada endpoint nyata:
+        // const r = await fetch('/api/quota'); const j = await r.json(); q.textContent = j.remaining ?? '—';
+        q.textContent = '—';
+      } catch { q.textContent = '—'; }
     }
     document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
     loadQuota();
 
+    // ----- Deskripsi dinamis -----
     const wrap = document.getElementById('descWrap');
     document.getElementById('btnAddDesc').addEventListener('click', () => {
       const el = document.createElement('input');
@@ -143,6 +150,7 @@
       if (items.length > 2) items[items.length - 1].remove();
     });
 
+    // ----- Generate (tampilkan detail error Gemini di UI) -----
     document.getElementById('btnGenerate').addEventListener('click', async () => {
       const err = document.getElementById('err'); err.textContent = '';
       const url = document.getElementById('productUrl').value.trim();
@@ -156,31 +164,39 @@
       if (!topic) return err.textContent = 'Poin Utama Produk wajib diisi.';
       if (descriptions.length < 2) return err.textContent = 'Minimal 2 deskripsi singkat.';
 
-      document.getElementById('btnGenerate').disabled = true;
+      const btn = document.getElementById('btnGenerate');
+      btn.disabled = true;
 
       try {
         const r = await fetch('/api/generate', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
+            // skema baru
             linkProduk: url, topik: topic, deskripsi: descriptions, gaya: style, panjang: length, jumlah: count,
+            // back-compat (API lama)
             link: url, topic, descriptions, style, length, generateCount: count, count
           })
         });
 
-        // >>>> BACA TEXT DULU supaya kalau body kosong tidak meledak
         const raw = await r.text();
-        let j = null; try { j = raw ? JSON.parse(raw) : null; } catch { j = null; }
+        let j = null; try { j = raw ? JSON.parse(raw) : null; } catch {}
 
         if (!r.ok || !j || !j.ok) {
-          const detail = j?.message || j?.error || raw || 'Gagal generate';
-          throw new Error(detail);
+          const msg =
+            j?.message ||
+            j?.error ||
+            j?.detail?.error?.message ||
+            j?.detail?.message ||
+            raw || 'Gagal generate';
+          throw new Error(`Gemini error (${r.status}): ${msg}`);
         }
+
         renderResults(j.scripts || []);
-      } catch(e) {
+      } catch (e) {
         err.textContent = 'Terjadi masalah: ' + e.message;
       } finally {
-        document.getElementById('btnGenerate').disabled = false;
+        btn.disabled = false;
       }
     });
 
