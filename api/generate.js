@@ -1,114 +1,122 @@
-// api/generate.js
-const fetch = global.fetch;
+// /api/generate.js
+// API Vercel Node yang menerima kedua skema payload (lama & baru) agar tidak INVALID_INPUT.
+// Menggunakan Gemini v1 (Generative Language API) tanpa responseSchema/safety_settings.
 
-function toClean(text = '') {
-  return String(text || '').trim();
+const MODEL = process.env.GEMINI_MODEL || 'models/gemini-2.5-flash';
+const API_KEY = process.env.GEMINI_API_KEY; // wajib
+
+function send(res, code, payload) {
+  res.status(code).json(payload);
+}
+function bad(res, code, message) {
+  send(res, code, { ok: false, message });
 }
 
-module.exports = async (req, res) => {
+function arrayify(x) {
+  if (!x) return [];
+  if (Array.isArray(x)) return x;
+  return String(x)
+    .split(/[;,]\s*/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return bad(res, 405, 'Method Not Allowed');
   }
+  if (!API_KEY) return bad(res, 500, 'Server missing GEMINI_API_KEY');
+
+  let body = {};
+  try {
+    body = typeof req.body === 'object' ? req.body : JSON.parse(req.body || '{}');
+  } catch {
+    body = {};
+  }
+
+  // Terima nama baruu & lama
+  const linkProduk = (body.linkProduk || body.link || '').trim();
+  const topik      = (body.topik || body.topic || '').trim();
+  const gaya       = (body.gaya || body.style || 'Gen Z').trim();
+  const panjang    = (body.panjang || body.length || 'Sedang').trim();
+  const count      = Math.max(1, Math.min(5, Number(body.jumlah || body.generateCount || body.count || 3)));
+  const deskripsi  = arrayify(body.deskripsi || body.descriptions);
+
+  // Validasi dasar
+  if (!linkProduk) return bad(res, 400, 'INVALID_INPUT: linkProduk wajib diisi.');
+  if (!topik)      return bad(res, 400, 'INVALID_INPUT: topik/poin utama wajib diisi.');
+  if (deskripsi.length < 2) {
+    return bad(res, 400, 'INVALID_INPUT: minimal 2 deskripsi singkat.');
+  }
+
+  // Prompt
+  const system = [
+    'Anda adalah penulis konten afiliasi berbahasa Indonesia.',
+    'Tulis skrip promosi persuasif, natural, variatif (hindari bullet kaku).',
+    'Selalu sertakan link produk pengguna.',
+    `Gaya bahasa: ${gaya}`,
+    `Target panjang: ${panjang}`,
+    'Tambahkan CTA yang jelas, gunakan emoji 👉 sebelum link.'
+  ].join('\n');
+
+  const user = [
+    `Buat ${count} variasi skrip afiliasi untuk: ${topik}`,
+    `Link: ${linkProduk}`,
+    `Deskripsi singkat: ${deskripsi.join(' | ')}`,
+    '',
+    'Balas dalam JSON VALID persis format:',
+    `{"scripts":[{"title":"...","content":"..."}]}`,
+    'JANGAN ada teks lain di luar JSON.'
+  ].join('\n');
+
+  const url = `https://generativelanguage.googleapis.com/v1/${MODEL}:generateContent?key=${API_KEY}`;
+
+  const payload = {
+    contents: [{
+      role: 'user',
+      parts: [{ text: system + '\n\n' + user }]
+    }],
+    generationConfig: {
+      temperature: 0.9,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 1200
+    }
+  };
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GEMINI_API_KEY is missing (ENV)' });
-    }
-
-    const body = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', (c) => (data += c));
-      req.on('end', () => {
-        try { resolve(JSON.parse(data || '{}')); }
-        catch (e) { reject(e); }
-      });
-    });
-
-    const link = toClean(body.link);
-    const mainPoint = toClean(body.mainPoint);
-    const descriptions = Array.isArray(body.descriptions) ? body.descriptions.map(toClean).filter(Boolean) : [];
-    const style = toClean(body.style || 'Gen Z');
-    const length = toClean(body.length || 'Sedang');
-    const variations = Math.max(1, Math.min(5, Number(body.variations || 3)));
-
-    if (!link || !mainPoint || descriptions.length < 2) {
-      return res.status(400).json({
-        error: 'INVALID_INPUT',
-        detail: 'Link, Poin utama, dan minimal 2 deskripsi wajib diisi.'
-      });
-    }
-
-    const systemPrompt =
-      `Kamu adalah creator copywriting berbahasa Indonesia. 
-Buat ${variations} variasi skrip promosi afiliasi yang natural, tidak kaku, dan cocok untuk caption/media sosial.
-JANGAN gunakan bullet * ataupun markdown tebal. Hindari list "1. 2. 3." di hasil akhir.
-Tetap sertakan link yang diberikan (tulis apa adanya).
-Gaya: ${style}. Panjang: ${length}.
-Fokus pada poin utama dan deskripsi singkat yang diberikan pengguna.
-`;
-
-    const userPrompt =
-      `Poin Utama Produk: ${mainPoint}
-Deskripsi Singkat (referensi):
-- ${descriptions.join('\n- ')}
-Link Produk (WAJIB tampil di CTA akhir): ${link}
-
-Format JSON jawab seperti ini:
-{
-  "scripts": [
-    { "title": "Judul catchy", "content": "Isi copy yang natural, 3-6 kalimat, akhiri CTA dengan link 👉 ${link}" }
-  ]
-}`;
-
-    // v1 endpoint
-    const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
-
-    const payload = {
-  contents: [{ parts: [{ text: userPrompt }] }],
-  generationConfig: {
-    temperature: 0.9,
-    topK: 40,
-    topP: 0.9,
-    maxOutputTokens: 800
-  }
-};
-
-
-    const r = await fetch(url, {
+    const fr = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
 
-    if (!r.ok) {
-      const t = await r.text();
-      return res.status(r.status).json({ error: 'Gemini error', detail: t });
+    const data = await fr.json();
+
+    if (!fr.ok) {
+      return send(res, fr.status, { ok: false, error: 'Gemini error', detail: data });
     }
 
-    const json = await r.json();
-    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    let data;
+    // Ambil teks kandidat
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let parsed;
     try {
-      data = JSON.parse(text);
-    } catch (_) {
-      // Fallback: bikin 1 variasi manual jika JSON AI tidak valid
-      data = {
-        scripts: [{
-          title: `Promo • ${mainPoint}`,
-          content:
-            `Cari ${mainPoint} yang pas? Ini dia jawabannya. ${descriptions.join(' ')}. ` +
-            `Langsung cek detailnya ya. Klik link ini 👉 ${link}`
-        }]
-      };
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = { scripts: [{ title: 'Hasil', content: text || 'Tidak ada keluaran.' }] };
+    }
+    if (!parsed || !Array.isArray(parsed.scripts) || parsed.scripts.length === 0) {
+      parsed = { scripts: [{ title: 'Hasil', content: text || 'Tidak ada keluaran.' }] };
     }
 
-    return res.status(200).json({ ok: true, result: data, model, version: "v1-full" });
-  } catch (e) {
-    return res.status(500).json({ error: 'SERVER_ERROR', detail: String(e) });
+    return send(res, 200, {
+      ok: true,
+      model: MODEL,
+      scripts: parsed.scripts,
+      version: 'v1-accept-both'
+    });
+  } catch (err) {
+    return bad(res, 500, `Gagal mengambil hasil dari Gemini: ${String(err)}`);
   }
-};
+}
