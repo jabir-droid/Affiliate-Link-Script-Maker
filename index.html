@@ -1,63 +1,52 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Affiliate Link Script Maker</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root{--bg1:rgba(2,6,23,0.85);--ring:rgba(99,102,241,.35)}
-    body{font-family:Inter,system-ui,Arial}
-    .bg-tech{
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
       background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent 60%),
-        radial-gradient(1000px 500px at 90% 110%, rgba(99,102,241,.12), transparent 60%),
+        radial-gradient(1000px 600px at 10% -10%, rgba(56,189,248,.15), transparent 60%),
+        radial-gradient(1000px 600px at 90% 110%, rgba(99,102,241,.15), transparent 60%),
         linear-gradient(180deg, rgba(2,6,23,.95), rgba(2,6,23,.95)),
-        url("https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat,
         url("https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat;
-      background-blend-mode: screen, screen, normal, overlay, multiply;
+      background-blend-mode: screen, screen, normal, overlay;
     }
-    .glass{
-      background: linear-gradient(180deg, rgba(15,23,42,.6), rgba(15,23,42,.35));
+    .glass {
+      background: rgba(15,23,42,0.6);
       backdrop-filter: blur(8px);
-      border:1px solid rgba(148,163,184,.15);
+      border: 1px solid rgba(148,163,184,0.15);
     }
-    .cta{
-      box-shadow: 0 0 0 0 var(--ring);
-      transition: transform .18s ease, box-shadow .18s ease, background .2s ease;
-    }
-    .cta:hover{transform: translateY(-1px) scale(1.01)}
-    .cta:focus-visible{outline:none;box-shadow:0 0 0 8px var(--ring)}
   </style>
 </head>
-<body class="bg-tech min-h-screen text-slate-200">
-  <main class="relative min-h-[100svh] flex items-center justify-center px-6">
-    <div class="max-w-5xl w-full">
-      <!-- Hero -->
-      <section class="glass rounded-2xl p-8 md:p-14 shadow-xl">
-        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
-          Affiliate Link Script Maker
-        </h1>
-        <p class="mt-4 md:mt-6 text-lg md:text-2xl text-slate-300 leading-relaxed max-w-3xl">
-          Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
-        </p>
+<body class="text-slate-200 min-h-screen flex flex-col justify-center items-center px-6">
 
-        <div class="mt-10">
-          <a href="./generator.html"
-             class="cta inline-flex items-center gap-3 rounded-xl bg-indigo-600/90 px-7 py-4 text-lg font-semibold text-white hover:bg-indigo-600 active:bg-indigo-700">
-            Mulai Generate
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-            </svg>
-          </a>
-        </div>
-      </section>
+  <div class="glass rounded-2xl p-10 md:p-16 text-center shadow-xl max-w-3xl w-full">
+    <h1 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-sky-300 via-cyan-200 to-indigo-300 text-transparent bg-clip-text">
+      Affiliate Link Script Maker
+    </h1>
+    <p class="mt-5 text-lg md:text-xl text-slate-300 leading-relaxed">
+      Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
+    </p>
 
-      <footer class="text-center text-slate-400 mt-10">
-        © 2025 – Dibangun untuk memudahkan promosi afiliasi
-      </footer>
+    <div class="mt-10 flex justify-center">
+      <a href="./generator.html"
+         class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-indigo-900/30 transition">
+        Mulai Generate
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+        </svg>
+      </a>
     </div>
-  </main>
+  </div>
+
+  <footer class="mt-10 text-center text-slate-400 text-sm">
+    © 2025 – Dilarang menyebar website ini tanpa izin pemilik.
+  </footer>
+
 </body>
 </html>
