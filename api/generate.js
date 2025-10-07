@@ -68,20 +68,15 @@ Format JSON jawab seperti ini:
     const url = `https://generativelanguage.googleapis.com/v1/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
 
     const payload = {
-      contents: [{ parts: [{ text: userPrompt }] }],
-      safetySettings: [
-        { category: "HARM_CATEGORY_SEXUAL_AND_PORNOGRAPHY", threshold: "BLOCK_NONE" },
-        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-      ],
-      generationConfig: {
-        temperature: 0.9,
-        topK: 40,
-        topP: 0.9,
-        maxOutputTokens: 800
-      }
-    };
+  contents: [{ parts: [{ text: userPrompt }] }],
+  generationConfig: {
+    temperature: 0.9,
+    topK: 40,
+    topP: 0.9,
+    maxOutputTokens: 800
+  }
+};
+
 
     const r = await fetch(url, {
       method: 'POST',
