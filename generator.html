@@ -3,100 +3,263 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Generator • Affiliate Link Script Maker</title>
-  <link rel="stylesheet" href="./assets/style.css" />
+  <title>Generate Skrip • Affiliate Link Script Maker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:Inter,system-ui,Arial}
+    .bg-tech{
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent 60%),
+        radial-gradient(1000px 500px at 90% 110%, rgba(99,102,241,.12), transparent 60%),
+        linear-gradient(180deg, rgba(2,6,23,.95), rgba(2,6,23,.95)),
+        url("https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat,
+        url("https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat;
+      background-blend-mode: screen, screen, normal, overlay, multiply;
+    }
+    .glass{
+      background: linear-gradient(180deg, rgba(15,23,42,.6), rgba(15,23,42,.35));
+      backdrop-filter: blur(8px);
+      border:1px solid rgba(148,163,184,.15);
+    }
+    .tag{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2)}
+    .btn{transition:transform .18s ease, box-shadow .18s ease, background .2s ease}
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .ring-soft{box-shadow:0 0 0 0 rgba(99,102,241,.35)}
+    .ring-soft:focus-visible{outline:none;box-shadow:0 0 0 8px rgba(99,102,241,.35)}
+  </style>
 </head>
-<body class="bg">
-  <header class="nav">
-    <a class="brand link" href="./">← Kembali</a>
-    <div class="spacer"></div>
-    <button id="refreshQuota" class="btn ghost">Refresh Kuota</button>
-  </header>
+<body class="bg-tech min-h-screen text-slate-200">
+  <main class="relative min-h-[100svh] flex items-center justify-center px-6 py-10">
+    <div class="max-w-5xl w-full">
+      <!-- Title -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight">Generate Skrip Afiliasi</h1>
+        <p class="mt-3 text-lg md:text-xl text-slate-300">
+          Tempel link produk, isi poin utama & deskripsi singkat, lalu klik generate.
+        </p>
+      </div>
 
-  <!-- Kartu Kuota -->
-  <section class="container quota-wrap">
-    <div class="card quota">
-      <div class="quota-row">
-        <div class="quota-card">
-          <div class="quota-title">Kuota Global (per hari)</div>
-          <div id="qGlobal" class="quota-value">—</div>
-        </div>
-        <div class="quota-card">
-          <div class="quota-title">Per Pengguna (estimasi/hari)</div>
-          <div id="qUser" class="quota-value">—</div>
+      <!-- Kuota -->
+      <div class="glass rounded-2xl p-4 md:p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex tag text-indigo-300 px-3 py-1 rounded-full text-sm font-semibold">Sisa kuota hari ini</span>
+            <span id="quota-today" class="text-xl font-bold">—</span>
+          </div>
+          <button id="btn-refresh" class="btn ring-soft rounded-lg bg-slate-700/60 hover:bg-slate-700 px-4 py-2 text-sm font-semibold">
+            Refresh
+          </button>
         </div>
       </div>
-      <div class="bar-wrap">
-        <div class="bar" id="qBar"></div>
-      </div>
-      <div class="bar-note">Bar menggambarkan proporsi kuota per pengguna terhadap kuota global.</div>
-    </div>
-  </section>
 
-  <!-- Form -->
-  <section class="container">
-    <div class="card">
-      <form id="genForm" class="form-grid">
-        <label class="field">
-          <span>Link Produk <b>(wajib)</b></span>
-          <input type="url" id="link" placeholder="Tempelkan link produk afiliasi…" required />
-        </label>
-
-        <label class="field">
-          <span>Poin Utama Produk <b>(wajib)</b></span>
-          <input type="text" id="mainPoint" placeholder="Contoh: polo shirt bahan adem / Tecno Spark 2" required />
-        </label>
-
-        <div class="field">
-          <div class="flex-between">
-            <span>Deskripsi Singkat <b>(minimal 2)</b></span>
-            <button type="button" class="btn xs ghost" id="btnAddDesc">+ Tambah deskripsi</button>
+      <!-- Form -->
+      <section class="glass rounded-2xl p-6 md:p-8">
+        <form id="genForm" class="grid grid-cols-1 gap-6">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Link Produk <span class="text-pink-400">*</span></label>
+            <input id="productUrl" type="url"
+              class="ring-soft w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+              placeholder="Contoh: https://www.tiktok.com/... atau https://www.tokopedia.com/... atau https://shopee.co.id/..." required>
           </div>
-          <div id="descList" class="desc-list">
-            <!-- input deskripsi dinamis -->
+
+          <div>
+            <label class="block text-sm font-semibold mb-1">Poin utama produk <span class="text-pink-400">*</span></label>
+            <input id="productTopic" type="text"
+              class="ring-soft w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+              placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll" required>
           </div>
-        </div>
 
-        <div class="field two">
-          <label>
-            <span>Gaya Bahasa</span>
-            <select id="style">
-              <option>Gen Z</option>
-              <option>Friendly</option>
-              <option>Formal</option>
-              <option>Informatif</option>
-            </select>
-          </label>
-          <label>
-            <span>Panjang</span>
-            <select id="length">
-              <option>Pendek</option>
-              <option selected>Sedang</option>
-              <option>Panjang</option>
-            </select>
-          </label>
-        </div>
+          <div id="descWrap">
+            <div class="flex items-center justify-between">
+              <label class="block text-sm font-semibold">Deskripsi singkat <span class="text-pink-400">*</span></label>
+              <div class="flex gap-2">
+                <button type="button" id="btnAddDesc"
+                        class="btn ring-soft rounded-md bg-indigo-600/90 hover:bg-indigo-600 px-3 py-2 text-sm font-semibold">
+                  + Tambah
+                </button>
+                <button type="button" id="btnRemoveDesc"
+                        class="btn ring-soft rounded-md bg-slate-700/70 hover:bg-slate-700 px-3 py-2 text-sm font-semibold">
+                  − Hapus
+                </button>
+              </div>
+            </div>
 
-        <label class="field">
-          <span>Jumlah Variasi</span>
-          <input type="number" id="variations" min="1" max="5" value="3" />
-        </label>
+            <!-- minimal 2 kolom -->
+            <div id="descList" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input class="desc-input ring-soft rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+                     placeholder="Deskripsi singkat 1 (mis. nyaman dipakai seharian)" required>
+              <input class="desc-input ring-soft rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3"
+                     placeholder="Deskripsi singkat 2 (mis. bahan awet & kuat)" required>
+            </div>
+            <p class="text-xs mt-2 text-slate-400">Minimal 2 deskripsi. Kamu bisa menambah lebih banyak jika perlu.</p>
+          </div>
 
-        <div class="actions">
-          <button type="submit" class="btn cta">Generate Script</button>
-          <span id="status" class="muted"></span>
-        </div>
-      </form>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Gaya bahasa</label>
+              <select id="style"
+                class="ring-soft w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
+                <option>Gen Z</option>
+                <option>Persuasif</option>
+                <option>Santai</option>
+                <option>Informatif</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Panjang</label>
+              <select id="length"
+                class="ring-soft w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
+                <option>Sedang</option>
+                <option>Pendek</option>
+                <option>Panjang</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold mb-1">Jumlah variasi</label>
+            <input id="count" type="number" min="1" max="5" value="3"
+              class="ring-soft w-full rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3">
+          </div>
+
+          <div class="pt-2">
+            <button type="submit"
+              class="btn ring-soft inline-flex items-center gap-3 rounded-xl bg-indigo-600/90 hover:bg-indigo-600 px-6 py-3 text-lg font-semibold">
+              Generate Script
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Hasil -->
+      <section id="results" class="mt-8 space-y-6"></section>
+
+      <footer class="text-center text-slate-400 mt-10">
+        © 2025 – Dibangun untuk memudahkan promosi afiliasi
+      </footer>
     </div>
-  </section>
+  </main>
 
-  <!-- Hasil -->
-  <section class="container" id="resultWrap" style="display:none">
-    <div id="results" class="results"></div>
-  </section>
+  <script>
+    // ===== helper kuota =====
+    async function loadQuota() {
+      try {
+        const r = await fetch('/api/quota');
+        const j = await r.json();
+        // API kamu mengembalikan "remaining" → hanya tampilkan sisa kuota
+        document.getElementById('quota-today').textContent =
+          (j && (j.remaining ?? j.sisa ?? j.left)) ?? '—';
+      } catch (e) {
+        document.getElementById('quota-today').textContent = '—';
+      }
+    }
+    document.getElementById('btn-refresh').addEventListener('click', loadQuota);
+    loadQuota();
 
-  <footer class="footer">© <span id="y"></span> – Afiliasi makin gampang.</footer>
-  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
-  <script src="./assets/generator.js"></script>
+    // ===== tambah/hapus input deskripsi (min 2) =====
+    const descList = document.getElementById('descList');
+    document.getElementById('btnAddDesc').addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.className = 'desc-input ring-soft rounded-lg bg-slate-800/70 border border-slate-700 px-4 py-3';
+      input.placeholder = 'Deskripsi singkat lainnya…';
+      input.required = true;
+      descList.appendChild(input);
+    });
+    document.getElementById('btnRemoveDesc').addEventListener('click', () => {
+      const inputs = descList.querySelectorAll('.desc-input');
+      if (inputs.length > 2) descList.lastElementChild.remove();
+    });
+
+    // ===== kirim ke /api/generate =====
+    const genForm = document.getElementById('genForm');
+    const results = document.getElementById('results');
+
+    genForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      results.innerHTML = '';
+
+      const productUrl   = document.getElementById('productUrl').value.trim();
+      const productTopic = document.getElementById('productTopic').value.trim();
+      const style        = document.getElementById('style').value;
+      const length       = document.getElementById('length').value;
+      const count        = Math.max(1, Math.min(5, Number(document.getElementById('count').value || 3)));
+
+      const descriptions = Array.from(document.querySelectorAll('.desc-input'))
+        .map(i => i.value.trim())
+        .filter(Boolean);
+
+      if (!productUrl || !productTopic || descriptions.length < 2) {
+        alert('Isi link produk, poin utama, dan minimal 2 deskripsi ya.');
+        return;
+      }
+
+      try {
+        const r = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            linkProduk: productUrl,
+            topik: productTopic,
+            deskripsi: descriptions,
+            gaya: style,
+            panjang: length,
+            jumlah: count
+          })
+        });
+
+        const j = await r.json();
+
+        if (r.ok && j && (j.result || j.scripts)) {
+          const items = j.scripts || [{title:'Hasil',content:j.result}];
+
+          items.forEach((s, idx) => {
+            const card = document.createElement('article');
+            card.className = 'glass rounded-2xl p-6';
+            card.innerHTML = `
+              <div class="flex items-center justify-between gap-3">
+                <h3 class="text-xl font-bold text-indigo-300">Variasi ${idx+1}</h3>
+                <button class="btn ring-soft bg-slate-700/70 hover:bg-slate-700 px-3 py-1.5 rounded-md text-sm font-semibold copy-btn">Salin</button>
+              </div>
+              <h4 class="mt-2 text-lg font-semibold">${escapeHTML(s.title || '')}</h4>
+              <p class="mt-3 whitespace-pre-wrap leading-relaxed">${escapeHTML(s.content || '')}</p>
+            `;
+            results.appendChild(card);
+          });
+
+          // tombol salin
+          results.querySelectorAll('.copy-btn').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+              const p = btn.closest('article').querySelector('p');
+              navigator.clipboard.writeText(p.textContent || '');
+              btn.textContent = 'Tersalin!';
+              setTimeout(()=>btn.textContent='Salin', 1400);
+            });
+          });
+
+          // refresh sisa kuota sesudah generate
+          loadQuota();
+
+        } else {
+          throw new Error(j?.error || 'Gagal membuat skrip.');
+        }
+
+      } catch (err) {
+        const card = document.createElement('div');
+        card.className = 'glass rounded-xl p-4 border border-rose-500/30 text-rose-300';
+        card.textContent = 'Terjadi masalah: ' + (err.message || err);
+        results.appendChild(card);
+      }
+    });
+
+    // util escape
+    function escapeHTML(str=''){
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+  </script>
 </body>
 </html>

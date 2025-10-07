@@ -1,253 +1,63 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Affiliate Link Script Maker</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root{--bg1:url('https://images.unsplash.com/photo-1551281044-8d8d0d8f8d8d?q=80&w=1200&auto=format&fit=crop');}
-    /* gunakan gambar network yang kamu kirim (link langsung ke file-mu jika host sendiri) */
-    .hero-bg{
-      /* layer 1: pola/gradien gelap */
-      background-image:
-        radial-gradient(ellipse at top left, rgba(0, 110, 255, .25), rgba(0,0,0,0) 45%),
-        radial-gradient(ellipse at bottom right, rgba(0, 255, 220, .18), rgba(0,0,0,0) 50%),
-        url('https://raw.githubusercontent.com/jabir-droid/Affiliate-Link-Script-Maker/main/public/bg/ai-network-2.jpg'),
-        url('https://raw.githubusercontent.com/jabir-droid/Affiliate-Link-Script-Maker/main/public/bg/ai-network-1.jpg');
-      background-size: 1200px 1200px, 1200px 1200px, cover, cover;
-      background-position: -20% -20%, 120% 120%, center, center;
-      background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    :root{--bg1:rgba(2,6,23,0.85);--ring:rgba(99,102,241,.35)}
+    body{font-family:Inter,system-ui,Arial}
+    .bg-tech{
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent 60%),
+        radial-gradient(1000px 500px at 90% 110%, rgba(99,102,241,.12), transparent 60%),
+        linear-gradient(180deg, rgba(2,6,23,.95), rgba(2,6,23,.95)),
+        url("https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat,
+        url("https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1400&auto=format&fit=crop") center/cover no-repeat;
+      background-blend-mode: screen, screen, normal, overlay, multiply;
     }
-    body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial}
-    .glass{backdrop-filter: blur(12px);}
+    .glass{
+      background: linear-gradient(180deg, rgba(15,23,42,.6), rgba(15,23,42,.35));
+      backdrop-filter: blur(8px);
+      border:1px solid rgba(148,163,184,.15);
+    }
+    .cta{
+      box-shadow: 0 0 0 0 var(--ring);
+      transition: transform .18s ease, box-shadow .18s ease, background .2s ease;
+    }
+    .cta:hover{transform: translateY(-1px) scale(1.01)}
+    .cta:focus-visible{outline:none;box-shadow:0 0 0 8px var(--ring)}
   </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-200 hero-bg">
-
-  <!-- container -->
-  <div class="min-h-screen flex flex-col">
-
-    <!-- HERO -->
-    <header class="px-5 md:px-8 pt-12 md:pt-16">
-      <div class="max-w-5xl mx-auto text-center">
-        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight bg-gradient-to-r from-sky-300 via-cyan-200 to-indigo-300 text-transparent bg-clip-text">
+<body class="bg-tech min-h-screen text-slate-200">
+  <main class="relative min-h-[100svh] flex items-center justify-center px-6">
+    <div class="max-w-5xl w-full">
+      <!-- Hero -->
+      <section class="glass rounded-2xl p-8 md:p-14 shadow-xl">
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
           Affiliate Link Script Maker
         </h1>
-        <p class="mt-4 md:mt-5 text-base md:text-lg text-slate-300">
+        <p class="mt-4 md:mt-6 text-lg md:text-2xl text-slate-300 leading-relaxed max-w-3xl">
           Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
         </p>
-      </div>
-    </header>
 
-    <!-- MAIN -->
-    <main class="flex-1 px-5 md:px-8 py-10 md:py-14">
-      <div class="max-w-5xl mx-auto">
-        <!-- QUOTA TILE (only per-user) -->
-        <div class="grid grid-cols-1 gap-4 mb-6">
-          <div class="glass bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center justify-between">
-            <div>
-              <div class="text-sm uppercase tracking-wider text-slate-400">Sisa kuota per hari</div>
-              <div id="quotaPerUser" class="text-2xl md:text-3xl font-bold mt-1">— / hari</div>
-            </div>
-            <button id="btnRefreshQuota"
-              class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 transition text-white font-semibold">
-              Refresh
-            </button>
-          </div>
+        <div class="mt-10">
+          <a href="./generator.html"
+             class="cta inline-flex items-center gap-3 rounded-xl bg-indigo-600/90 px-7 py-4 text-lg font-semibold text-white hover:bg-indigo-600 active:bg-indigo-700">
+            Mulai Generate
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+            </svg>
+          </a>
         </div>
+      </section>
 
-        <!-- FORM CARD CENTER -->
-        <section class="glass bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 max-w-3xl mx-auto">
-          <h2 class="text-2xl md:text-3xl font-bold text-sky-200 mb-1 text-center">Mulai Generate</h2>
-          <p class="text-slate-300 text-center mb-8">Isi data singkat di bawah ini, lalu klik “Generate Script”.</p>
-
-          <div class="space-y-5">
-            <!-- Link -->
-            <div>
-              <label for="productUrl" class="block text-sm font-semibold mb-1 text-slate-300">Link Produk (wajib)</label>
-              <input id="productUrl" type="url" placeholder="Contoh: https://contoh.toko/produk-anda"
-                     class="w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-            </div>
-
-            <!-- Poin utama produk -->
-            <div>
-              <label for="mainPoint" class="block text-sm font-semibold mb-1 text-slate-300">Poin utama produk</label>
-              <input id="mainPoint" type="text" placeholder="Contoh: kamera 108MP, baterai 6000mAh, desain ramping"
-                     class="w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500" />
-            </div>
-
-            <!-- Deskripsi singkat (min 2) -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-semibold text-slate-300">Deskripsi singkat (minimal 2)</label>
-                <div class="flex gap-2">
-                  <button id="addDesc" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 text-sm">+ Tambah</button>
-                </div>
-              </div>
-              <div id="descList" class="space-y-3">
-                <div class="flex gap-2">
-                  <input type="text" class="flex-1 px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500 desc" placeholder="Contoh: performa kencang untuk harian" />
-                  <button class="rmDesc px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200">Hapus</button>
-                </div>
-                <div class="flex gap-2">
-                  <input type="text" class="flex-1 px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500 desc" placeholder="Contoh: layar jernih, nyaman dipakai lama" />
-                  <button class="rmDesc px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200">Hapus</button>
-                </div>
-              </div>
-              <p class="text-xs text-slate-400 mt-2">Tips contoh lain: “harga ramah”, “build solid”, “baterai awet”, dll.</p>
-            </div>
-
-            <!-- Style & Length -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold mb-1 text-slate-300">Gaya Bahasa</label>
-                <select id="languageStyle" class="w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                  <option>Gen Z</option>
-                  <option>Persuasif & Menjual</option>
-                  <option>Informatif & Edukatif</option>
-                  <option>Santai & Kasual</option>
-                  <option>Ulasan Jujur</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-semibold mb-1 text-slate-300">Panjang</label>
-                <select id="contentLength" class="w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                  <option>Sedang</option>
-                  <option>Pendek</option>
-                  <option>Panjang</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Count -->
-            <div>
-              <label class="block text-sm font-semibold mb-1 text-slate-300">Jumlah variasi</label>
-              <input id="generateCount" type="number" min="1" max="5" value="3"
-                     class="w-full px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500"/>
-            </div>
-
-            <!-- Action -->
-            <div class="pt-2 text-center">
-              <button id="generateBtn" class="inline-flex items-center gap-2 px-7 py-3 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-semibold shadow-lg shadow-sky-900/30 transition">
-                Generate Script
-              </button>
-              <p id="err" class="text-rose-300 text-sm mt-3 hidden"></p>
-            </div>
-          </div>
-        </section>
-
-        <!-- RESULTS -->
-        <section id="outputSection" class="max-w-5xl mx-auto mt-10 space-y-6"></section>
-      </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="px-5 md:px-8 pb-10">
-      <div class="max-w-5xl mx-auto text-center text-slate-400 text-sm">
+      <footer class="text-center text-slate-400 mt-10">
         © 2025 – Dibangun untuk memudahkan promosi afiliasi
-      </div>
-    </footer>
-  </div>
-
-  <script>
-    // helper: minimum 2 deskripsi
-    const descList = document.getElementById('descList');
-    const addBtn = document.getElementById('addDesc');
-    function bindRemoveButtons(){
-      descList.querySelectorAll('.rmDesc').forEach(btn=>{
-        btn.onclick = () => {
-          const rows = [...descList.querySelectorAll('.desc')];
-          if(rows.length <= 2){ alert('Minimal 2 deskripsi.'); return; }
-          btn.parentElement.remove();
-        };
-      });
-    }
-    addBtn.onclick = ()=>{
-      const row = document.createElement('div');
-      row.className='flex gap-2';
-      row.innerHTML = `
-        <input type="text" class="flex-1 px-3 py-2 rounded-xl bg-slate-900/60 border border-white/10 focus:outline-none focus:ring-2 focus:ring-sky-500 desc" placeholder="Deskripsi singkat lainnya"/>
-        <button class="rmDesc px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200">Hapus</button>`;
-      descList.appendChild(row); bindRemoveButtons();
-    };
-    bindRemoveButtons();
-
-    // quota (frontend hanya tampilkan per-user)
-    async function refreshQuota(){
-      const el = document.getElementById('quotaPerUser');
-      try{
-        const r = await fetch('/api/quota'); // endpoint yang sudah kamu buat
-        const j = await r.json();
-        el.textContent = j?.perUserLeft != null ? `${j.perUserLeft} / hari` : '— / hari';
-      }catch(e){
-        el.textContent = '— / hari';
-      }
-    }
-    document.getElementById('btnRefreshQuota').onclick = refreshQuota;
-    refreshQuota();
-
-    // generate
-    const outputSection = document.getElementById('outputSection');
-    const errEl = document.getElementById('err');
-    document.getElementById('generateBtn').onclick = async ()=>{
-      errEl.classList.add('hidden'); errEl.textContent='';
-      const link = document.getElementById('productUrl').value.trim();
-      const mainPoint = document.getElementById('mainPoint').value.trim();
-      const style = document.getElementById('languageStyle').value;
-      const length = document.getElementById('contentLength').value;
-      const count = Math.max(1, Math.min(5, parseInt(document.getElementById('generateCount').value||'3',10)));
-      const descs = [...document.querySelectorAll('.desc')].map(i=>i.value.trim()).filter(Boolean);
-
-      if(!link){ errEl.textContent='Link produk wajib diisi.'; errEl.classList.remove('hidden'); return; }
-      if(descs.length < 2){ errEl.textContent='Minimal 2 deskripsi singkat.'; errEl.classList.remove('hidden'); return; }
-
-      // panggil serverless
-      try{
-        const r = await fetch('/api/generate',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            linkProduk: link,
-            gaya: style,
-            panjang: length,
-            jumlah: count,
-            poinUtama: mainPoint,
-            deskripsi: descs
-          })
-        });
-        const j = await r.json();
-        if(!r.ok || j.error){
-          throw new Error(j.detail || j.error || 'Gagal generate');
-        }
-        const scripts = Array.isArray(j.result) ? j.result : [{title:'Hasil',content:j.result}];
-        outputSection.innerHTML='';
-        scripts.forEach((s,idx)=>{
-          const card = document.createElement('div');
-          card.className = 'glass bg-white/5 border border-white/10 rounded-2xl p-6';
-          card.innerHTML = `
-            <div class="text-lg font-bold text-sky-200 mb-2">${(s.title||`Variasi ${idx+1}`)}</div>
-            <div class="whitespace-pre-wrap text-slate-200" id="c-${idx}">${s.content||''}</div>
-            <div class="mt-4 flex gap-2 justify-end">
-              <button class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200" data-copy="${idx}">Salin</button>
-            </div>`;
-          outputSection.appendChild(card);
-        });
-        outputSection.querySelectorAll('[data-copy]').forEach(btn=>{
-          btn.onclick = ()=>{
-            const id = btn.getAttribute('data-copy');
-            const t = document.getElementById(`c-${id}`).innerText;
-            navigator.clipboard.writeText(t);
-            btn.textContent='Tersalin!'; setTimeout(()=>btn.textContent='Salin',1600);
-          };
-        });
-      }catch(e){
-        errEl.textContent = `Terjadi masalah: ${e.message}`;
-        errEl.classList.remove('hidden');
-      }
-    };
-  </script>
+      </footer>
+    </div>
+  </main>
 </body>
 </html>
