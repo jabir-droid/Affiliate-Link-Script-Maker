@@ -1,12 +1,21 @@
 // /api/generate.js
 // Vercel Serverless API untuk Google Generative Language API v1 (AI Studio)
-// - Default model: models/gemini-2.5-flash-lite
-// - Robust: baca raw body jika req.body kosong
-// - Sanitize: hapus fence ```json ... ``` lalu parse jadi scripts[]
-// - UI akan menampilkan pesan error asli (status + detail)
+// - Model default: models/gemini-2.5-flash-lite
+// - Robust: raw-body fallback, sanitize ```json fences, error detail
+// - Kuota harian: increment 1x per request sukses (Upstash Redis, optional)
+
+import { Redis } from '@upstash/redis';
 
 const MODEL = process.env.GEMINI_MODEL || 'models/gemini-2.5-flash-lite';
-const API_KEY = process.env.GEMINI_API_KEY; // AI Studio API key WAJIB
+const API_KEY = process.env.GEMINI_API_KEY;
+
+const HAVE_REDIS = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+const redis = HAVE_REDIS ? new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+}) : null;
+
+const DAILY_LIMIT = Number(process.env.QUOTA_DAILY_LIMIT || 1000);
 
 function send(res, code, payload) { res.status(code).json(payload); }
 function bad(res, code, message) { send(res, code, { ok: false, message }); }
@@ -17,7 +26,6 @@ function arrayify(x) {
   return String(x).split(/[;,]\s*/g).map(s => s.trim()).filter(Boolean);
 }
 
-// Baca raw body jika req.body belum ter-parse
 async function readRawJson(req) {
   return new Promise((resolve) => {
     try {
@@ -35,6 +43,28 @@ async function readRawJson(req) {
   });
 }
 
+// Helpers kuota (WIB)
+function getJakartaTodayKey() {
+  const nowUtc = Date.now();
+  const wib = new Date(nowUtc + 7 * 60 * 60 * 1000);
+  const y = wib.getUTCFullYear();
+  const m = String(wib.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(wib.getUTCDate()).padStart(2, '0');
+  return `usage:${y}-${m}-${d}`;
+}
+function getResetEpochWibNextMidnightSec() {
+  const nowUtc = Date.now();
+  const wib = new Date(nowUtc + 7 * 60 * 60 * 1000);
+  const next = new Date(Date.UTC(
+    wib.getUTCFullYear(),
+    wib.getUTCMonth(),
+    wib.getUTCDate() + 1,
+    0,0,0,0
+  ));
+  const resetUtcMs = next.getTime() - 7 * 60 * 60 * 1000;
+  return Math.floor(resetUtcMs / 1000);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -42,7 +72,7 @@ export default async function handler(req, res) {
   }
   if (!API_KEY) return bad(res, 500, 'Server missing GEMINI_API_KEY');
 
-  // ---- parse body (obj | string | raw) ----
+  // --- parse body (obj | string | raw)
   let body = {};
   try {
     if (req.body && typeof req.body === 'object') {
@@ -52,11 +82,8 @@ export default async function handler(req, res) {
     } else {
       body = await readRawJson(req);
     }
-  } catch {
-    body = {};
-  }
+  } catch { body = {}; }
 
-  // Terima field baru & lama (back-compat)
   const linkProduk = (body.linkProduk || body.link || '').trim?.() || '';
   const topik      = (body.topik || body.topic || '').trim?.() || '';
   const gaya       = (body.gaya || body.style || 'Gen Z').trim?.() || 'Gen Z';
@@ -64,12 +91,21 @@ export default async function handler(req, res) {
   const count      = Math.max(1, Math.min(5, Number(body.jumlah || body.generateCount || body.count || 3)));
   const deskripsi  = arrayify(body.deskripsi || body.descriptions);
 
-  // Validasi
+  // --- cek kuota sebelum lanjut (opsional)
+  if (HAVE_REDIS) {
+    const key = getJakartaTodayKey();
+    const used = Number(await redis.get(key) || 0);
+    if (used >= DAILY_LIMIT) {
+      return bad(res, 429, 'Kuota harian sudah habis. Coba lagi besok.');
+    }
+  }
+
+  // --- validasi input
   if (!linkProduk) return bad(res, 400, 'INVALID_INPUT: linkProduk wajib diisi.');
   if (!topik)      return bad(res, 400, 'INVALID_INPUT: topik/poin utama wajib diisi.');
   if (deskripsi.length < 2) return bad(res, 400, 'INVALID_INPUT: minimal 2 deskripsi singkat.');
 
-  // Prompt aman untuk v1
+  // --- prompt
   const system = [
     'Anda adalah penulis konten afiliasi berbahasa Indonesia.',
     'Tulis skrip promosi persuasif, natural, variatif (hindari bullet kaku).',
@@ -97,9 +133,7 @@ export default async function handler(req, res) {
 
   try {
     const fr = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
     });
 
     const raw = await fr.text();
@@ -115,7 +149,6 @@ export default async function handler(req, res) {
     }
     if (!data) return bad(res, 502, 'Gemini returned empty/invalid JSON body');
 
-    // ---- Ambil teks kandidat & sanitize fence ```json ... ``` ----
     const rawText =
       data?.candidates?.[0]?.content?.parts?.find(p => typeof p?.text === 'string')?.text || '';
 
@@ -126,34 +159,38 @@ export default async function handler(req, res) {
       cleaned = cleaned.replace(/^\s*```\s*/i, '').replace(/\s*```\s*$/i, '').trim();
       try {
         const obj = JSON.parse(cleaned);
-        if (obj && Array.isArray(obj.scripts) && obj.scripts.length) {
-          return obj;
-        }
+        if (obj && Array.isArray(obj.scripts) && obj.scripts.length) return obj;
       } catch (_) {}
       return null;
     }
 
     let parsed = tryParseScripts(rawText);
-
     if (!parsed) {
       try {
         const obj = JSON.parse(rawText);
-        if (obj && Array.isArray(obj.scripts) && obj.scripts.length) {
-          parsed = obj;
-        }
+        if (obj && Array.isArray(obj.scripts) && obj.scripts.length) parsed = obj;
       } catch (_) {}
     }
-
     if (!parsed) {
       const safeText = rawText && rawText.trim() ? rawText.trim() : 'Tidak ada keluaran.';
       parsed = { scripts: [{ title: 'Hasil', content: safeText }] };
+    }
+
+    // --- increment kuota (opsional, hanya jika sukses)
+    if (HAVE_REDIS) {
+      const key = getJakartaTodayKey();
+      const used = Number(await redis.incr(key));
+      // set EXPIREAT ke 00:00 WIB besok kalau key baru
+      if (used === 1) {
+        await redis.expireat(key, getResetEpochWibNextMidnightSec());
+      }
     }
 
     return send(res, 200, {
       ok: true,
       model: MODEL,
       scripts: parsed.scripts,
-      version: 'v1-flash-lite-robust+sanitized'
+      version: 'v1-flash-lite-robust+sanitized+quota'
     });
   } catch (err) {
     return bad(res, 500, `Gagal mengambil hasil dari Gemini: ${String(err)}`);

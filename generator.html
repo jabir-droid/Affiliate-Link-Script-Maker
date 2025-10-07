@@ -125,13 +125,19 @@
   </main>
 
   <script>
-    // Quota dummy (sambungkan ke /api/quota jika tersedia)
-    async function loadQuota() {
-      const q = document.getElementById('quotaLabel');
-      try { q.textContent = '—'; } catch { q.textContent = '—'; }
+  async function loadQuota() {
+    const q = document.getElementById('quotaLabel');
+    try {
+      const r = await fetch('/api/quota');
+      const j = await r.json();
+      if (!r.ok || !j.ok) throw new Error(j.error || 'Gagal ambil kuota');
+      q.textContent = String(j.remaining);
+    } catch (e) {
+      q.textContent = '—';
     }
-    document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
-    loadQuota();
+  }
+  document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
+  loadQuota();
 
     // Deskripsi dinamis
     const wrap = document.getElementById('descWrap');
