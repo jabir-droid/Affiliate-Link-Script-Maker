@@ -4,52 +4,73 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Affiliate Link Script Maker</title>
+  <meta name="description" content="Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      background: url("/bg/ai-network-1.jpg") center/cover no-repeat fixed;
-      background-color: #020617;
-      color: #e2e8f0;
-      font-family: 'Inter', sans-serif;
+    /* ===== Background + overlay ===== */
+    .bg-hero::before{
+      content:"";position:fixed;inset:0;z-index:-2;
+      background:url("/public/bg/ai-network-1.jpg") center/cover no-repeat;
+      filter:saturate(1.05) contrast(1.05) brightness(.85);
     }
-    .glass {
-      background: rgba(2, 6, 23, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    .bg-hero::after{
+      content:"";position:fixed;inset:0;z-index:-1;
+      background:
+        radial-gradient(1100px 480px at 0% -10%, rgba(99,102,241,.25), transparent 60%),
+        radial-gradient(900px 520px at 110% 10%, rgba(56,189,248,.2), transparent 60%),
+        linear-gradient(180deg, rgba(2,6,23,.75), rgba(2,6,23,.85));
     }
-    .btn-primary {
-      background: linear-gradient(90deg, #4f46e5, #6366f1);
-      color: white;
-      transition: all .25s ease-in-out;
-    }
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 15px rgba(99,102,241,0.45);
-    }
-    .title-gradient {
-      background: linear-gradient(90deg, #93c5fd, #c4b5fd, #60a5fa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    /* ===== Glass & accents ===== */
+    .glass{background:rgba(2,6,23,.65);border:1px solid rgba(148,163,184,.18);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+    .btn-primary{background:#4f46e5;color:#fff}.btn-primary:hover{background:#4338ca}
+    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+    /* ===== Page transition ===== */
+    .fade-in{animation:fadeIn .5s ease both}
+    .page-fade-out{animation:fadeOut .35s ease forwards}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes fadeOut{to{opacity:0;transform:translateY(8px)}}
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
+<body class="min-h-screen bg-slate-950 text-slate-200 bg-hero fade-in">
+  <main class="max-w-6xl mx-auto px-6 py-16 lg:py-24">
+    <section class="glass rounded-3xl px-8 md:px-12 py-12 md:py-16">
+      <h1 class="title-grad font-black text-center leading-[0.95] 
+                 text-5xl md:text-7xl lg:text-8xl tracking-tight">
+        Affiliate Link Script Maker
+      </h1>
 
-  <main class="glass p-10 rounded-3xl text-center max-w-2xl mx-auto">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4 title-gradient">Affiliate Link Script Maker</h1>
-    <p class="text-lg md:text-xl text-slate-200/90 mb-8">
-      Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
+      <p class="mt-7 text-center text-slate-200/95 
+                text-xl md:text-2xl lg:text-[26px] leading-relaxed">
+        Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, 
+        dan pasang di web atau media sosial Anda tanpa ribet.
+      </p>
+
+      <div class="mt-12 flex justify-center">
+        <a href="./generator.html" data-nav
+           class="btn-primary rounded-2xl px-7 py-4 text-lg font-semibold inline-flex items-center gap-2 shadow-lg">
+          Mulai Generate
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <p class="mt-10 text-center text-slate-300/85 text-sm">
+      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
     </p>
-    <a href="generator.html"
-      class="btn-primary inline-block px-8 py-4 text-lg font-semibold rounded-xl">
-      Mulai Generate →
-    </a>
   </main>
 
-  <footer class="absolute bottom-5 w-full text-center text-slate-400/80 text-sm">
-    © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
-  </footer>
-
+  <script>
+    // transition ke halaman lain (fade-out)
+    document.querySelectorAll('[data-nav]').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        document.body.classList.add('page-fade-out');
+        setTimeout(()=>location.href = a.getAttribute('href'), 250);
+      });
+    });
+  </script>
 </body>
 </html>
