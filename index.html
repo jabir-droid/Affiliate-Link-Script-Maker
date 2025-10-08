@@ -6,46 +6,50 @@
   <title>Affiliate Link Script Maker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .bg-grid:before{
-      content:"";
-      position:absolute;inset:0;
-      background:
-        radial-gradient(1000px 400px at 20% -10%,rgba(79,70,229,.25),transparent 60%),
-        radial-gradient(1200px 600px at 120% 0,rgba(14,165,233,.18),transparent 60%),
-        url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
-      filter:saturate(1.1) contrast(1.05) brightness(.92);
-      z-index:-2;
+    body {
+      background: url("/bg/ai-network-1.jpg") center/cover no-repeat fixed;
+      background-color: #020617;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
     }
-    .glass{background:rgba(2,6,23,.68);border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .glass {
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #4f46e5, #6366f1);
+      color: white;
+      transition: all .25s ease-in-out;
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(99,102,241,0.45);
+    }
+    .title-gradient {
+      background: linear-gradient(90deg, #93c5fd, #c4b5fd, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
   </style>
 </head>
-<body class="min-h-screen relative bg-slate-950 text-slate-200 overflow-x-hidden">
-  <div class="bg-grid absolute inset-0"></div>
+<body class="flex items-center justify-center min-h-screen">
 
-  <main class="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-10">
-    <section class="glass rounded-3xl p-10 md:p-16 text-center">
-      <h1 class="title-grad text-4xl md:text-6xl font-extrabold leading-tight">
-        Affiliate Link Script Maker
-      </h1>
-      <p class="text-lg md:text-2xl text-slate-300/90 mt-6 max-w-3xl mx-auto">
-        Generator Skrip Afiliasi Kilat! Tempel tautan, salin skrip siap pakai, pasang di media sosial atau website. Selesai dalam hitungan detik.
-      </p>
-
-      <div class="mt-10 flex justify-center">
-        <a href="generator.html"
-           class="group inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-900/30 text-white text-lg font-semibold">
-          Mulai Generate
-          <svg class="w-5 h-5 transition -translate-x-0 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-
-      <p class="text-center text-slate-400/80 text-sm mt-14">
-        © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin.
-      </p>
-    </section>
+  <main class="glass p-10 rounded-3xl text-center max-w-2xl mx-auto">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 title-gradient">Affiliate Link Script Maker</h1>
+    <p class="text-lg md:text-xl text-slate-200/90 mb-8">
+      Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
+    </p>
+    <a href="generator.html"
+      class="btn-primary inline-block px-8 py-4 text-lg font-semibold rounded-xl">
+      Mulai Generate →
+    </a>
   </main>
+
+  <footer class="absolute bottom-5 w-full text-center text-slate-400/80 text-sm">
+    © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+  </footer>
+
 </body>
 </html>
