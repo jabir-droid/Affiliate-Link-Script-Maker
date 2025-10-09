@@ -1,76 +1,81 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Affiliate Link Script Maker</title>
-  <meta name="description" content="Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* ===== Background + overlay ===== */
-    .bg-hero::before{
-      content:"";position:fixed;inset:0;z-index:-2;
-      background:url("/public/bg/ai-network-1.jpg") center/cover no-repeat;
-      filter:saturate(1.05) contrast(1.05) brightness(.85);
-    }
-    .bg-hero::after{
-      content:"";position:fixed;inset:0;z-index:-1;
-      background:
-        radial-gradient(1100px 480px at 0% -10%, rgba(99,102,241,.25), transparent 60%),
-        radial-gradient(900px 520px at 110% 10%, rgba(56,189,248,.2), transparent 60%),
-        linear-gradient(180deg, rgba(2,6,23,.75), rgba(2,6,23,.85));
-    }
-    /* ===== Glass & accents ===== */
-    .glass{background:rgba(2,6,23,.65);border:1px solid rgba(148,163,184,.18);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
-    .btn-primary{background:#4f46e5;color:#fff}.btn-primary:hover{background:#4338ca}
-    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
-
-    /* ===== Page transition ===== */
-    .fade-in{animation:fadeIn .5s ease both}
-    .page-fade-out{animation:fadeOut .35s ease forwards}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    @keyframes fadeOut{to{opacity:0;transform:translateY(8px)}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Affiliate Link Script Maker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .bg-landing:before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(900px 360px at 0% -20%,rgba(99,102,241,.28),transparent 60%),
+      radial-gradient(820px 420px at 110% 8%,rgba(56,189,248,.2),transparent 60%),
+      url('/public/bg/ai-network-1.jpg') center/cover no-repeat;
+    filter:saturate(1.05) contrast(1.05) brightness(.92);
+    z-index:-2;
+  }
+  .glass{background:rgba(2,6,23,.68);border:1px solid rgba(148,163,184,.12);box-shadow:0 10px 30px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+  .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .btn-primary{background:#6d28d9}.btn-primary:hover{background:#5b21b6}
+  .fade-out{opacity:0;transform:translateY(-6px);transition:all .5s ease}
+</style>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-200 bg-hero fade-in">
-  <main class="max-w-6xl mx-auto px-6 py-16 lg:py-24">
-    <section class="glass rounded-3xl px-8 md:px-12 py-12 md:py-16">
-      <h1 class="title-grad font-black text-center leading-[0.95] 
-                 text-5xl md:text-7xl lg:text-8xl tracking-tight">
-        Affiliate Link Script Maker
-      </h1>
+<body class="min-h-screen relative bg-slate-950 text-slate-200">
+<div class="bg-landing absolute inset-0"></div>
 
-      <p class="mt-7 text-center text-slate-200/95 
-                text-xl md:text-2xl lg:text-[26px] leading-relaxed">
-        Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, 
-        dan pasang di web atau media sosial Anda tanpa ribet.
-      </p>
+<main id="wrap" class="relative z-10 max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
+  <h1 class="title-grad text-5xl md:text-6xl font-extrabold">Affiliate Link Script Maker</h1>
+  <p class="mt-4 text-slate-300/90 text-lg md:text-xl">
+    Generator skrip affiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
+  </p>
 
-      <div class="mt-12 flex justify-center">
-        <a href="./generator.html" data-nav
-           class="btn-primary rounded-2xl px-7 py-4 text-lg font-semibold inline-flex items-center gap-2 shadow-lg">
-          Mulai Generate
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-    </section>
+  <section class="glass rounded-3xl p-6 md:p-8 mt-10">
+    <label class="block text-left text-sm font-medium text-slate-300 mb-2">Nama Anda <span class="text-rose-400">*</span></label>
+    <input id="name" type="text" placeholder="Masukkan nama untuk identitas"
+      class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
+    <p id="err" class="text-rose-300 mt-2"></p>
 
-    <p class="mt-10 text-center text-slate-300/85 text-sm">
-      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
-    </p>
-  </main>
+    <button id="btnMasuk" class="btn-primary mt-5 inline-flex items-center gap-3 px-6 py-3 rounded-xl font-semibold">
+      Masuk & Lanjutkan
+      <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+  </section>
 
-  <script>
-    // transition ke halaman lain (fade-out)
-    document.querySelectorAll('[data-nav]').forEach(a=>{
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        document.body.classList.add('page-fade-out');
-        setTimeout(()=>location.href = a.getAttribute('href'), 250);
+  <p class="mt-16 text-slate-400/80 text-sm">© 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</p>
+</main>
+
+<script>
+  const nameEl = document.getElementById('name');
+  const err = document.getElementById('err');
+  nameEl.value = localStorage.getItem('aff_name') || '';
+
+  document.getElementById('btnMasuk').addEventListener('click', async () => {
+    err.textContent = '';
+    const name = nameEl.value.trim();
+    if (!name) { err.textContent = 'Nama wajib diisi.'; return; }
+
+    // daftar slot
+    try {
+      const r = await fetch('/api/access', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name })
       });
-    });
-  </script>
+      const j = await r.json();
+      if (!j.ok || (j.registered === false && j.full)) {
+        err.textContent = j.message || 'Slot penuh. Hubungi admin.';
+        return;
+      }
+      // simpan & transisi
+      localStorage.setItem('aff_name', name);
+      const wrap = document.getElementById('wrap');
+      wrap.classList.add('fade-out');
+      setTimeout(()=>{ window.location.href = 'generator.html'; }, 480);
+    } catch(e) {
+      err.textContent = 'Gagal menghubungi server: ' + (e?.message || e);
+    }
+  });
+</script>
 </body>
 </html>
