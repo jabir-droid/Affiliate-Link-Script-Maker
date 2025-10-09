@@ -1,60 +1,71 @@
 // api/admin/revoke.js
-import { Redis } from '@upstash/redis';
+// POST /api/admin/revoke
+// Header: x-admin-secret: <ADMIN_SECRET>
+// Body JSON: { "userId": "alice", "action": "reset" | "revoke" }
 
-const redis = new Redis({
-  url: process.env.AFFILIATE_SCRIPT_KV_REST_API_URL,
-  token: process.env.AFFILIATE_SCRIPT_KV_REST_API_TOKEN,
-});
+const { Redis } = require("@upstash/redis");
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
-
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
-    if (req.method !== 'POST') return res.status(405).json({ ok: false, message: 'Method not allowed' });
-    if (!ADMIN_SECRET || req.headers['x-admin-secret'] !== ADMIN_SECRET) {
-      return res.status(401).json({ ok: false, message: 'Unauthorized' });
+    if (req.method !== "POST") {
+      res.status(405).json({ ok: false, message: "Method Not Allowed" });
+      return;
     }
 
-    const { userId, token, todayReset } = await readJson(req);
-    if (!userId && !token) {
-      return res.status(400).json({ ok: false, message: 'userId atau token wajib diisi' });
+    const adminSecretEnv = process.env.ADMIN_SECRET || "";
+    const adminHeader =
+      req.headers["x-admin-secret"] || req.headers["x-admin"] || "";
+    if (!adminSecretEnv || adminHeader !== adminSecretEnv) {
+      res.status(401).json({ ok: false, message: "Unauthorized" });
+      return;
     }
 
-    const ops = [];
-
-    if (userId) {
-      // hapus dari daftar user yang diizinkan
-      ops.push(redis.srem('users', userId));
-      if (todayReset) {
-        const today = new Date().toISOString().slice(0, 10);
-        ops.push(redis.del(`usage:${today}:user:${userId}`));
-      }
+    const { userId, action } = parseBody(req);
+    if (!userId || !action) {
+      res.status(400).json({ ok: false, message: "userId & action wajib." });
+      return;
     }
 
-    if (token) {
-      // hapus mapping link:{token} jika kamu memakainya
-      ops.push(redis.del(`link:${token}`));
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) {
+      res.status(200).json({
+        ok: true,
+        connected: false,
+        hint: "Upstash belum dikonfigurasi; operasi dianggap sukses (no-op).",
+      });
+      return;
     }
 
-    await Promise.all(ops);
+    const redis = new Redis({ url, token });
+    const date = today();
+    const USER_KEY = `usage:${date}:user:${userId}`;
 
-    return res.json({ ok: true, message: 'revoked/updated' });
+    if (action === "reset" || action === "revoke") {
+      await redis.del(USER_KEY);
+      res.json({ ok: true, action, userId });
+      return;
+    }
+
+    res.status(400).json({ ok: false, message: "action tidak dikenal." });
   } catch (e) {
-    return res.status(500).json({ ok: false, message: e.message || 'Internal error' });
+    res.status(500).json({ ok: false, message: e.message || "Server error" });
+  }
+};
+
+function parseBody(req) {
+  try {
+    if (typeof req.body === "object") return req.body;
+    return JSON.parse(req.body);
+  } catch {
+    return {};
   }
 }
 
-async function readJson(req) {
-  return new Promise((resolve, reject) => {
-    let raw = '';
-    req.on('data', (c) => (raw += c));
-    req.on('end', () => {
-      try {
-        resolve(raw ? JSON.parse(raw) : {});
-      } catch (err) {
-        reject(err);
-      }
-    });
-    req.on('error', reject);
-  });
+function today() {
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}${m}${day}`;
 }

@@ -1,86 +1,94 @@
 // api/usage.js
-import { Redis } from '@upstash/redis';
+// GET /api/usage  (admin only)
+// Header:  x-admin-secret: <ADMIN_SECRET>
 
-const redis = new Redis({
-  url: process.env.AFFILIATE_SCRIPT_KV_REST_API_URL,
-  token: process.env.AFFILIATE_SCRIPT_KV_REST_API_TOKEN,
-});
+const { Redis } = require("@upstash/redis");
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
-
-/** Scan helper untuk ambil semua keys yang match pattern */
-async function scanAll(pattern, count = 200) {
-  let cursor = 0;
-  const keys = [];
-  // Upstash: scan(cursor, { match, count })
-  do {
-    const [next, batch] = await redis.scan(cursor, { match: pattern, count });
-    cursor = Number(next);
-    if (Array.isArray(batch) && batch.length) keys.push(...batch);
-  } while (cursor !== 0);
-  return keys;
-}
-
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
-    if (req.method !== 'GET') return res.status(405).json({ ok: false, message: 'Method not allowed' });
-
-    // Simple admin guard
-    if (!ADMIN_SECRET || req.headers['x-admin-secret'] !== ADMIN_SECRET) {
-      return res.status(401).json({ ok: false, message: 'Unauthorized' });
+    if (req.method !== "GET") {
+      res.status(405).json({ ok: false, message: "Method Not Allowed" });
+      return;
     }
 
-    const today = new Date().toISOString().slice(0, 10);
-    const limit = Number(process.env.QUOTA_DAILY_LIMIT || 1000);
+    const adminSecretEnv = process.env.ADMIN_SECRET || "";
+    const adminHeader =
+      req.headers["x-admin-secret"] || req.headers["x-admin"] || "";
 
-    // Global Usage
-    const globalUsed = Number((await redis.get(`usage:${today}:global`)) || 0);
-
-    // Daftar user yang diizinkan (opsi simple: set 'users')
-    const users = (await redis.smembers('users')) || [];
-    const activeCount = users.length || Number(process.env.ESTIMATED_USERS || 100);
-
-    // Ambil semua key usage user hari ini
-    const usageKeys = await scanAll(`usage:${today}:user:*`, 500);
-
-    // Map key → userId
-    const userFromKey = (k) => k.split(':').slice(-1)[0];
-
-    let perUser = [];
-    if (usageKeys.length) {
-      const vals = await redis.mget(...usageKeys);
-      perUser = usageKeys.map((k, i) => ({
-        userId: userFromKey(k),
-        used: Number(vals?.[i] || 0),
-      }));
+    if (!adminSecretEnv || adminHeader !== adminSecretEnv) {
+      res.status(401).json({ ok: false, message: "Unauthorized" });
+      return;
     }
 
-    // Gabungkan user dari set `users` yang mungkin belum punya pemakaian hari ini
-    const usedIds = new Set(perUser.map((u) => u.userId));
-    users.forEach((u) => {
-      if (!usedIds.has(u)) perUser.push({ userId: u, used: 0 });
-    });
+    const QUOTA =
+      Number(process.env.QUOTA_DAILY_LIMIT ||
+        process.env.MAX_GLOBAL_PER_DAY ||
+        1000);
 
-    // Hitung sisa & kuota per user (otomatis dibagi pengguna aktif)
-    const remainingGlobal = Math.max(0, limit - globalUsed);
-    const perUserQuota = Math.floor(remainingGlobal / Math.max(1, activeCount));
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
 
-    return res.json({
+    // Jika Upstash belum dikonfigurasi, balikan dummy
+    if (!url || !token) {
+      res.json({
+        ok: true,
+        connected: false,
+        hint:
+          "Upstash Redis belum dikonfigurasi (KV_REST_API_URL & KV_REST_API_TOKEN).",
+        date: today(),
+        limit: QUOTA,
+        globalUsed: 0,
+        remaining: QUOTA,
+        users: [],
+      });
+      return;
+    }
+
+    const redis = new Redis({ url, token });
+    const date = today();
+    const GLOBAL_KEY = `usage:${date}:global`;
+    const USER_PREFIX = `usage:${date}:user:`;
+
+    // global counter
+    const globalUsed = Number((await redis.get(GLOBAL_KEY)) || 0);
+
+    // scan semua user hari ini
+    let cursor = 0;
+    const users = [];
+    do {
+      const [next, keys] = await redis.scan(cursor, {
+        match: `${USER_PREFIX}*`,
+        count: 500,
+      });
+      cursor = Number(next);
+      if (keys && keys.length) {
+        const vals = await redis.mget(...keys);
+        keys.forEach((k, i) => {
+          const id = k.replace(USER_PREFIX, "");
+          users.push({ id, used: Number(vals[i] || 0) });
+        });
+      }
+    } while (cursor !== 0);
+
+    res.json({
       ok: true,
-      date: today,
-      limit,
-      global: {
-        used: globalUsed,
-        remaining: remainingGlobal,
-      },
-      users: {
-        totalRegistered: users.length,
-        estimatedActive: activeCount,
-        perUserQuota,
-        perUser, // [{ userId, used }]
-      },
+      connected: true,
+      date,
+      limit: QUOTA,
+      globalUsed,
+      remaining: Math.max(QUOTA - globalUsed, 0),
+      users,
     });
   } catch (e) {
-    return res.status(500).json({ ok: false, message: e.message || 'Internal error' });
+    res.status(500).json({ ok: false, message: e.message || "Server error" });
   }
+};
+
+function today() {
+  // gunakan UTC supaya konsisten; kalau mau WIB tinggal geser
+  const d = new Date();
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}${m}${day}`; // e.g., 20251008
 }
