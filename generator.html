@@ -1,228 +1,251 @@
-<!-- generator.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Generator Skrip Afiliasi</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  .bg-grid:before{
-    content:"";position:absolute;inset:0;
-    background:
-      radial-gradient(1000px 400px at 0% -20%,rgba(99,102,241,.25),transparent 60%),
-      radial-gradient(900px 450px at 110% 10%,rgba(56,189,248,.18),transparent 60%),
-      url('/public/bg/ai-network-2.jpg') center/cover no-repeat;
-    filter:saturate(1.05) contrast(1.05) brightness(.9);
-    z-index:-2;
-  }
-  .glass{background:rgba(2,6,23,.68);border:1px solid rgba(148,163,184,.12);box-shadow:0 8px 30px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-  .chip{background:linear-gradient(180deg,rgba(99,102,241,.16),rgba(37,99,235,.06));border:1px solid rgba(99,102,241,.22)}
-  .btn-primary{background:#6d28d9}.btn-primary:hover{background:#5b21b6}
-  .btn-soft{background:#374151}.btn-soft:hover{background:#475569}
-  .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generator • Affiliate Link Script Maker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bg-gen:before{
+      content:"";position:absolute;inset:0;z-index:-1;
+      background:
+        radial-gradient(900px 350px at 0% -10%,rgba(99,102,241,.22),transparent 60%),
+        radial-gradient(800px 350px at 100% 0%,rgba(56,189,248,.16),transparent 60%),
+        url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
+      filter:saturate(1.05) contrast(1.05) brightness(.9);
+    }
+    .glass{background:rgba(2,6,23,.68);border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+    .chip{background:linear-gradient(180deg,rgba(99,102,241,.16),rgba(37,99,235,.06));border:1px solid rgba(99,102,241,.35)}
+    .btn-primary{background:#4f46e5}.btn-primary:hover{background:#4338ca}
+    .btn-soft{background:#334155}.btn-soft:hover{background:#475569}
+    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  </style>
 </head>
-<body class="min-h-screen relative bg-slate-950 text-slate-200">
-<div class="bg-grid absolute inset-0"></div>
+<body class="min-h-screen relative bg-slate-950 text-slate-200 bg-gen">
 
-<main class="relative z-10 max-w-5xl mx-auto px-6 pt-10 pb-20">
-  <header class="mb-4 flex items-center justify-between">
-    <button onclick="window.location.href='index.html'" class="btn-soft px-4 py-2 rounded-lg">&larr; Kembali</button>
-    <div class="text-right">
-      <h2 class="title-grad text-3xl md:text-4xl font-extrabold">Generator Skrip Afiliasi</h2>
-      <p class="text-slate-300/90 mt-1">Tempel link produk, isi data singkat di bawah ini, lalu klik “Buat Skrip”.</p>
+  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-8 pb-24">
+
+    <!-- BAR ATAS: tombol kembali -->
+    <div class="mb-6">
+      <button onclick="goBack()" class="btn-soft px-4 py-2 rounded-lg text-slate-100/95 text-sm">
+        ← Kembali
+      </button>
     </div>
-  </header>
 
-  <!-- Bar kuota -->
-  <section class="glass rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <span class="chip rounded-full px-4 py-1.5 text-sm text-indigo-200">Sisa kuota hari ini</span>
-      <span id="quotaLabel" class="text-slate-200/90 font-semibold tracking-wide">—</span>
-    </div>
-    <button id="btnRefreshQuota" class="btn-soft px-4 py-2 rounded-lg text-slate-100/95 text-sm">Refresh</button>
-  </section>
+    <header class="mb-8 text-center">
+      <h2 class="title-grad text-4xl md:text-5xl font-extrabold">Generator Skrip Afiliasi</h2>
+      <p class="text-slate-300/90 mt-3">
+        Tempel link produk, isi data singkat di bawah ini, lalu klik “Buat Skrip”.
+      </p>
+    </header>
 
-  <!-- Form -->
-  <section class="glass rounded-3xl p-6 md:p-8">
-    <div class="grid gap-5">
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-2">Link Produk <span class="text-rose-400">*</span></label>
-        <input id="productUrl" type="url" placeholder="Contoh: tautan TikTok / Tokopedia / Shopee"
-          class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
+    <!-- Bar kuota -->
+    <section class="glass rounded-2xl px-5 py-4 mb-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="chip rounded-full px-4 py-1.5 text-sm text-indigo-200">Sisa kuota hari ini</span>
+        <span id="quotaLabel" class="text-slate-200/90 font-semibold tracking-wide">—</span>
       </div>
+      <button id="btnRefreshQuota" class="btn-soft px-4 py-2 rounded-lg text-slate-100/95 text-sm">Refresh</button>
+    </section>
 
-      <div>
-        <label class="block text-sm font-medium text-slate-300 mb-2">Nama / Jenis Produk <span class="text-rose-400">*</span></label>
-        <input id="productTopic" type="text" placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll"
-          class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
-      </div>
-
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-slate-300">Kelebihan / Keunggulan <span class="text-rose-400">*</span></label>
-          <div class="flex gap-2">
-            <button id="btnAddDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-white btn-primary">+ Tambah</button>
-            <button id="btnRemoveDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-slate-100/95 btn-soft">– Hapus</button>
-          </div>
-        </div>
-        <div id="descWrap" class="grid md:grid-cols-2 gap-4">
-          <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Contoh: nyaman dipakai seharian">
-          <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Contoh: bahan awet & kuat">
-        </div>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-4">
+    <!-- FORM -->
+    <section class="glass rounded-3xl p-6 md:p-8">
+      <div class="grid gap-5">
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Jumlah variasi</label>
-          <input id="count" type="number" min="1" max="8" value="3"
-            class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-medium text-slate-300 mb-2">Link Produk <span class="text-rose-400">*</span></label>
+          <input id="productUrl" type="url"
+                 placeholder="Contoh: tautan TikTok / Tokopedia / Shopee"
+                 class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Gaya Bahasa</label>
-            <select id="style" class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
-              <option>Gen Z</option>
-              <option>Persuasif & Menjual</option>
-              <option>Santai & Kasual</option>
-              <option>Informatif & Edukatif</option>
-            </select>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2">Nama / Jenis Produk <span class="text-rose-400">*</span></label>
+          <input id="productTopic" type="text"
+                 placeholder="Contoh: tecno spark, sandal kulit, kaos distro pria, dll"
+                 class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium text-slate-300">Kelebihan / Keunggulan <span class="text-rose-400">*</span></label>
+            <div class="flex gap-2">
+              <button id="btnAddDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-white btn-primary">+ Tambah</button>
+              <button id="btnRemoveDesc" type="button" class="px-4 py-2 rounded-lg text-sm text-slate-100/95 btn-soft">– Hapus</button>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Panjang</label>
-            <select id="length" class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
-              <option>Sedang</option>
-              <option>Pendek</option>
-              <option>Panjang</option>
-            </select>
+          <div id="descWrap" class="grid md:grid-cols-2 gap-4">
+            <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="Contoh: nyaman dipakai seharian" />
+            <input class="descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
+                   placeholder="Contoh: bahan awet & kuat" />
           </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Jumlah variasi</label>
+            <input id="count" type="number" min="1" max="5" value="3"
+              class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Gaya Bahasa</label>
+              <select id="style" class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
+                <option>Gen Z</option>
+                <option>Persuasif & Menjual</option>
+                <option>Santai & Kasual</option>
+                <option>Informatif & Edukatif</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-300 mb-2">Panjang</label>
+              <select id="length" class="w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500">
+                <option>Sedang</option>
+                <option>Pendek</option>
+                <option>Panjang</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2">
+          <button id="btnGenerate"
+            class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold btn-primary">
+            Buat Skrip
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+          <span id="err" class="ml-3 text-rose-300"></span>
         </div>
       </div>
+    </section>
 
-      <div class="mt-2">
-        <button id="btnGenerate" class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold btn-primary">
-          Buat Skrip
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
-        </button>
-        <span id="err" class="ml-3 text-rose-300"></span>
-      </div>
-    </div>
-  </section>
+    <section id="results" class="mt-8 grid gap-6"></section>
 
-  <section id="results" class="mt-6 grid gap-6"></section>
+    <footer class="mt-10 text-center text-slate-400/80 text-sm">
+      © 2025 – Dibuat untuk Mempermudah Promosi Afiliasi.
+    </footer>
+  </main>
 
-  <p class="text-center text-slate-400/80 text-sm mt-12">
-    © 2025 – Dibuat untuk Mempermudah promosi afiliasi
-  </p>
-</main>
+  <script>
+    // Pastikan user sudah isi nama
+    (function guard(){
+      const id = localStorage.getItem('aff_user_id');
+      const name = localStorage.getItem('aff_user_name');
+      if (!id || !name) {
+        // balik dengan transisi
+        document.body.style.transition = 'opacity .25s ease';
+        document.body.style.opacity = '0';
+        setTimeout(()=>location.href='/', 200);
+      }
+    })();
 
-<script>
-  // Ambil nama dari localStorage; kalau kosong balikin ke index
-  const name = localStorage.getItem('aff_name') || '';
-  if (!name) { window.location.href = 'index.html'; }
+    function goBack(){
+      document.body.style.transition = 'opacity .25s ease';
+      document.body.style.opacity = '0';
+      setTimeout(()=>history.back(), 200);
+    }
 
-  // Quota
-  async function loadQuota() {
-    const q = document.getElementById('quotaLabel'); q.textContent = '—';
-    try {
-      const r = await fetch('/api/quota'); const j = await r.json();
-      if (j && j.ok) q.textContent = String(j.remaining ?? (j.limit - (j.used||0)) ?? '—');
-    } catch {}
-  }
-  document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
-  loadQuota();
+    // Kuota
+    async function loadQuota() {
+      const q = document.getElementById('quotaLabel');
+      q.textContent = '…';
+      try {
+        const r = await fetch('/api/quota');
+        const j = await r.json();
+        q.textContent = (j && typeof j.remaining === 'number') ? j.remaining : '—';
+      } catch { q.textContent = '—'; }
+    }
+    document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
+    loadQuota();
 
-  // Deskripsi dinamis
-  const wrap = document.getElementById('descWrap');
-  document.getElementById('btnAddDesc').addEventListener('click', () => {
-    const el = document.createElement('input');
-    el.className = 'descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500';
-    el.placeholder = 'Deskripsi singkat lainnya...';
-    wrap.appendChild(el);
-  });
-  document.getElementById('btnRemoveDesc').addEventListener('click', () => {
-    const items = wrap.querySelectorAll('.descItem');
-    if (items.length > 2) items[items.length - 1].remove();
-  });
+    // Deskripsi dinamis
+    const wrap = document.getElementById('descWrap');
+    document.getElementById('btnAddDesc').addEventListener('click', () => {
+      const el = document.createElement('input');
+      el.className = 'descItem w-full rounded-xl bg-slate-800/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500';
+      el.placeholder = 'Kelebihan lain…';
+      wrap.appendChild(el);
+    });
+    document.getElementById('btnRemoveDesc').addEventListener('click', () => {
+      const items = wrap.querySelectorAll('.descItem');
+      if (items.length > 2) items[items.length - 1].remove();
+    });
 
-  // Generate
-  document.getElementById('btnGenerate').addEventListener('click', async () => {
-    const err = document.getElementById('err'); err.textContent = '';
-    const url = document.getElementById('productUrl').value.trim();
-    const topic = document.getElementById('productTopic').value.trim();
-    const style = document.getElementById('style').value;
-    const length = document.getElementById('length').value;
-    const count = Math.max(1, Math.min(8, Number(document.getElementById('count').value || 3)));
-    const descriptions = Array.from(document.querySelectorAll('.descItem')).map(i => i.value.trim()).filter(Boolean);
+    // Generate
+    document.getElementById('btnGenerate').addEventListener('click', generate);
+    async function generate(){
+      const err = document.getElementById('err'); err.textContent = '';
+      const url = document.getElementById('productUrl').value.trim();
+      const topic = document.getElementById('productTopic').value.trim();
+      const style = document.getElementById('style').value;
+      const length = document.getElementById('length').value;
+      const count = Math.max(1, Math.min(5, Number(document.getElementById('count').value || 3)));
+      const descriptions = Array.from(document.querySelectorAll('.descItem')).map(i => i.value.trim()).filter(Boolean);
 
-    if (!url)    return err.textContent = 'Link Produk wajib diisi.';
-    if (!topic)  return err.textContent = 'Nama / Jenis Produk wajib diisi.';
-    if (descriptions.length < 2) return err.textContent = 'Minimal 2 deskripsi singkat (kelebihan).';
+      if (!url)   return err.textContent = 'Link Produk wajib diisi.';
+      if (!topic) return err.textContent = 'Nama / Jenis Produk wajib diisi.';
+      if (descriptions.length < 2) return err.textContent = 'Minimal 2 kelebihan / keunggulan.';
 
-    const btn = document.getElementById('btnGenerate');
-    const old = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = 'AI sedang meracik kata-kata...';
+      const btn = document.getElementById('btnGenerate');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = 'AI sedang meracik kata-kata…';
 
-    try {
-      const r = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          userName: name,
-          linkProduk: url,
-          topik: topic,
-          deskripsi: descriptions,
-          gaya: style,
-          panjang: length,
-          jumlah: count
-        })
-      });
+      try {
+        const r = await fetch('/api/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            linkProduk: url, topik: topic, deskripsi: descriptions, gaya: style, panjang: length, jumlah: count,
+            // back-compat
+            link: url, topic, descriptions, style, length, generateCount: count, count
+          })
+        });
+        const raw = await r.text();
+        let j = null; try { j = raw ? JSON.parse(raw) : null; } catch {}
+        if (!r.ok || !j || !j.ok) {
+          const msg = j?.message || j?.error || raw || 'Gagal generate';
+          throw new Error(msg);
+        }
+        renderResults(j.scripts || []);
+        // refresh sisa kuota setelah generate
+        loadQuota();
+      } catch(e) {
+        err.textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    }
 
-      const raw = await r.text(); let j = null;
-      try { j = raw ? JSON.parse(raw) : null; } catch {}
-      if (!r.ok || !j || !j.ok) {
-        err.textContent = j?.message || j?.error || raw || 'Gagal generate';
+    function renderResults(scripts){
+      const box = document.getElementById('results');
+      box.innerHTML = '';
+      if (!scripts.length){
+        box.innerHTML = '<p class="text-slate-300/80">Tidak ada hasil.</p>';
         return;
       }
-      renderResults(j.scripts || []);
-      await loadQuota();
-    } catch(e) {
-      err.textContent = 'Terjadi masalah: ' + (e?.message || e);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = old;
-    }
-  });
-
-  function renderResults(scripts) {
-    const box = document.getElementById('results'); box.innerHTML='';
-    if (!scripts?.length) { box.innerHTML = '<p class="text-slate-300/80">Tidak ada hasil.</p>'; return; }
-    scripts.forEach((s, i) => {
-      const card = document.createElement('div');
-      card.className = 'glass rounded-2xl p-6';
-      card.innerHTML = `
-        <h3 class="text-indigo-300 font-semibold mb-2">Variasi ${i+1} • ${escapeHtml(s.title || 'Hasil')}</h3>
-        <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(s.content || '')}</p>
-        <div class="mt-4 flex gap-2 justify-end">
-          <button class="btn-soft px-4 py-2 rounded-lg" data-copy>Salin</button>
-        </div>
-      `;
-      card.querySelector('[data-copy]').addEventListener('click', () => {
-        navigator.clipboard.writeText(s.content || '').then(()=>{
-          const b = card.querySelector('[data-copy]'); const t=b.textContent;
-          b.textContent='Tersalin!'; setTimeout(()=>b.textContent=t,1400);
+      scripts.forEach((s, i) => {
+        const card = document.createElement('div');
+        card.className = 'glass rounded-2xl p-6';
+        card.innerHTML = `
+          <h3 class="text-indigo-300 font-semibold mb-2">Variasi ${i+1} • ${escapeHtml(s.title || 'Hasil')}</h3>
+          <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(s.content || '')}</p>
+          <div class="mt-4 flex gap-2 justify-end">
+            <button class="btn-soft px-4 py-2 rounded-lg" data-copy>Salin</button>
+          </div>
+        `;
+        card.querySelector('[data-copy]').addEventListener('click', () => {
+          navigator.clipboard.writeText(s.content || '').then(()=>{
+            const b = card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500);
+          });
         });
+        box.appendChild(card);
       });
-      box.appendChild(card);
-    });
-  }
-  function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-</script>
+    }
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+  </script>
 </body>
 </html>
