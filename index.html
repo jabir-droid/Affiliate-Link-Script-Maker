@@ -4,116 +4,43 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Affiliate Link Script Maker</title>
+  <meta name="description" content="Generator skrip afiliasi tercepat! Tempel link produk, salin skrip, pasang di web atau media sosial Anda.">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; color:#0f172a; }
-    header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:#f8fafc; border-bottom:1px solid #e2e8f0; position:sticky; top:0; }
-    .container { max-width:960px; margin:20px auto; padding:0 16px; }
-    input, select, textarea, button { font: inherit; }
-    input, select, textarea { width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:10px; margin:6px 0 12px; }
-    button { padding:10px 14px; background:#2563eb; border:0; border-radius:10px; color:white; cursor:pointer; font-weight:600; }
-    button.secondary { background:#0f172a; }
-    .row { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-    pre { background:#0b1220; color:#e5e7eb; padding:14px; border-radius:12px; overflow:auto; border:1px solid rgba(255,255,255,.1); }
-    .muted { color:#64748b; }
+    body{min-height:100vh;background:#0b1220;color:#e5e7eb}
+    .bg-hero:before{
+      content:"";position:absolute;inset:0;z-index:-1;
+      background:
+        radial-gradient(800px 300px at 10% -10%, rgba(99,102,241,.22), transparent 60%),
+        radial-gradient(900px 380px at 100% 0%, rgba(56,189,248,.18), transparent 60%),
+        url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
+      filter:saturate(1.05) contrast(1.05) brightness(.9);
+    }
+    .glass{background:rgba(2,6,23,.6);border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .btn-primary{background:#4f46e5}.btn-primary:hover{background:#4338ca}
   </style>
 </head>
-<body>
-  <header>
-    <div>
-      <strong>Affiliate Link Script Maker</strong>
-      <span id="hi" class="muted" style="margin-left:10px;"></span>
-    </div>
-    <div>
-      <button class="secondary" onclick="location.href='generator.html'">Halaman 2</button>
-      <button id="logoutBtn">Logout</button>
-    </div>
-  </header>
-
-  <div class="container">
-    <h2>Buat Skrip Afiliasi</h2>
-    <form id="genForm">
-      <div class="row">
-        <div>
-          <label>Link Produk</label>
-          <input id="linkProduk" placeholder="https://..." required />
-        </div>
-        <div>
-          <label>Nama/Jenis Produk</label>
-          <input id="topik" placeholder="Contoh: Lampu Meja Minimalis" required />
-        </div>
+<body class="relative bg-hero">
+  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-20 pb-24">
+    <section class="glass rounded-3xl px-6 md:px-12 py-12 text-center">
+      <h1 class="title-grad text-4xl md:text-6xl font-extrabold leading-tight">
+        Affiliate Link Script<br class="hidden md:block"/> Maker
+      </h1>
+      <p class="text-slate-300/90 mt-6 max-w-3xl mx-auto">
+        Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.
+      </p>
+      <div class="mt-10">
+        <a href="generator.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold btn-primary">
+          Mulai Generate
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </a>
       </div>
+    </section>
 
-      <div class="row">
-        <div>
-          <label>Kelebihan/Keunggulan (min. 2, pisah baris)</label>
-          <textarea id="deskripsi" rows="4" placeholder="- Hemat energi\n- Desain elegan" required></textarea>
-        </div>
-        <div>
-          <label>Gaya Bahasa</label>
-          <select id="gaya">
-            <option>Gen Z</option><option>Persuasif</option><option>Friendly</option><option>Formal</option>
-          </select>
-          <label>Panjang</label>
-          <select id="panjang">
-            <option>Pendek</option><option>Sedang</option><option>Panjang</option>
-          </select>
-          <label>Jumlah Variasi</label>
-          <input id="jumlah" type="number" min="1" max="8" value="2" />
-        </div>
-      </div>
-      <button type="submit">Buat Skrip</button>
-    </form>
-
-    <h3>Hasil</h3>
-    <pre id="out" class="muted">Belum ada hasil…</pre>
-  </div>
-
-  <script>
-    // sapaan
-    (async () => {
-      try {
-        const res = await fetch('/api/me');
-        const data = await res.json().catch(()=>({}));
-        document.getElementById('hi').textContent = data?.user ? `(Hi, ${data.user})` : '';
-      } catch {}
-    })();
-
-    // logout
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try { await fetch('/api/logout', { method:'POST' }); } catch {}
-      location.href = '/login.html';
-    });
-
-    // form submit → /api/generate (POST)
-    const form = document.getElementById('genForm');
-    const out  = document.getElementById('out');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        linkProduk: document.getElementById('linkProduk').value.trim(),
-        topik: document.getElementById('topik').value.trim(),
-        deskripsi: document.getElementById('deskripsi').value.split('\n').map(s=>s.replace(/^[-•\s]+/,'').trim()).filter(Boolean),
-        gaya: document.getElementById('gaya').value,
-        panjang: document.getElementById('panjang').value,
-        jumlah: Number(document.getElementById('jumlah').value || 1)
-      };
-      try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const text = await res.text();
-        if (!res.ok) throw new Error(`HTTP ${res.status} – ${text.slice(0,200)}`);
-        const data = JSON.parse(text);
-        if (!data.ok) throw new Error(data.message || 'Gagal');
-
-        const lines = (data.scripts || []).map((s, i) => `#${i+1} ${s.title}\n${s.content}`).join('\n\n---\n\n');
-        out.textContent = lines || 'Kosong.';
-      } catch (err) {
-        out.textContent = `Error: ${err.message}`;
-      }
-    });
-  </script>
+    <footer class="mt-12 text-center text-slate-400/80 text-sm">
+      © 2025 – Dilarang Menduplicate dan Menyebarluaskan Tanpa Izin Pemilik.
+    </footer>
+  </main>
 </body>
 </html>
