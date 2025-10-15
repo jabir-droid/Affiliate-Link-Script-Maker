@@ -8,49 +8,65 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f1b33; --panel:rgba(20,34,64,.72); --border:rgba(154,175,210,.25);
-      --txt:#eaf1ff; --muted:#b4c0d8; --blue:#12b3ff; --purple:#7c5cff;
+      /* LIGHT like page-1 */
+      --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
+      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff; --mint:#30e0c3;
     }
+    html,body{height:100%}
     body{
-      margin:0;background:linear-gradient(180deg,#132346,#0f1b33);
-      color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial
+      margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1000px 420px at 10% -10%, #e7f1ff 0%, transparent 60%),
+        radial-gradient(1000px 450px at 95% 0%, #efe6ff 0%, transparent 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      position:relative; isolation:isolate;
     }
-    .g-title{
-      background:linear-gradient(90deg,#60a5fa,#8b5cf6);
-      -webkit-background-clip:text;background-clip:text;color:transparent
+    /* subtle grid pattern */
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(93,109,169,.15) 1px, transparent 1.2px);
+      background-size: 22px 22px;
+      opacity:.5;
+      mix-blend-mode:multiply;
     }
-    .glass{background:var(--panel);border:1px solid var(--border);backdrop-filter:blur(10px);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
-    .pill{background:rgba(17,42,75,.9);border:1px solid rgba(124,58,237,.35);box-shadow:0 0 24px rgba(124,58,237,.20), inset 0 0 24px rgba(48,224,195,.18);border-radius:14px}
-    .inp{width:100%;border:1px solid var(--border);background:rgba(15,28,52,.75);padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
-    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.2)}
+
+    .g-title{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
+    .pill{background:#f3f6ff;border:1px solid var(--border);border-radius:12px}
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
     .seg input{display:none}
-    .seg label{border:1px solid var(--border);background:rgba(15,28,52,.75);padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600}
-    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.25), rgba(124,92,255,.25));border-color:#7c5cff;box-shadow:0 0 18px rgba(124,92,255,.25)}
-    .cta{background:linear-gradient(90deg,#12b3ff,#7b5cff);box-shadow:0 12px 40px rgba(112,80,255,.35)}
-    /* ====== RESPONSIVE RULES ====== */
-    /* Title & paddings skala otomatis */
-    .title-size{font-size:clamp(28px, 4vw, 44px); line-height:1.08}
+    .seg label{border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600}
+    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.18), rgba(124,92,255,.18));border-color:#7c5cff;box-shadow:0 0 18px rgba(124,92,255,.20)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 12px 36px rgba(123,92,255,.28);color:#fff}
+
+    /* Title & paddings scale automatically */
+    .title-size{font-size:clamp(26px, 4.5vw, 44px); line-height:1.08}
     .section-pad{padding:clamp(16px, 3vw, 28px)}
+
+    /* ====== RESPONSIVE ====== */
     /* Mobile (≤640px) */
     @media (max-width:640px){
-      #guidePanel{display:none}
-      /* 1 kolom biar stabil */
+      /* show toolbar compact (Panduan + Kuota) */
+      .toolbar{display:grid;grid-template-columns:1fr;gap:10px; width:100%}
       .seg-style{display:grid;grid-template-columns:1fr;gap:12px}
       .seg-length{display:grid;grid-template-columns:1fr;gap:12px}
-      /* sticky CTA + ruang kosong di bawah konten agar tidak ketutup */
-      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(15,27,51,.0),rgba(15,27,51,.9));backdrop-filter:blur(10px)}
-      main{padding-bottom:110px} /* ruang untuk sticky CTA */
-      /* Chips wrap */
+      /* sticky CTA + room */
+      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
+      main{padding-bottom:110px}
       #chips{display:flex;flex-wrap:wrap;gap:8px}
     }
     /* Tablet (641–1024px) */
     @media (min-width:641px) and (max-width:1024px){
+      .toolbar{display:flex;gap:12px;align-items:center}
       .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:14px}
       .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
       main{padding-bottom:32px}
     }
     /* Desktop (≥1025px) */
     @media (min-width:1025px){
+      .toolbar{display:flex;gap:14px;align-items:center}
       .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:16px}
       .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
       main{padding-bottom:32px}
@@ -60,67 +76,68 @@
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
     <!-- Header -->
-    <div class="flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3 sm:gap-4">
-        <button onclick="history.back()" class="grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl border border-[var(--border)]"
-                style="background:rgba(15,28,52,.8)">←</button>
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <button onclick="history.back()" class="grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl border border-[var(--border)] bg-white/80">←</button>
         <div>
           <h1 class="g-title title-size font-extrabold">Detail Produk & Konfigurasi</h1>
           <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
         </div>
       </div>
-      <div class="hidden sm:flex items-center gap-3 sm:gap-4">
-        <button id="btnGuide" class="glass px-4 py-2.5 rounded-xl text-sm sm:text-base flex items-center gap-2">
-          <span class="text-sky-300">ℹ</span> Panduan
+
+      <!-- Toolbar: SELALU ADA, juga di HP -->
+      <div class="toolbar">
+        <button id="btnGuide" class="glass px-4 py-2 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 bg-white">
+          <span style="color:#0284c7">ℹ</span> Panduan
         </button>
-        <div class="pill px-4 py-2.5 text-sm sm:text-base">
-          Kuota Harian <b id="quotaNow" class="ml-1">—</b> / 1000
-          <button id="btnRefreshQuota" class="ml-2 underline text-teal-300">Refresh</button>
+        <div class="pill px-4 py-2 text-sm sm:text-base flex items-center justify-center gap-2">
+          Kuota: <b id="quotaNow">—</b> / 1000
+          <button id="btnRefreshQuota" class="ml-1 underline text-sky-600">Refresh</button>
         </div>
       </div>
     </div>
 
-    <!-- Panduan -->
-    <section id="guidePanel" class="glass mt-6">
-      <div class="px-5 py-3 border-b border-[var(--border)]/60 flex items-center justify-between">
+    <!-- PANDUAN (accordion; default: hidden di HP, visible di tablet/desktop) -->
+    <section id="guidePanel" class="glass mt-4" style="display:none">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(90deg,#60a5fa,#8b5cf6)"></span>
           <h3 class="text-lg sm:text-xl font-extrabold">Panduan Penggunaan</h3>
         </div>
-        <button id="closeGuide" class="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)]" style="background:rgba(15,28,52,.8)">✕</button>
+        <button id="closeGuide" class="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)] bg-white">✕</button>
       </div>
       <div class="section-pad">
-        <ol class="space-y-4 sm:space-y-5 text-[16px] sm:text-[18px] leading-relaxed">
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span>Masukkan <b>link produk</b> & info dasar</li>
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span>Tambah <b>kelebihan/keunggulan</b> (≥1)</li>
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span>Pilih <b>gaya bahasa</b></li>
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span>Tentukan <b>panjang tulisan</b></li>
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span>Klik <b>Generate Konten Cepat</b></li>
-          <li class="flex gap-3"><span class="text-emerald-400">✔</span><b>Salin hasil</b> atau download</li>
+        <ol class="space-y-4 sm:space-y-5 text-[15px] sm:text-[17px] leading-relaxed">
+          <li>1. Masukkan <b>link produk</b> & info dasar.</li>
+          <li>2. Tambahkan <b>kelebihan/keunggulan</b> (≥1).</li>
+          <li>3. Pilih <b>gaya bahasa</b> yang sesuai.</li>
+          <li>4. Tentukan <b>panjang tulisan</b>.</li>
+          <li>5. Klik <b>Generate Konten Cepat</b>.</li>
+          <li>6. <b>Salin hasil</b> atau download.</li>
         </ol>
       </div>
     </section>
 
-    <!-- Form -->
-    <section class="glass mt-6">
-      <div class="px-5 py-3 border-b border-[var(--border)]/60 flex items-center gap-2">
+    <!-- FORM -->
+    <section class="glass mt-5">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2 bg-white/60">
         <span>📝</span><h2 class="text-[18px] sm:text-[22px] font-extrabold">Form Input Produk</h2>
       </div>
 
       <div class="section-pad grid gap-5 sm:gap-6">
         <div>
-          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-300">*</span></label>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-600">*</span></label>
           <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
         </div>
 
         <div>
-          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-300">*</span></label>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-600">*</span></label>
           <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
         </div>
 
         <div>
           <div class="flex items-center justify-between mb-2">
-            <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-300">*</span></label>
+            <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-600">*</span></label>
             <button id="addDescTop" class="hidden sm:inline px-4 py-2 rounded-xl text-white" style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">+ Tambah</button>
           </div>
           <input id="descInput" class="inp" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
@@ -155,10 +172,10 @@
         </div>
 
         <!-- CTA normal (tablet/desktop) -->
-        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-white text-lg font-extrabold cta">
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta">
           ✨ Mulai Hasilkan
         </button>
-        <span id="err" class="text-rose-300"></span>
+        <span id="err" class="text-rose-600"></span>
       </div>
     </section>
 
@@ -167,7 +184,7 @@
 
   <!-- Sticky CTA untuk HP -->
   <div class="sm:hidden sticky-cta">
-    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-white text-base font-extrabold cta">
+    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta">
       ✨ Mulai Hasilkan
     </button>
   </div>
@@ -175,24 +192,32 @@
   <script>
     // guide
     const panel=document.getElementById('guidePanel');
-    document.getElementById('btnGuide')?.addEventListener('click',()=>{ panel.style.display = panel.style.display==='none' ? '' : 'none'; });
-    document.getElementById('closeGuide').addEventListener('click',()=> panel.style.display='none');
+    const openBtn=document.getElementById('btnGuide');
+    const closeBtn=document.getElementById('closeGuide');
+    openBtn.addEventListener('click',()=>{ panel.style.display = panel.style.display==='none' ? '' : 'none'; });
+    closeBtn.addEventListener('click',()=> panel.style.display='none');
 
     // kuota
     async function loadQuota(){
-      try{const r=await fetch('/api/quota'); const j=await r.json(); document.getElementById('quotaNow').textContent = j?.remaining ?? '—';}catch{}
+      try{
+        const r=await fetch('/api/quota'); const j=await r.json();
+        document.getElementById('quotaNow').textContent = j?.remaining ?? '—';
+      }catch{
+        document.getElementById('quotaNow').textContent = '—';
+      }
     }
-    document.getElementById('btnRefreshQuota')?.addEventListener('click', loadQuota); loadQuota();
+    document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
+    loadQuota();
 
     // chips
     const chipsEl=document.getElementById('chips'); const inputEl=document.getElementById('descInput');
     const btnTop=document.getElementById('addDescTop'); let chips=[];
-    const render=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:rgba(255,255,255,.06);border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);render()};chipsEl.appendChild(s);})};
+    const render=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);render()};chipsEl.appendChild(s);})};
     const add=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; render();};
     inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); }});
     btnTop?.addEventListener('click', add);
 
-    // generate (dipakai HP & desktop)
+    // generate (desktop & mobile)
     async function doGenerate(btn){
       const err=document.getElementById('err'); err.textContent='';
       const url=document.getElementById('productUrl').value.trim();
@@ -224,9 +249,9 @@
       const box=document.getElementById('results'); box.innerHTML='';
       scripts.forEach((s,i)=>{
         const card=document.createElement('div'); card.className='glass p-5 sm:p-6';
-        card.innerHTML=`<h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#c7d2fe">Variasi ${i+1} • ${escapeHtml(s.title||'')}</h3>
+        card.innerHTML=`<h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#3b82f6">Variasi ${i+1} • ${escapeHtml(s.title||'')}</h3>
                         <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base">${escapeHtml(s.content||'')}</p>
-                        <div class="mt-4 flex justify-end"><button class="px-4 py-2 rounded-lg" style="background:#334155;color:white" data-copy>Salin</button></div>`;
+                        <div class="mt-4 flex justify-end"><button class="px-4 py-2 rounded-lg text-white" style="background:#334155" data-copy>Salin</button></div>`;
         card.querySelector('[data-copy]').onclick=()=>{ navigator.clipboard.writeText(s.content||'').then(()=>{ const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500); }); };
         box.appendChild(card);
       });
