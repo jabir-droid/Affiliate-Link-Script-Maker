@@ -11,7 +11,6 @@
       --bg:#0b1220; --panel:rgba(8,13,25,.66); --panel-border:rgba(139,160,190,.2);
       --txt:#e8eef7; --muted:#93a4bf; --neon1:#22d3ee; --neon2:#7c3aed; --mint:#2dd4bf;
     }
-    [data-theme="day"]{ --bg:#0e1426; --panel:rgba(255,255,255,.06); --panel-border:rgba(139,160,190,.25); --txt:#f4f7fb; --muted:#a7b3c9; }
     html,body{height:100%} body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
     .g-title{background:linear-gradient(92deg,var(--neon1),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
     .g-btn{background:linear-gradient(92deg,var(--neon1),var(--neon2))}
@@ -26,16 +25,19 @@
       filter:saturate(1.06) contrast(1.05) brightness(.9);
     }
     .seg input{display:none}
-    .seg label{border:1px solid var(--panel-border);background:rgba(11,18,32,.6);padding:.8rem 1rem;border-radius:14px;cursor:pointer;text-align:center}
+    .seg label{border:1px solid var(--panel-border);background:rgba(14,21,36,.7);padding:.8rem 1rem;border-radius:14px;cursor:pointer;text-align:center}
     .seg input:checked + label{background:linear-gradient(92deg, rgba(34,211,238,.25), rgba(124,58,237,.25)); border-color:rgba(124,58,237,.55); box-shadow:0 0 18px rgba(124,58,237,.25)}
     .chip{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid var(--panel-border);padding:.5rem .75rem;border-radius:999px;margin:.25rem .35rem .25rem 0}
     .chip button{background:transparent;border:0;color:var(--muted);cursor:pointer}
     .inp{width:100%;border:1px solid var(--panel-border);background:rgba(14,21,36,.7);padding:.85rem 1rem;border-radius:14px;outline:none;color:var(--txt)}
     .inp:focus{border-color:rgba(34,211,238,.65);box-shadow:0 0 0 3px rgba(34,211,238,.18)}
+    .pill{background:rgba(20,28,48,.7);border:1px solid rgba(124,58,237,.35);box-shadow:0 0 26px rgba(20,184,166,.25) inset, 0 0 26px rgba(124,58,237,.2);border-radius:14px}
+    .close-x{width:28px;height:28px;border-radius:8px;border:1px solid var(--panel-border);display:grid;place-items:center;cursor:pointer}
     .btn-soft{background:#334155;border:0;color:#e8eef7}
   </style>
 </head>
 <body class="bg-neon">
+  <!-- header -->
   <header class="max-w-6xl mx-auto px-6 pt-6 flex items-center justify-between">
     <div class="flex items-center gap-3">
       <img src="/public/logo.png" alt="logo" class="w-9 h-9 object-contain">
@@ -43,19 +45,51 @@
     </div>
     <div class="flex items-center gap-3 text-sm" style="color:var(--muted)">
       <span>Mode Malam</span>
-      <input id="themeToggle" type="checkbox" class="toggle" style="appearance:none;width:54px;height:30px;border-radius:999px;background:#0f172a;border:1px solid #334155;position:relative;cursor:pointer">
+      <input id="themeToggle" type="checkbox"
+             style="appearance:none;width:54px;height:30px;border-radius:999px;background:#0f172a;border:1px solid #334155;position:relative;cursor:pointer">
     </div>
   </header>
 
-  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-6 pb-24">
+  <main class="relative z-10 max-w-6xl mx-auto px-6 pt-6 pb-24">
+    <!-- title + actions -->
     <div class="flex items-center justify-between mb-5">
-      <h1 class="g-title text-3xl md:text-4xl font-extrabold">Detail Produk & Konfigurasi</h1>
-      <div class="glass rounded-lg px-3 py-1.5 text-sm">
-        Kuota Harian <span id="quotaNow" class="font-semibold">—</span>
-        <button id="btnRefreshQuota" class="ml-2 underline text-teal-300">Refresh</button>
+      <div>
+        <h1 class="g-title text-3xl md:text-5xl font-extrabold">Detail Produk & Konfigurasi</h1>
+        <p class="text-sm mt-1" style="color:var(--muted)">Buat script promosi afiliasi Anda</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <button id="btnGuide" class="glass px-4 py-2 rounded-xl text-sm flex items-center gap-2">
+          <span class="text-sky-300">ℹ</span> Panduan
+        </button>
+        <div class="pill px-4 py-2 text-sm">
+          Kuota Harian <span id="quotaNow" class="font-semibold ml-1">—</span>
+          <button id="btnRefreshQuota" class="ml-2 underline text-teal-300">Refresh</button>
+        </div>
       </div>
     </div>
 
+    <!-- GUIDE PANEL -->
+    <section id="guidePanel" class="glass rounded-2xl overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-slate-700/60 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(92deg,#60a5fa,#7c3aed)"></span>
+          <h3 class="text-lg md:text-xl font-semibold">Panduan Penggunaan</h3>
+        </div>
+        <button id="closeGuide" class="close-x" title="Tutup">✕</button>
+      </div>
+      <div class="p-6 md:p-8">
+        <ol class="space-y-5 text-[17px]">
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span>Masukkan <b>link produk</b> dan info dasar produk Anda</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span>Tambahkan <b>kelebihan/keunggulan</b> produk (minimal 1)</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span>Pilih <b>gaya bahasa</b> yang sesuai dengan target audiens</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span>Tentukan <b>panjang tulisan</b> yang diinginkan</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span>Klik <b>‘Generate Konten Cepat’</b> untuk menghasilkan konten</span></li>
+          <li class="flex gap-3"><span class="text-emerald-400">✔</span> <span><b>Salin hasil</b> atau download untuk digunakan</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- FORM CARD -->
     <section class="glass rounded-2xl overflow-hidden">
       <div class="px-5 py-3 border-b border-slate-700/60 flex items-center gap-2">
         <span class="text-teal-300">🧩</span>
@@ -114,7 +148,7 @@
 
         <div class="mt-2">
           <button id="btnGenerate" class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold g-btn shadow-[0_0_30px_rgba(124,58,237,.35)]">
-            ⚡ Hasilkan Konten Cepat
+            ⚡ Generate Konten Cepat
           </button>
           <span id="err" class="ml-3 text-rose-300"></span>
         </div>
@@ -136,11 +170,18 @@
       localStorage.setItem('theme', theme);
     });
 
+    /* guide toggle */
+    const panel = document.getElementById('guidePanel');
+    document.getElementById('btnGuide').onclick = ()=> panel.style.display = panel.style.display === 'none' ? '' : 'none';
+    document.getElementById('closeGuide').onclick = ()=> panel.style.display = 'none';
+
     /* quota */
     async function loadQuota(){
       const el=document.getElementById('quotaNow'); el.textContent='…';
-      try{const r=await fetch('/api/quota'); const j=await r.json(); el.textContent=j?.label || (j?.remaining + '/' + j?.limit) || '—';}
-      catch{el.textContent='—'}
+      try{
+        const r=await fetch('/api/quota'); const j=await r.json();
+        el.innerHTML = `<b>${j?.remaining ?? '-'}</b> / ${j?.limit ?? '-'}`;
+      }catch{ el.textContent='—'; }
     }
     document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
     loadQuota();
@@ -150,7 +191,6 @@
     const inputEl = document.getElementById('descInput');
     const addBtn  = document.getElementById('addDesc');
     let chips = [];
-
     function renderChips(){
       chipsEl.innerHTML='';
       chips.forEach((txt,idx)=>{
@@ -161,11 +201,7 @@
         chipsEl.appendChild(el);
       });
     }
-    function tryAddChip(){
-      const v = inputEl.value.trim();
-      if(!v) return;
-      chips.push(v); inputEl.value=''; renderChips();
-    }
+    function tryAddChip(){ const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; renderChips(); }
     inputEl.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); tryAddChip(); } });
     addBtn.addEventListener('click', tryAddChip);
 
@@ -177,30 +213,30 @@
       const topic=document.getElementById('productTopic').value.trim();
       const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Friendly';
       const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
-      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+      const count=Math.max(1,Math.min(10, Number(document.getElementById('count')?.value || 3)));
       const descriptions=chips.slice();
 
       if(!url) return err.textContent='Link Produk wajib diisi.';
       if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
-      if(descriptions.length<2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
+      if(descriptions.length<1) return err.textContent='Minimal 1 kelebihan / keunggulan.';
 
-      const btn=this; const original=document.getElementById('btnGenerate').innerHTML;
-      document.getElementById('btnGenerate').disabled=true;
-      document.getElementById('btnGenerate').innerHTML='AI sedang meracik kata-kata…';
+      const btn=document.getElementById('btnGenerate'); const original=btn.innerHTML;
+      btn.disabled=true; btn.innerHTML='AI sedang meracik kata-kata…';
 
       try{
-        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
-            link:url, topic, descriptions, style, length, generateCount:count, count })
+        const r=await fetch('/api/generate',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            linkProduk:url, topik:topic, deskripsi:descriptions,
+            gaya:style, panjang:length, jumlah:count,
+            link:url, topic, descriptions, style, length, generateCount:count, count
+          })
         });
-        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw):null }catch{};
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{};
         if(!r.ok || !j || !j.ok){ const msg=j?.message || raw || 'Gagal generate'; throw new Error(msg); }
         renderResults(j.scripts||[]); loadQuota();
       }catch(e){ err.textContent=e.message; }
-      finally{
-        document.getElementById('btnGenerate').disabled=false;
-        document.getElementById('btnGenerate').innerHTML=original;
-      }
+      finally{ btn.disabled=false; btn.innerHTML=original; }
     }
 
     function renderResults(scripts){
