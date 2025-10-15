@@ -1,108 +1,120 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full" data-theme="night">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Detail Produk & Konfigurasi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .bg-gen:before{content:"";position:absolute;inset:0;z-index:-1;
+    :root{
+      --bg:#0b1220; --panel:rgba(8,13,25,.66); --panel-border:rgba(139,160,190,.2);
+      --txt:#e8eef7; --muted:#93a4bf; --neon1:#22d3ee; --neon2:#7c3aed; --mint:#2dd4bf;
+    }
+    [data-theme="day"]{ --bg:#0e1426; --panel:rgba(255,255,255,.06); --panel-border:rgba(139,160,190,.25); --txt:#f4f7fb; --muted:#a7b3c9; }
+    html,body{height:100%} body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+    .g-title{background:linear-gradient(92deg,var(--neon1),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .g-btn{background:linear-gradient(92deg,var(--neon1),var(--neon2))}
+    .glass{background:var(--panel);border:1px solid var(--panel-border);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.45)}
+    .bg-neon{position:relative;isolation:isolate}
+    .bg-neon:before{
+      content:"";position:absolute;inset:0;z-index:-1;
       background:
-        radial-gradient(900px 350px at 0% -10%,rgba(99,102,241,.22),transparent 60%),
-        radial-gradient(800px 350px at 100% 0%,rgba(56,189,248,.16),transparent 60%),
+        radial-gradient(1100px 380px at 0% -10%, rgba(99,102,241,.22), transparent 60%),
+        radial-gradient(1100px 420px at 100% 0%, rgba(56,189,248,.18), transparent 60%),
         url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
-      filter:saturate(1.05) contrast(1.05) brightness(.9);}
-    .glass{background:rgba(2,6,23,.68);border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .seg input:checked + label{background:#1d4ed8;color:#fff;border-color:#3b82f6}
-    .seg label{cursor:pointer}
-    .btn-grad{background:linear-gradient(90deg,#0ea5e9,#6366f1)}
-    .btn-soft{background:#334155}.btn-soft:hover{background:#475569}
+      filter:saturate(1.06) contrast(1.05) brightness(.9);
+    }
+    .seg input{display:none}
+    .seg label{border:1px solid var(--panel-border);background:rgba(11,18,32,.6);padding:.8rem 1rem;border-radius:14px;cursor:pointer;text-align:center}
+    .seg input:checked + label{background:linear-gradient(92deg, rgba(34,211,238,.25), rgba(124,58,237,.25)); border-color:rgba(124,58,237,.55); box-shadow:0 0 18px rgba(124,58,237,.25)}
+    .chip{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid var(--panel-border);padding:.5rem .75rem;border-radius:999px;margin:.25rem .35rem .25rem 0}
+    .chip button{background:transparent;border:0;color:var(--muted);cursor:pointer}
+    .inp{width:100%;border:1px solid var(--panel-border);background:rgba(14,21,36,.7);padding:.85rem 1rem;border-radius:14px;outline:none;color:var(--txt)}
+    .inp:focus{border-color:rgba(34,211,238,.65);box-shadow:0 0 0 3px rgba(34,211,238,.18)}
+    .btn-soft{background:#334155;border:0;color:#e8eef7}
   </style>
 </head>
-<body class="min-h-screen relative bg-slate-950 text-slate-200 bg-gen">
-  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-8 pb-24">
-    <div class="flex items-center justify-between mb-6">
-      <button onclick="history.back()" class="btn-soft px-3 py-2 rounded-lg text-sm">←</button>
-      <div class="flex items-center gap-3">
-        <button id="btnGuide" class="glass px-3 py-1.5 rounded-lg text-sm">🛈 Panduan</button>
-        <div class="glass rounded-lg px-3 py-1.5 text-sm">
-          Kuota Harian <span id="quotaNow" class="font-semibold">—</span>
-          <button id="btnRefreshQuota" class="ml-2 text-sky-300 underline">Refresh</button>
-        </div>
+<body class="bg-neon">
+  <header class="max-w-6xl mx-auto px-6 pt-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="/public/logo.png" alt="logo" class="w-9 h-9 object-contain">
+      <strong>Script Engine AI</strong>
+    </div>
+    <div class="flex items-center gap-3 text-sm" style="color:var(--muted)">
+      <span>Mode Malam</span>
+      <input id="themeToggle" type="checkbox" class="toggle" style="appearance:none;width:54px;height:30px;border-radius:999px;background:#0f172a;border:1px solid #334155;position:relative;cursor:pointer">
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-5xl mx-auto px-6 pt-6 pb-24">
+    <div class="flex items-center justify-between mb-5">
+      <h1 class="g-title text-3xl md:text-4xl font-extrabold">Detail Produk & Konfigurasi</h1>
+      <div class="glass rounded-lg px-3 py-1.5 text-sm">
+        Kuota Harian <span id="quotaNow" class="font-semibold">—</span>
+        <button id="btnRefreshQuota" class="ml-2 underline text-teal-300">Refresh</button>
       </div>
     </div>
 
     <section class="glass rounded-2xl overflow-hidden">
       <div class="px-5 py-3 border-b border-slate-700/60 flex items-center gap-2">
-        <span class="text-pink-300">📝</span>
-        <h2 class="title-grad text-2xl font-extrabold">Form Input Produk</h2>
+        <span class="text-teal-300">🧩</span>
+        <h2 class="text-lg font-semibold">Form Input Produk</h2>
       </div>
 
       <div class="p-6 md:p-8 grid gap-5">
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Link Produk <span class="text-rose-400">*</span></label>
-          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
+          <label class="block text-sm mb-2" style="color:var(--muted)">Link Produk *</label>
+          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Nama / Jenis Produk <span class="text-rose-400">*</span></label>
-          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
+          <label class="block text-sm mb-2" style="color:var(--muted)">Nama / Jenis Produk *</label>
+          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
         </div>
 
+        <!-- Kelebihan sebagai CHIP -->
         <div>
-          <div class="flex items-center justify-between mb-2">
-            <label class="block text-sm font-medium text-slate-300">Kelebihan / Keunggulan Produk <span class="text-rose-400">*</span></label>
-            <button id="btnAddDesc" type="button" class="px-3 py-2 rounded-lg text-sm text-white btn-soft">+ Tambah</button>
+          <label class="block text-sm mb-2" style="color:var(--muted)">Kelebihan / Keunggulan *</label>
+          <div class="flex gap-2">
+            <input id="descInput" class="inp" placeholder="Tulis kelebihan lalu tekan Enter…">
+            <button id="addDesc" class="px-4 rounded-xl btn-soft">+ Tambah</button>
           </div>
-          <div id="descWrap" class="grid gap-3">
-            <input class="descItem w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: Tahan Air IP68" />
-            <input class="descItem w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: Baterai 7 Hari" />
-          </div>
+          <div id="chips" class="mt-3"></div>
         </div>
 
-        <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Jumlah Variasi Konten</label>
-          <input id="count" type="number" min="1" max="10" value="3" class="w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-slate-400 text-xs mt-1">Antara 1–10 variasi</p>
-        </div>
-
-        <div class="grid gap-4">
+        <div class="grid md:grid-cols-2 gap-5">
           <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Gaya Bahasa</label>
-            <div class="seg grid md:grid-cols-4 gap-3">
-              <input class="hidden peer" type="radio" name="style" id="sty1" value="Santai & Friendly" checked>
-              <label for="sty1" class="glass px-4 py-3 rounded-xl border border-slate-600 peer-checked:border-indigo-500">Santai & Friendly</label>
+            <label class="block text-sm mb-2" style="color:var(--muted)">Jumlah Variasi Konten</label>
+            <input id="count" type="number" min="1" max="10" value="3" class="inp">
+            <p class="text-xs mt-1" style="color:var(--muted)">Antara 1–10 variasi</p>
+          </div>
 
-              <input class="hidden peer" type="radio" name="style" id="sty2" value="Formal & Informatif">
-              <label for="sty2" class="glass px-4 py-3 rounded-xl border border-slate-600">Formal & Informatif</label>
-
-              <input class="hidden peer" type="radio" name="style" id="sty3" value="Promosi Soft Selling">
-              <label for="sty3" class="glass px-4 py-3 rounded-xl border border-slate-600">Promosi Soft Selling</label>
-
-              <input class="hidden peer" type="radio" name="style" id="sty4" value="Copywriting (AIDA/PAS)">
-              <label for="sty4" class="glass px-4 py-3 rounded-xl border border-slate-600">Copywriting (AIDA/PAS)</label>
+          <div class="grid gap-5">
+            <div>
+              <label class="block text-sm mb-2" style="color:var(--muted)">Gaya Bahasa</label>
+              <div class="seg grid md:grid-cols-2 gap-3">
+                <input type="radio" name="style" id="sty1" value="Santai & Friendly" checked><label for="sty1">Santai & Friendly</label>
+                <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2">Formal & Informatif</label>
+                <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3">Promosi Soft Selling</label>
+                <input type="radio" name="style" id="sty4" value="Copywriting (AIDA/PAS)"><label for="sty4">Copywriting (AIDA/PAS)</label>
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Panjang Tulisan</label>
-            <div class="seg grid md:grid-cols-3 gap-3">
-              <input class="hidden peer" type="radio" name="length" id="len1" value="Pendek (1 paragraf)">
-              <label for="len1" class="glass px-4 py-3 rounded-xl border border-slate-600">Pendek (1 paragraf)</label>
-
-              <input class="hidden peer" type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked>
-              <label for="len2" class="glass px-4 py-3 rounded-xl border border-slate-600">Sedang (2-3 paragraf)</label>
-
-              <input class="hidden peer" type="radio" name="length" id="len3" value="Panjang (artikel mini)">
-              <label for="len3" class="glass px-4 py-3 rounded-xl border border-slate-600">Panjang (artikel mini)</label>
+            <div>
+              <label class="block text-sm mb-2" style="color:var(--muted)">Panjang Tulisan</label>
+              <div class="seg grid md:grid-cols-3 gap-3">
+                <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1">Pendek (1 paragraf)</label>
+                <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2">Sedang (2-3 paragraf)</label>
+                <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3">Panjang (artikel mini)</label>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="mt-2">
-          <button id="btnGenerate" class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold btn-grad">
-            ✨ Mulai Generate
+          <button id="btnGenerate" class="inline-flex items-center gap-3 px-7 py-4 rounded-xl text-white font-semibold g-btn shadow-[0_0_30px_rgba(124,58,237,.35)]">
+            ⚡ Hasilkan Konten Cepat
           </button>
           <span id="err" class="ml-3 text-rose-300"></span>
         </div>
@@ -113,34 +125,51 @@
   </main>
 
   <script>
-    // Panduan kecil
-    document.getElementById('btnGuide').addEventListener('click', () => {
-      alert('Tips: isi link produk, minimal 2 keunggulan, pilih gaya & panjang, lalu klik Mulai Generate.');
+    /* theme toggle */
+    const t = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('theme') || 'night';
+    document.documentElement.setAttribute('data-theme', saved);
+    t.checked = saved === 'night';
+    t.addEventListener('change', ()=>{
+      const theme = t.checked ? 'night' : 'day';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
     });
 
-    // Kuota (Refresh berfungsi)
+    /* quota */
     async function loadQuota(){
-      const el=document.getElementById('quotaNow');
-      el.textContent='…';
-      try{
-        const r=await fetch('/api/quota');
-        const j=await r.json();
-        el.textContent = j?.label || (j?.remaining + '/' + j?.limit) || '—';
-      }catch{ el.textContent='—'; }
+      const el=document.getElementById('quotaNow'); el.textContent='…';
+      try{const r=await fetch('/api/quota'); const j=await r.json(); el.textContent=j?.label || (j?.remaining + '/' + j?.limit) || '—';}
+      catch{el.textContent='—'}
     }
     document.getElementById('btnRefreshQuota').addEventListener('click', loadQuota);
     loadQuota();
 
-    // Tambah/Hapus keunggulan
-    const wrap=document.getElementById('descWrap');
-    document.getElementById('btnAddDesc').addEventListener('click',()=>{
-      const el=document.createElement('input');
-      el.className='descItem w-full rounded-xl bg-slate-900/60 border border-slate-600 px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500';
-      el.placeholder='Kelebihan lain…';
-      wrap.appendChild(el);
-    });
+    /* chip input */
+    const chipsEl = document.getElementById('chips');
+    const inputEl = document.getElementById('descInput');
+    const addBtn  = document.getElementById('addDesc');
+    let chips = [];
 
-    // Generate
+    function renderChips(){
+      chipsEl.innerHTML='';
+      chips.forEach((txt,idx)=>{
+        const el=document.createElement('span');
+        el.className='chip';
+        el.innerHTML = `<span>${escapeHtml(txt)}</span><button aria-label="hapus" data-i="${idx}">✕</button>`;
+        el.querySelector('button').onclick = (e)=>{ const i=Number(e.currentTarget.dataset.i); chips.splice(i,1); renderChips(); };
+        chipsEl.appendChild(el);
+      });
+    }
+    function tryAddChip(){
+      const v = inputEl.value.trim();
+      if(!v) return;
+      chips.push(v); inputEl.value=''; renderChips();
+    }
+    inputEl.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); tryAddChip(); } });
+    addBtn.addEventListener('click', tryAddChip);
+
+    /* generate */
     document.getElementById('btnGenerate').addEventListener('click', generate);
     async function generate(){
       const err=document.getElementById('err'); err.textContent='';
@@ -148,42 +177,43 @@
       const topic=document.getElementById('productTopic').value.trim();
       const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Friendly';
       const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
-      const count=Math.max(1, Math.min(10, Number(document.getElementById('count').value || 3)));
-      const descriptions=Array.from(document.querySelectorAll('.descItem')).map(i=>i.value.trim()).filter(Boolean);
+      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+      const descriptions=chips.slice();
 
       if(!url) return err.textContent='Link Produk wajib diisi.';
       if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
       if(descriptions.length<2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
 
-      const btn=this; const original=btn.innerHTML;
-      btn.disabled=true; btn.innerHTML='AI sedang meracik kata-kata…';
+      const btn=this; const original=document.getElementById('btnGenerate').innerHTML;
+      document.getElementById('btnGenerate').disabled=true;
+      document.getElementById('btnGenerate').innerHTML='AI sedang meracik kata-kata…';
 
       try{
-        const r=await fetch('/api/generate',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
-            // back-compat
-            link:url, topic, descriptions, style, length, generateCount:count, count
-          })
+        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
+            link:url, topic, descriptions, style, length, generateCount:count, count })
         });
-        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{};
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw):null }catch{};
         if(!r.ok || !j || !j.ok){ const msg=j?.message || raw || 'Gagal generate'; throw new Error(msg); }
         renderResults(j.scripts||[]); loadQuota();
-      }catch(e){ err.textContent = e.message; }
-      finally{ btn.disabled=false; btn.innerHTML=original; }
+      }catch(e){ err.textContent=e.message; }
+      finally{
+        document.getElementById('btnGenerate').disabled=false;
+        document.getElementById('btnGenerate').innerHTML=original;
+      }
     }
 
     function renderResults(scripts){
       const box=document.getElementById('results'); box.innerHTML='';
-      if(!scripts.length){ box.innerHTML='<p class="text-slate-300/80">Tidak ada hasil.</p>'; return; }
+      if(!scripts.length){ box.innerHTML='<p style="color:var(--muted)">Tidak ada hasil.</p>'; return; }
       scripts.forEach((s,i)=>{
         const card=document.createElement('div'); card.className='glass rounded-2xl p-6';
         card.innerHTML=`
-          <h3 class="text-indigo-300 font-semibold mb-2">Variasi ${i+1} • ${escapeHtml(s.title||'Hasil')}</h3>
+          <h3 class="font-semibold mb-2" style="color:#c7d2fe">Variasi ${i+1} • ${escapeHtml(s.title||'Hasil')}</h3>
           <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(s.content||'')}</p>
-          <div class="mt-4 flex gap-2 justify-end"><button class="btn-soft px-4 py-2 rounded-lg" data-copy>Salin</button></div>`;
+          <div class="mt-4 flex gap-2 justify-end">
+            <button class="px-4 py-2 rounded-lg btn-soft" data-copy>Salin</button>
+          </div>`;
         card.querySelector('[data-copy]').addEventListener('click',()=>{
           navigator.clipboard.writeText(s.content||'').then(()=>{ const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500); });
         });

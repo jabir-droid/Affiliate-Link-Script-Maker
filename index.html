@@ -1,68 +1,124 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full" data-theme="night">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Script Engine AI</title>
   <meta name="description" content="Ubah link produk jadi skrip siap pakai dalam hitungan detik.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body{min-height:100vh;background:#0b1220;color:#e5e7eb}
-    .bg-hero:before{content:"";position:absolute;inset:0;z-index:-1;
-      background:
-        radial-gradient(900px 360px at 0% -10%, rgba(99,102,241,.20), transparent 60%),
-        radial-gradient(900px 360px at 100% 0%, rgba(56,189,248,.18), transparent 60%),
-        url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
-      filter:saturate(1.05) contrast(1.05) brightness(.9);
+    :root{
+      --bg:#0b1220;
+      --panel:rgba(8,13,25,.66);
+      --panel-border:rgba(139,160,190,.2);
+      --txt:#e8eef7;
+      --muted:#93a4bf;
+      --neon1:#22d3ee; /* teal/blue */
+      --neon2:#7c3aed; /* purple */
+      --mint:#2dd4bf;
     }
-    .glass{background:rgba(2,6,23,.6);border:1px solid rgba(148,163,184,.18);box-shadow:0 10px 35px rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-    .title-grad{background:linear-gradient(90deg,#93c5fd,#c4b5fd,#60a5fa);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .btn-grad{background:linear-gradient(90deg,#0ea5e9,#6366f1)}
+    [data-theme="day"]{
+      --bg:#0e1426;
+      --panel:rgba(255,255,255,.06);
+      --panel-border:rgba(139,160,190,.25);
+      --txt:#f4f7fb;
+      --muted:#a7b3c9;
+    }
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+    /* neon gradient helpers */
+    .g-title{background:linear-gradient(92deg,var(--neon1),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .g-btn{background:linear-gradient(92deg,var(--neon1),var(--neon2))}
+    .glass{background:var(--panel);border:1px solid var(--panel-border);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.45)}
+    /* subtle grid/hex overlay */
+    .bg-neon{position:relative;isolation:isolate}
+    .bg-neon:before{
+      content:"";position:absolute;inset:0;z-index:-1;
+      background:
+        radial-gradient(1200px 480px at 10% -10%, rgba(99,102,241,.22), transparent 60%),
+        radial-gradient(1200px 520px at 100% 0%, rgba(56,189,248,.18), transparent 60%),
+        url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
+      filter:saturate(1.06) contrast(1.05) brightness(.9);
+    }
+    .bg-neon:after{
+      /* hex grid */
+      content:"";position:absolute;inset:0;z-index:-2;opacity:.12;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(124,58,237,.35), transparent 55%) 0 0/1200px 1200px,
+        conic-gradient(from 0deg at 50% 50%, rgba(34,211,238,.4), transparent 30%, transparent 70%, rgba(124,58,237,.3)) 0 0/900px 900px;
+    }
+    .card:hover{box-shadow:0 18px 50px rgba(59,130,246,.25)}
+    .toggle{appearance:none;width:54px;height:30px;border-radius:999px;background:#0f172a;border:1px solid #334155;position:relative;cursor:pointer}
+    .toggle:checked{background:linear-gradient(100deg,var(--neon1),var(--neon2));border-color:transparent}
+    .toggle:before{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#e2e8f0;transition:all .25s}
+    .toggle:checked:before{left:27px;background:white}
   </style>
 </head>
-<body class="relative bg-hero">
-  <main class="relative z-10 max-w-6xl mx-auto px-6 pt-14 pb-24 text-center">
-    <div class="mx-auto w-16 h-16 rounded-2xl grid place-items-center glass mb-6">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#93c5fd"><path stroke-width="2" d="M3 7l9-4 9 4-9 4-9-4z"/><path stroke-width="2" d="M3 7v10l9 4 9-4V7"/></svg>
+<body class="bg-neon">
+  <header class="max-w-6xl mx-auto px-6 pt-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <img src="/public/logo.png" alt="logo" class="w-10 h-10 object-contain">
+      <strong class="tracking-wide">Script Engine AI</strong>
     </div>
+    <div class="flex items-center gap-3 text-sm text-[var(--muted)]">
+      <span>Mode Malam</span>
+      <input id="themeToggle" type="checkbox" class="toggle">
+    </div>
+  </header>
 
-    <h1 class="title-grad text-4xl md:text-6xl font-extrabold">Script Engine AI</h1>
-    <p class="text-slate-300/90 mt-4 max-w-3xl mx-auto">
+  <main class="relative z-10 max-w-6xl mx-auto px-6 pt-10 pb-24 text-center">
+    <h1 class="g-title text-4xl md:text-6xl font-extrabold leading-tight">Script Engine AI</h1>
+    <p class="mt-4 text-[var(--muted)] max-w-3xl mx-auto">
       Ubah link produk jadi skrip konten siap pakai dalam 30 detik. Hemat waktu Anda, tingkatkan konversi.
     </p>
 
     <div class="grid md:grid-cols-4 gap-5 mt-10">
-      <div class="glass rounded-2xl p-5 text-left">
-        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 grid place-items-center mb-3">🧠</div>
+      <div class="card glass rounded-2xl p-6 text-left">
+        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">🧠</div>
         <h3 class="font-semibold">Mesin AI Cerdas</h3>
-        <p class="text-slate-400 text-sm mt-1">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+        <p class="text-sm text-[var(--muted)] mt-1">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
       </div>
-      <div class="glass rounded-2xl p-5 text-left">
-        <div class="w-10 h-10 rounded-xl bg-sky-500/20 grid place-items-center mb-3">⚡</div>
+      <div class="card glass rounded-2xl p-6 text-left">
+        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">⚡</div>
         <h3 class="font-semibold">Proses Kilat</h3>
-        <p class="text-slate-400 text-sm mt-1">Dari link jadi skrip siap pakai hanya hitungan detik.</p>
+        <p class="text-sm text-[var(--muted)] mt-1">Dari link jadi skrip siap pakai hanya hitungan detik.</p>
       </div>
-      <div class="glass rounded-2xl p-5 text-left">
-        <div class="w-10 h-10 rounded-xl bg-violet-500/20 grid place-items-center mb-3">🎛️</div>
+      <div class="card glass rounded-2xl p-6 text-left">
+        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">🎛️</div>
         <h3 class="font-semibold">Penuh Kendali</h3>
-        <p class="text-slate-400 text-sm mt-1">Atur gaya, panjang, dan jumlah variasi.</p>
+        <p class="text-sm text-[var(--muted)] mt-1">Atur gaya, panjang tulisan, dan jumlah variasi.</p>
       </div>
-      <div class="glass rounded-2xl p-5 text-left">
-        <div class="w-10 h-10 rounded-xl bg-fuchsia-500/20 grid place-items-center mb-3">📥</div>
+      <div class="card glass rounded-2xl p-6 text-left">
+        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">📥</div>
         <h3 class="font-semibold">Langsung Eksekusi</h3>
-        <p class="text-slate-400 text-sm mt-1">Salin cepat untuk bank konten Anda.</p>
+        <p class="text-sm text-[var(--muted)] mt-1">Salin sekali klik untuk bank konten Anda.</p>
       </div>
     </div>
 
     <div class="mt-10">
-      <a href="generator.html" class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold btn-grad shadow-lg">
-        🔗 Generate Skrip Sekarang!
+      <a href="generator.html" class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold g-btn shadow-[0_0_30px_rgba(124,58,237,.35)]">
+        Mulai Hasilkan &gt;
       </a>
     </div>
 
-    <footer class="mt-12 text-center text-slate-400/80 text-sm">
+    <footer class="mt-12 text-center text-[var(--muted)] text-sm">
       © 2025 — Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
     </footer>
   </main>
+
+  <script>
+    // theme toggle (persist to localStorage)
+    const t = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('theme') || 'night';
+    document.documentElement.setAttribute('data-theme', saved);
+    t.checked = saved === 'night';
+    t.addEventListener('change', ()=>{
+      const theme = t.checked ? 'night' : 'day';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    });
+  </script>
 </body>
 </html>
