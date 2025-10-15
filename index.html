@@ -2,20 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Script Engine AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      /* terang */
-      --bg1:#ffffff;
-      --bg2:#f5f9ff;          /* sangat terang kebiruan */
-      --panel:#ffffff;
-      --border:#e3e8f4;
-      --txt:#0f172a;          /* hampir hitam */
-      --muted:#4b5563;
-      --blue:#12b3ff; --purple:#7b5cff;
+      --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
+      --txt:#0f172a; --muted:#4b5563; --blue:#12b3ff; --purple:#7b5cff;
     }
     html,body{height:100%}
     body{
@@ -26,96 +20,63 @@
         linear-gradient(180deg,var(--bg1),var(--bg2));
     }
     .g-title{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .card{
-      background:var(--panel);border:1px solid var(--border);border-radius:22px;
-      box-shadow:0 16px 40px rgba(15,23,42,.08);
-    }
-    .iconWrap{
-      width:82px;height:82px;border-radius:24px;
-      background:linear-gradient(135deg,#5cc5ff,#b07bff);
-      box-shadow:
-        0 0 0 8px rgba(99,102,241,.06),
-        0 12px 28px rgba(99,102,241,.25);
-    }
-    .cta{
-      background:linear-gradient(90deg,var(--blue),var(--purple));
-      box-shadow:0 14px 40px rgba(123,92,255,.35);
-    }
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:22px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+    .iconWrap{width:82px;height:82px;border-radius:24px;background:linear-gradient(135deg,#5cc5ff,#b07bff);box-shadow:0 0 0 10px rgba(99,102,241,.06),0 12px 28px rgba(99,102,241,.25)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 14px 40px rgba(123,92,255,.35)}
     .lead{color:var(--muted)}
+    /* Mobile tuning */
+    @media (max-width: 640px){
+      .card{border-radius:18px}
+      .iconWrap{width:72px;height:72px;border-radius:20px}
+    }
   </style>
 </head>
 <body>
-  <main class="max-w-6xl mx-auto px-6 pt-14 pb-24 text-center">
+  <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-10 sm:pt-14 lg:pt-16 pb-24 text-center">
+    <!-- LOGO CENTER (size per device) -->
+    <img src="/public/logo.png" alt="logo"
+         class="mx-auto w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 object-contain mb-5 sm:mb-6">
 
-    <!-- LOGO BESAR DI TENGAH -->
-    <img src="/public/logo.png" alt="logo" class="mx-auto w-28 h-28 object-contain mb-6">
-
-    <!-- Judul & subjudul -->
-    <h1 class="g-title text-[46px] md:text-[72px] leading-[1.05] font-extrabold tracking-tight">
+    <h1 class="g-title text-[34px] sm:text-[46px] lg:text-[72px] leading-[1.08] lg:leading-[1.05] font-extrabold tracking-tight">
       Script Engine AI
     </h1>
-    <p class="lead mt-5 text-lg md:text-2xl max-w-4xl mx-auto">
+    <p class="lead mt-3 sm:mt-5 text-base sm:text-xl lg:text-2xl max-w-4xl mx-auto">
       Ubah link produk jadi skrip konten siap pakai dalam 30 detik. Hemat waktu Anda, tingkatkan konversi.
     </p>
 
-    <!-- KARTU FITUR (ikon & teks CENTER) -->
-    <div class="grid md:grid-cols-4 gap-6 mt-12">
-      <!-- 1 -->
-      <div class="card p-8 text-center">
-        <div class="iconWrap grid place-items-center mx-auto mb-5">
-          <span class="text-white text-3xl">🧠</span>
-        </div>
-        <h3 class="text-[26px] font-extrabold mb-2">Mesin AI Cerdas</h3>
-        <p class="lead leading-relaxed">
-          Ditenagai AI yang dilatih khusus untuk membuat skrip afiliasi yang menjual.
-        </p>
+    <!-- GRID FITUR: 1 / 2 / 4 kolom -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-8 sm:mt-12">
+      <div class="card p-6 sm:p-8 text-center">
+        <div class="iconWrap grid place-items-center mx-auto mb-4 sm:mb-5"><span class="text-white text-2xl sm:text-3xl">🧠</span></div>
+        <h3 class="text-[22px] sm:text-[24px] lg:text-[26px] font-extrabold mb-1.5 sm:mb-2">Mesin AI Cerdas</h3>
+        <p class="lead text-[15px] sm:text-base leading-relaxed">Ditenagai AI yang dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
       </div>
-
-      <!-- 2 -->
-      <div class="card p-8 text-center">
-        <div class="iconWrap grid place-items-center mx-auto mb-5">
-          <span class="text-white text-3xl">⚡</span>
-        </div>
-        <h3 class="text-[26px] font-extrabold mb-2">Proses Kilat</h3>
-        <p class="lead leading-relaxed">
-          Dari link menjadi skrip siap pakai hanya dalam hitungan detik.
-        </p>
+      <div class="card p-6 sm:p-8 text-center">
+        <div class="iconWrap grid place-items-center mx-auto mb-4 sm:mb-5"><span class="text-white text-2xl sm:text-3xl">⚡</span></div>
+        <h3 class="text-[22px] sm:text-[24px] lg:text-[26px] font-extrabold mb-1.5 sm:mb-2">Proses Kilat</h3>
+        <p class="lead text-[15px] sm:text-base leading-relaxed">Dari link menjadi skrip siap pakai hanya dalam hitungan detik.</p>
       </div>
-
-      <!-- 3 -->
-      <div class="card p-8 text-center">
-        <div class="iconWrap grid place-items-center mx-auto mb-5">
-          <span class="text-white text-3xl">🎛️</span>
-        </div>
-        <h3 class="text-[26px] font-extrabold mb-2">Penuh Kendali</h3>
-        <p class="lead leading-relaxed">
-          Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai keinginan Anda.
-        </p>
+      <div class="card p-6 sm:p-8 text-center">
+        <div class="iconWrap grid place-items-center mx-auto mb-4 sm:mb-5"><span class="text-white text-2xl sm:text-3xl">🎛️</span></div>
+        <h3 class="text-[22px] sm:text-[24px] lg:text-[26px] font-extrabold mb-1.5 sm:mb-2">Penuh Kendali</h3>
+        <p class="lead text-[15px] sm:text-base leading-relaxed">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai keinginan Anda.</p>
       </div>
-
-      <!-- 4 -->
-      <div class="card p-8 text-center">
-        <div class="iconWrap grid place-items-center mx-auto mb-5">
-          <span class="text-white text-3xl">📥</span>
-        </div>
-        <h3 class="text-[26px] font-extrabold mb-2">Langsung Eksekusi</h3>
-        <p class="lead leading-relaxed">
-          Salin sekali klik atau unduh skrip dalam format Word & PDF untuk bank konten Anda.
-        </p>
+      <div class="card p-6 sm:p-8 text-center">
+        <div class="iconWrap grid place-items-center mx-auto mb-4 sm:mb-5"><span class="text-white text-2xl sm:text-3xl">📥</span></div>
+        <h3 class="text-[22px] sm:text-[24px] lg:text-[26px] font-extrabold mb-1.5 sm:mb-2">Langsung Eksekusi</h3>
+        <p class="lead text-[15px] sm:text-base leading-relaxed">Salin sekali klik atau unduh skrip dalam format Word & PDF untuk bank konten Anda.</p>
       </div>
     </div>
 
-    <!-- CTA BESAR -->
-    <div class="mt-12">
+    <!-- CTA: full HP, 4/5 tablet, fixed width desktop -->
+    <div class="mt-8 sm:mt-12">
       <a href="generator.html"
-         class="inline-flex items-center justify-center w-full md:w-[760px] mx-auto px-10 py-5 rounded-2xl text-white text-[20px] md:text-[22px] font-extrabold cta">
+         class="inline-flex items-center justify-center w-full sm:w-4/5 lg:w-[760px] mx-auto px-8 py-4 sm:py-5 rounded-2xl text-white text-lg sm:text-xl lg:text-[22px] font-extrabold cta">
         ✨ Generate Skrip Sekarang!
       </a>
     </div>
 
-    <footer class="mt-12 text-sm lead">
-      © 2025 — Dibuat untuk Mempermudah promosi afiliasi.
-    </footer>
+    <footer class="mt-10 sm:mt-12 text-sm lead">© 2025 — Dibuat untuk Mempermudah promosi afiliasi.</footer>
   </main>
 </body>
 </html>
