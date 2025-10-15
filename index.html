@@ -8,29 +8,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.85); --border:rgba(15,23,42,.10);
+      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
       --blue:#12b3ff; --purple:#7b5cff;
     }
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.9) 0%, transparent 60%),
-        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.9) 0%, transparent 60%),
-        url("/public/bg/landing-city.jpg") center/cover no-repeat fixed;
+        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        url("/public/bg/landing-city.jpg") center/cover no-repeat fixed; /* FOTO #2 */
     }
-    .hero{position:relative; overflow:visible;} /* penting: cegah clipping huruf bawah */
+    .hero{position:relative; overflow:visible;} /* cegah clipping huruf bawah */
     .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
     .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.06; letter-spacing:-.02em}
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
-    .glass{background:var(--panel); border:1px solid var(--border); border-radius:22px; box-shadow:0 22px 60px rgba(15,23,42,.15)}
     .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
-    /* kartu fitur */
-    .feature{padding:28px; border-radius:20px; background:rgba(255,255,255,.9); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10)}
-    .icon-wrap{width:68px;height:68px;border-radius:18px;
-      background:radial-gradient(140% 140% at 30% 20%, rgba(18,179,255,.25), rgba(123,92,255,.25));
-      box-shadow:0 12px 28px rgba(18,179,255,.30), inset 0 0 35px rgba(123,92,255,.25);
-      display:grid;place-items:center}
-    .ico{width:34px;height:34px; stroke:url(#g); fill:none; stroke-width:1.8}
+    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
+    .icon-emoji{font-size:40px; line-height:1}
     .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
@@ -40,71 +34,36 @@
   <main class="max-w-6xl mx-auto px-5 sm:px-6">
 
     <!-- HERO -->
-    <section class="hero pt-14 sm:pt-16 lg:pt-24 pb-10">
-      <div class="flex flex-col items-center text-center">
-        <!-- hapus logo; fokus ke judul besar -->
-        <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
-        <p class="subtitle text-slate-600 mt-4 max-w-3xl">
-          Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
-        </p>
-      </div>
+    <section class="hero pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
+      <!-- logo dihapus sesuai permintaan -->
+      <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
+      <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
+        Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
+      </p>
     </section>
 
-    <!-- FITUR -->
+    <!-- FITUR (emoji kembali seperti sebelumnya) -->
     <section class="mt-6 sm:mt-10">
       <div class="grid-feat">
-        <!-- 1 -->
         <div class="feature">
-          <div class="icon-wrap mb-4">
-            <!-- Brain elegant -->
-            <svg viewBox="0 0 24 24" class="ico">
-              <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12b3ff"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
-              <path d="M8 6c0-1.66 1.34-3 3-3 1.2 0 2.24.67 2.74 1.66C15.66 5.19 17 6.9 17 9v7a3 3 0 0 1-3 3h-1"/>
-              <path d="M8 6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/>
-              <path d="M9 8v3m0 2v3M12 6v3m0 2v6M15 8.5V13m0 2v3"/>
-            </svg>
-          </div>
+          <div class="icon-emoji mb-3">🧠</div>
           <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
-          <p class="text-slate-600 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+          <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
         </div>
-
-        <!-- 2 -->
         <div class="feature">
-          <div class="icon-wrap mb-4">
-            <!-- Bolt/speed -->
-            <svg viewBox="0 0 24 24" class="ico">
-              <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12b3ff"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
-              <path stroke="url(#g2)" d="M13 2 3 14h7l-1 8 12-14h-7l-1-6z"/>
-            </svg>
-          </div>
+          <div class="icon-emoji mb-3">⚡</div>
           <h3 class="text-xl font-extrabold">Proses Kilat</h3>
-          <p class="text-slate-600 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
+          <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
         </div>
-
-        <!-- 3 -->
         <div class="feature">
-          <div class="icon-wrap mb-4">
-            <!-- sliders -->
-            <svg viewBox="0 0 24 24" class="ico">
-              <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12b3ff"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
-              <path stroke="url(#g3)" d="M4 6h16M4 12h16M4 18h16M8 6v4M12 12v4M16 18v4"/>
-            </svg>
-          </div>
+          <div class="icon-emoji mb-3">🎛️</div>
           <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
-          <p class="text-slate-600 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
+          <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
         </div>
-
-        <!-- 4 -->
         <div class="feature">
-          <div class="icon-wrap mb-4">
-            <!-- download -->
-            <svg viewBox="0 0 24 24" class="ico">
-              <defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#12b3ff"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
-              <path stroke="url(#g4)" d="M12 3v12m0 0-4-4m4 4 4-4M4 21h16"/>
-            </svg>
-          </div>
+          <div class="icon-emoji mb-3">📥</div>
           <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
-          <p class="text-slate-600 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
+          <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
         </div>
       </div>
 
@@ -115,7 +74,7 @@
       </div>
     </section>
 
-    <footer class="text-center text-slate-500 mt-12 mb-8">
+    <footer class="text-center text-slate-600 mt-12 mb-8">
       © 2025 – Dibuat untuk Mempermudah promosi afiliasi.
     </footer>
   </main>
