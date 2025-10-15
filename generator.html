@@ -3,45 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Generator | Affiliate Link Script Maker</title>
+  <title>Halaman 2 | Affiliate Script Maker</title>
+  <script>
+    // Gate proteksi
+    (async () => {
+      try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (!res.ok) location.href = 'login.html';
+        const j = await res.json().catch(()=>({}));
+        if (!j?.ok) location.href = 'login.html';
+      } catch {
+        location.href = 'login.html';
+      }
+    })();
+  </script>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; color:#0f172a; }
-    header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; position:sticky; top:0; }
+    body { font-family: system-ui, sans-serif; margin:0; color:#0f172a; }
+    header { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+    button { padding:10px 14px; border:none; border-radius:10px; cursor:pointer; font-weight:600; }
+    button.logout { background:#ef4444; color:#fff; }
+    button.back { background:#0f172a; color:#fff; }
     .container { max-width:960px; margin:20px auto; padding:0 16px; }
-    button { padding:8px 12px; background:#0f172a; border:0; border-radius:10px; color:#fff; cursor:pointer; font-weight:600; }
-    .muted { color:#64748b; }
   </style>
 </head>
 <body>
   <header>
-    <button onclick="history.back()">← Kembali</button>
-    <div style="flex:1 1 auto"></div>
-    <button id="logoutBtn">Logout</button>
+    <button class="back" onclick="history.back()">← Kembali</button>
+    <button class="logout" id="logoutBtn">Logout</button>
   </header>
 
   <div class="container">
     <h2>Panduan Singkat</h2>
-    <ol class="muted">
-      <li>Masukkan link, nama/jenis produk, dan minimal 2 keunggulan.</li>
-      <li>Pilih gaya, panjang, dan jumlah variasi.</li>
-      <li>Tekan <strong>Buat Skrip</strong> di halaman utama.</li>
+    <ol>
+      <li>Isi link dan nama produk</li>
+      <li>Tulis minimal 2 keunggulan</li>
+      <li>Pilih gaya dan panjang</li>
+      <li>Klik “Buat Skrip”</li>
     </ol>
-
-    <p id="hi" class="muted"></p>
   </div>
 
   <script>
-    (async () => {
-      try {
-        const res = await fetch('/api/me');
-        const data = await res.json().catch(()=>({}));
-        document.getElementById('hi').textContent = data?.user ? `Login sebagai: ${data.user}` : '';
-      } catch {}
-    })();
-
     document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try { await fetch('/api/logout', { method:'POST' }); } catch {}
-      location.href = '/login.html';
+      await fetch('/api/logout', { method:'POST' });
+      location.href = 'login.html';
     });
   </script>
 </body>

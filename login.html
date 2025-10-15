@@ -5,37 +5,35 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login | Affiliate Link Script Maker</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; min-height:100vh; display:grid; place-items:center; background:#0f172a; color:#e5e7eb; }
-    .card { width:min(92vw,360px); background:#0b1220; border:1px solid #1f2937; border-radius:16px; padding:24px; box-shadow:0 10px 40px rgba(0,0,0,.4); }
-    label{display:block;margin:10px 0 6px;font-size:13px;color:#cbd5e1;}
-    input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#e5e7eb}
-    input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.25)}
-    button{width:100%;margin-top:14px;padding:12px;border-radius:10px;border:0;cursor:pointer;background:#2563eb;color:white;font-weight:600}
-    .error{color:#fca5a5;min-height:20px;margin-top:10px;font-size:13px}
+    body { font-family: system-ui, sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; background:#0f172a; color:white; }
+    .card { background:rgba(255,255,255,0.1); padding:2rem; border-radius:1rem; width:320px; box-shadow:0 8px 20px rgba(0,0,0,.3); backdrop-filter:blur(10px); }
+    h2 { margin-top:0; }
+    input { width:100%; padding:10px; margin:8px 0; border:none; border-radius:6px; }
+    button { width:100%; padding:10px; border:none; border-radius:6px; background:#2563eb; color:white; font-weight:bold; cursor:pointer; }
+    button:hover { background:#1d4ed8; }
+    #msg { color:#fca5a5; min-height:20px; font-size:14px; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2 style="margin:0 0 8px">Masuk</h2>
-    <p style="margin:0 0 20px;color:#94a3b8">Affiliate Link Script Maker</p>
-
-    <label>Nama pengguna</label>
-    <input id="username" autocomplete="username" />
-
-    <label>Password</label>
-    <input id="password" type="password" autocomplete="current-password" />
-
+    <h2>Masuk ke Aplikasi</h2>
+    <input type="text" id="username" placeholder="Nama pengguna" required>
+    <input type="password" id="password" placeholder="Password" required>
     <button id="loginBtn">Masuk</button>
-    <div id="msg" class="error"></div>
+    <p id="msg"></p>
   </div>
 
   <script>
-    // Jika sudah punya cookie sesi, middleware akan redirect otomatis saat akses index.html
     document.getElementById('loginBtn').addEventListener('click', async () => {
       const u = document.getElementById('username').value.trim();
       const p = document.getElementById('password').value.trim();
       const msg = document.getElementById('msg');
       msg.textContent = '';
+
+      if (!u || !p) {
+        msg.textContent = 'Nama dan password wajib diisi!';
+        return;
+      }
 
       try {
         const res = await fetch('/api/login', {
@@ -44,18 +42,21 @@
           body: JSON.stringify({ username: u, password: p })
         });
         const text = await res.text();
-        const ct = res.headers.get('content-type') || '';
         if (!res.ok) throw new Error(text.slice(0,200));
-        const data = ct.includes('application/json') ? JSON.parse(text) : {};
-        if (!data.ok) throw new Error(data.message || 'Login gagal');
-        location.href = '/'; // index.html
+        const data = JSON.parse(text);
+        if (data.ok) {
+          location.href = '/';
+        } else {
+          msg.textContent = data.message || 'Login gagal';
+        }
       } catch (e) {
-        msg.textContent = String(e.message || e);
+        msg.textContent = 'Gagal login: ' + e.message;
       }
     });
 
-    // Enter submit
-    document.addEventListener('keydown', (e) => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
   </script>
 </body>
 </html>
