@@ -1,124 +1,83 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full" data-theme="night">
+<html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Script Engine AI</title>
-  <meta name="description" content="Ubah link produk jadi skrip siap pakai dalam hitungan detik.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0b1220;
-      --panel:rgba(8,13,25,.66);
-      --panel-border:rgba(139,160,190,.2);
-      --txt:#e8eef7;
-      --muted:#93a4bf;
-      --neon1:#22d3ee; /* teal/blue */
-      --neon2:#7c3aed; /* purple */
-      --mint:#2dd4bf;
-    }
-    [data-theme="day"]{
-      --bg:#0e1426;
-      --panel:rgba(255,255,255,.06);
-      --panel-border:rgba(139,160,190,.25);
-      --txt:#f4f7fb;
-      --muted:#a7b3c9;
+      --bg:#0f1b33;            /* lebih cerah dari versi sebelumnya */
+      --panel:rgba(20,34,64,.68);
+      --border:rgba(154,175,210,.25);
+      --txt:#eaf1ff;
+      --muted:#b4c0d8;
+      --blue:#22c1f1; --purple:#8b5cf6;
     }
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
-    /* neon gradient helpers */
-    .g-title{background:linear-gradient(92deg,var(--neon1),var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .g-btn{background:linear-gradient(92deg,var(--neon1),var(--neon2))}
-    .glass{background:var(--panel);border:1px solid var(--panel-border);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.45)}
-    /* subtle grid/hex overlay */
-    .bg-neon{position:relative;isolation:isolate}
-    .bg-neon:before{
-      content:"";position:absolute;inset:0;z-index:-1;
+    .g-title{background:linear-gradient(90deg,#60a5fa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .card{background:var(--panel);border:1px solid var(--border);backdrop-filter:blur(10px);border-radius:20px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+    .cta{background:linear-gradient(90deg,#12b3ff,#7b5cff);box-shadow:0 12px 40px rgba(112,80,255,.35)}
+    .iconGrad{background:linear-gradient(160deg,#62a8ff,#b574ff);}
+    .bg-bright{
+      position:relative;isolation:isolate;
       background:
-        radial-gradient(1200px 480px at 10% -10%, rgba(99,102,241,.22), transparent 60%),
-        radial-gradient(1200px 520px at 100% 0%, rgba(56,189,248,.18), transparent 60%),
+        radial-gradient(1200px 500px at 10% -10%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(1200px 520px at 100% 0%, rgba(168,85,247,.22), transparent 60%),
         url("/public/bg/ai-network-2.jpg") center/cover no-repeat;
-      filter:saturate(1.06) contrast(1.05) brightness(.9);
+      filter:saturate(1.08) contrast(1.05) brightness(1.05);
     }
-    .bg-neon:after{
-      /* hex grid */
-      content:"";position:absolute;inset:0;z-index:-2;opacity:.12;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(124,58,237,.35), transparent 55%) 0 0/1200px 1200px,
-        conic-gradient(from 0deg at 50% 50%, rgba(34,211,238,.4), transparent 30%, transparent 70%, rgba(124,58,237,.3)) 0 0/900px 900px;
-    }
-    .card:hover{box-shadow:0 18px 50px rgba(59,130,246,.25)}
-    .toggle{appearance:none;width:54px;height:30px;border-radius:999px;background:#0f172a;border:1px solid #334155;position:relative;cursor:pointer}
-    .toggle:checked{background:linear-gradient(100deg,var(--neon1),var(--neon2));border-color:transparent}
-    .toggle:before{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#e2e8f0;transition:all .25s}
-    .toggle:checked:before{left:27px;background:white}
   </style>
 </head>
-<body class="bg-neon">
-  <header class="max-w-6xl mx-auto px-6 pt-6 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <img src="/public/logo.png" alt="logo" class="w-10 h-10 object-contain">
-      <strong class="tracking-wide">Script Engine AI</strong>
-    </div>
-    <div class="flex items-center gap-3 text-sm text-[var(--muted)]">
-      <span>Mode Malam</span>
-      <input id="themeToggle" type="checkbox" class="toggle">
-    </div>
-  </header>
+<body class="bg-bright">
+  <main class="max-w-6xl mx-auto px-6 pt-16 pb-24 text-center">
+    <!-- logo tengah -->
+    <img src="/public/logo.png" alt="logo" class="mx-auto w-20 h-20 object-contain mb-6">
 
-  <main class="relative z-10 max-w-6xl mx-auto px-6 pt-10 pb-24 text-center">
-    <h1 class="g-title text-4xl md:text-6xl font-extrabold leading-tight">Script Engine AI</h1>
-    <p class="mt-4 text-[var(--muted)] max-w-3xl mx-auto">
+    <h1 class="g-title text-[44px] md:text-[68px] leading-[1.05] font-extrabold tracking-tight">
+      Script Engine AI
+    </h1>
+    <p class="mt-5 text-lg md:text-2xl text-[var(--muted)] max-w-4xl mx-auto">
       Ubah link produk jadi skrip konten siap pakai dalam 30 detik. Hemat waktu Anda, tingkatkan konversi.
     </p>
 
-    <div class="grid md:grid-cols-4 gap-5 mt-10">
-      <div class="card glass rounded-2xl p-6 text-left">
-        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">🧠</div>
-        <h3 class="font-semibold">Mesin AI Cerdas</h3>
-        <p class="text-sm text-[var(--muted)] mt-1">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+    <!-- 4 kartu fitur -->
+    <div class="grid md:grid-cols-4 gap-6 mt-12">
+      <div class="card p-8 text-left">
+        <div class="w-16 h-16 rounded-2xl iconGrad grid place-items-center mb-4 shadow-lg">🧠</div>
+        <h3 class="text-2xl font-extrabold mb-2">Mesin AI Cerdas</h3>
+        <p class="text-[var(--muted)] leading-relaxed">Ditenagai AI yang dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
       </div>
-      <div class="card glass rounded-2xl p-6 text-left">
-        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">⚡</div>
-        <h3 class="font-semibold">Proses Kilat</h3>
-        <p class="text-sm text-[var(--muted)] mt-1">Dari link jadi skrip siap pakai hanya hitungan detik.</p>
+      <div class="card p-8 text-left">
+        <div class="w-16 h-16 rounded-2xl iconGrad grid place-items-center mb-4 shadow-lg">⚡</div>
+        <h3 class="text-2xl font-extrabold mb-2">Proses Kilat</h3>
+        <p class="text-[var(--muted)] leading-relaxed">Dari link menjadi skrip siap pakai hanya dalam hitungan detik.</p>
       </div>
-      <div class="card glass rounded-2xl p-6 text-left">
-        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">🎛️</div>
-        <h3 class="font-semibold">Penuh Kendali</h3>
-        <p class="text-sm text-[var(--muted)] mt-1">Atur gaya, panjang tulisan, dan jumlah variasi.</p>
+      <div class="card p-8 text-left">
+        <div class="w-16 h-16 rounded-2xl iconGrad grid place-items-center mb-4 shadow-lg">🎛️</div>
+        <h3 class="text-2xl font-extrabold mb-2">Penuh Kendali</h3>
+        <p class="text-[var(--muted)] leading-relaxed">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai keinginan Anda.</p>
       </div>
-      <div class="card glass rounded-2xl p-6 text-left">
-        <div class="w-10 h-10 rounded-xl grid place-items-center mb-3" style="background:linear-gradient(140deg,rgba(99,102,241,.25),rgba(34,211,238,.2))">📥</div>
-        <h3 class="font-semibold">Langsung Eksekusi</h3>
-        <p class="text-sm text-[var(--muted)] mt-1">Salin sekali klik untuk bank konten Anda.</p>
+      <div class="card p-8 text-left">
+        <div class="w-16 h-16 rounded-2xl iconGrad grid place-items-center mb-4 shadow-lg">📥</div>
+        <h3 class="text-2xl font-extrabold mb-2">Langsung Eksekusi</h3>
+        <p class="text-[var(--muted)] leading-relaxed">Salin sekali klik atau unduh skrip dalam format Word & PDF untuk bank konten Anda.</p>
       </div>
     </div>
 
-    <div class="mt-10">
-      <a href="generator.html" class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold g-btn shadow-[0_0_30px_rgba(124,58,237,.35)]">
-        Mulai Hasilkan &gt;
+    <!-- CTA besar -->
+    <div class="mt-12">
+      <a href="generator.html"
+         class="inline-flex items-center justify-center w-full md:w-[720px] mx-auto px-8 py-5 rounded-2xl text-white text-xl font-extrabold cta">
+        ✨ Generate Skrip Sekarang!
       </a>
     </div>
 
-    <footer class="mt-12 text-center text-[var(--muted)] text-sm">
-      © 2025 — Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+    <footer class="mt-12 text-[var(--muted)] text-sm">
+      © 2025 — Dibuat untuk Mempermudah promosi afiliasi.
     </footer>
   </main>
-
-  <script>
-    // theme toggle (persist to localStorage)
-    const t = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme') || 'night';
-    document.documentElement.setAttribute('data-theme', saved);
-    t.checked = saved === 'night';
-    t.addEventListener('change', ()=>{
-      const theme = t.checked ? 'night' : 'day';
-      document.documentElement.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-    });
-  </script>
 </body>
 </html>
