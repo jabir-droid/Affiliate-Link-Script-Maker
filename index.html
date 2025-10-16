@@ -8,59 +8,53 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
-      --blue:#12b3ff; --purple:#7b5cff; --cta:#ff8a00;
+      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.9); --border:rgba(15,23,42,.10);
+      --blue:#12b3ff; --purple:#7b5cff;
     }
-    *{box-sizing:border-box}
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      /* BG halus & rata */
       background:
-        radial-gradient(1200px 600px at 15% -10%, rgba(233,241,255,.85) 0%, rgba(233,241,255,0) 70%),
-        radial-gradient(1200px 600px at 85% 0%,  rgba(239,231,255,.85) 0%, rgba(239,231,255,0) 70%),
-        linear-gradient(180deg,#f7faff 0%, #eef3ff 55%, #eaf0ff 100%),
+        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
-      position:relative; isolation:isolate;
-    }
-    body::before{
-      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
-      background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
-      background-size: 22px 22px; opacity:.30; mix-blend-mode:multiply;
     }
     .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.12; letter-spacing:-.02em}
+    .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.06; letter-spacing:-.02em}
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
-    .feature{padding:26px;border-radius:20px;background:var(--panel);border:1px solid var(--border);
-      box-shadow:0 14px 34px rgba(15,23,42,.10);text-align:center;transform:translateZ(0);transition:.18s ease}
-    .feature:hover{transform:translateY(-3px); box-shadow:0 18px 44px rgba(15,23,42,.16)}
-    .feature:active{transform:translateY(0) scale(.99)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
+    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
     .icon-emoji{font-size:40px; line-height:1}
     .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
-
-    .cta{
-      background:linear-gradient(90deg,var(--blue),var(--purple));
-      color:#fff; border-radius:18px; box-shadow:0 20px 45px rgba(123,92,255,.35);
-      transform:translateZ(0); transition:transform .16s ease, box-shadow .16s ease;
-    }
-    .cta:hover{transform:translateY(-2px); box-shadow:0 26px 60px rgba(123,92,255,.42)}
-    .cta:active{transform:translateY(0) scale(.98)}
   </style>
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6">
-
     <!-- HERO -->
-    <section class="pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
+    <section class="pt-14 sm:pt-16 lg:pt-24 pb-8 text-center">
       <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
       <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
         Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
       </p>
+
+      <!-- Panel Login by Name -->
+      <div class="max-w-xl mx-auto mt-6 sm:mt-8 bg-white/90 backdrop-blur border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-lg">
+        <p class="text-slate-700 text-sm sm:text-base mb-3">
+          Masukkan <b>Nama Lynk.id</b> yang valid untuk masuk.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input id="loginName" class="flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-sky-400"
+                 placeholder="Contoh: Budi Santoso" />
+          <button id="btnLogin" class="px-6 py-3 rounded-xl font-semibold text-white"
+                  style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">Masuk</button>
+        </div>
+        <p id="loginErr" class="text-rose-600 mt-2 text-sm"></p>
+      </div>
     </section>
 
     <!-- FITUR -->
-    <section class="mt-6 sm:mt-10">
+    <section class="mt-4 sm:mt-8">
       <div class="grid-feat">
         <div class="feature">
           <div class="icon-emoji mb-3">🧠</div>
@@ -85,7 +79,7 @@
       </div>
 
       <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
-        <a href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 text-lg font-extrabold">
+        <a href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
           ✨ Generate Skrip Sekarang!
         </a>
       </div>
@@ -95,5 +89,23 @@
       © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
     </footer>
   </main>
+
+  <script>
+    // Login by name → /api/login-name
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+      const name = document.getElementById('loginName').value.trim();
+      const err = document.getElementById('loginErr'); err.textContent = '';
+      if(!name){ err.textContent = 'Nama wajib diisi.'; return; }
+      try{
+        const r = await fetch('/api/login-name', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ name })
+        });
+        const j = await r.json();
+        if(!r.ok || !j.ok) throw new Error(j?.message || 'Gagal masuk');
+        location.href = '/generator.html';
+      }catch(e){ err.textContent = e.message; }
+    });
+  </script>
 </body>
 </html>
