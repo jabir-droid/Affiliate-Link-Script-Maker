@@ -1,7 +1,7 @@
 // api/generate.js
 import { Redis } from "@upstash/redis";
 
-/* ----------------------------- Redis client ----------------------------- */
+/* ---------- Redis optional client ---------- */
 function redisClient() {
   const url =
     process.env.KV_REST_API_URL || process.env.AFFILIATE_SCRIPT_KV_REST_API_URL;
@@ -12,137 +12,37 @@ function redisClient() {
   return new Redis({ url, token });
 }
 
-/* ----------------------------- Konstanta/env ---------------------------- */
+/* ---------- Config ---------- */
 const MAX_USERS = Number(process.env.MAX_USERS || 50);
+/** Default ke model yang valid untuk generateContent (v1beta): */
 const PRIMARY_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+/** Daftar fallback yang juga mendukung generateContent (tanpa gemini-pro) */
 const FALLBACK_MODELS = [
-  "gemini-1.5-flash",
-  "gemini-1.5-flash-8b",
-  "gemini-pro",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-image",
+  "gemini-2.5-flash-lite",
 ].filter((m) => m !== PRIMARY_MODEL);
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
-/* -------------------------------- Utils -------------------------------- */
-const slugify = (name) =>
-  String(name || "")
+/* ---------- Utils ---------- */
+function slugify(name) {
+  return String(name || "")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 60);
-
-const todayStr = () => {
+}
+function todayStr() {
   const d = new Date();
-  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
-};
-
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function buildPrompt({ variations, topik, deskripsi, linkProduk, gaya, panjang }) {
-  return `
-Tulis ${variations} variasi skrip promosi afiliasi dalam bahasa Indonesia.
-Produk: ${topik}
-Kelebihan: ${deskripsi.join(", ")}
-Link: ${linkProduk}
-Gaya: ${gaya}
-Panjang: ${panjang}
-
-Format keluaran HARUS JSON valid, tanpa teks lain:
-{
-  "scripts": [
-    { "title": "Judul Variasi 1", "content": "Isi copy 1 (multi-paragraf boleh)" }
-  ]
-}`.trim();
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function parseGeminiTextToJSON(text) {
-  if (!text) throw new Error("Model tidak mengembalikan teks.");
-  let raw = String(text).replace(/```json|```/g, "").trim();
-  try {
-    return JSON.parse(raw);
-  } catch {
-    const start = raw.indexOf("{");
-    const end = raw.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return JSON.parse(raw.slice(start, end + 1));
-    }
-    throw new Error("Format balikan model tidak sesuai (tanpa 'scripts').");
-  }
-}
-
-/* ----------------------- Panggilan Gemini + Retry ---------------------- */
-async function callGeminiOnce({ model, prompt }) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
-    model
-  )}:generateContent?key=${GEMINI_API_KEY}`;
-
-  const payload = {
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.9, topP: 0.9 },
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  const bodyText = await res.text();
-
-  if (!res.ok) {
-    const err = new Error(`Gemini error (${res.status}): ${bodyText}`);
-    err.status = res.status;
-    throw err;
-  }
-
-  const j = JSON.parse(bodyText);
-  const text =
-    j?.candidates?.[0]?.content?.parts?.map((p) => p?.text).join("") ||
-    j?.candidates?.[0]?.content?.parts?.[0]?.text ||
-    "";
-
-  const parsed = parseGeminiTextToJSON(text);
-  if (!parsed || !Array.isArray(parsed.scripts)) {
-    throw new Error("Format balikan model tidak sesuai (tanpa 'scripts').");
-  }
-  return parsed.scripts;
-}
-
-async function callGeminiWithRetry({ prompt }) {
-  if (!GEMINI_API_KEY) {
-    // Fallback dev agar UI tetap jalan
-    return [
-      {
-        title: "Contoh 1",
-        content:
-          "Ini contoh hasil dummy karena API Key kosong. Tambahkan GEMINI_API_KEY di environment untuk hasil asli.",
-      },
-    ];
-  }
-
-  const all = [PRIMARY_MODEL, ...FALLBACK_MODELS];
-  let lastErr = null;
-
-  for (const model of all) {
-    for (let i = 0; i < 3; i++) {
-      try {
-        return await callGeminiOnce({ model, prompt });
-      } catch (e) {
-        lastErr = e;
-        const retriable = [429, 500, 502, 503, 504].includes(e?.status);
-        if (!retriable || i === 2) break;
-        const base = 1000 * Math.pow(2, i); // 1s,2s,4s
-        const jitter = Math.floor(Math.random() * 350);
-        await delay(base + jitter);
-      }
-    }
-  }
-  throw lastErr || new Error("Gagal memanggil model AI.");
-}
-
-/* -------------------------------- Handler ------------------------------- */
+/* ---------- Core ---------- */
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -150,23 +50,26 @@ export default async function handler(req, res) {
   }
 
   const b = typeof req.body === "object" ? req.body : {};
-  // Nama TIDAK wajib lagi — default "guest"
-  const userName = String(b.userName || b.nama || "guest").trim();
+  // userName kini opsional; kalau tidak ada kita set "anon"
+  const userName = String(b.userName || b.nama || "").trim() || "anon";
   const linkProduk = String(b.linkProduk || b.link || "").trim();
   const topik = String(b.topik || b.topic || "").trim();
+
+  // dukung dua nama properti utk kelebihan
   const deskripsi = Array.isArray(b.deskripsi)
     ? b.deskripsi
     : Array.isArray(b.descriptions)
     ? b.descriptions
     : [];
-  const gaya = String(b.gaya || b.style || "Gen Z");
-  const panjang = String(b.panjang || b.length || "Sedang");
+
+  const gaya = String(b.gaya || b.style || "Santai & Ramah");
+  const panjang = String(b.panjang || b.length || "Sedang (2-3 paragraf)");
   const jumlah = Math.max(
     1,
-    Math.min(8, Number(b.jumlah || b.count || b.generateCount || 1))
+    Math.min(10, Number(b.jumlah || b.count || b.generateCount || 1))
   );
 
-  // Validasi minimal
+  // Validasi minimal yang disepakati
   if (!linkProduk)
     return res
       .status(400)
@@ -176,59 +79,159 @@ export default async function handler(req, res) {
       .status(400)
       .json({ ok: false, message: "Nama/Jenis Produk wajib diisi." });
   if (!deskripsi || deskripsi.length < 1)
-    return res
-      .status(400)
-      .json({ ok: false, message: "Minimal 1 kelebihan/keunggulan." });
+    return res.status(400).json({
+      ok: false,
+      message: "Minimal 1 kelebihan/keunggulan.",
+    });
 
-  // Redis + batas pengguna (best-effort)
+  // Batasi jumlah user unik jika Redis tersedia (opsional)
   const redis = redisClient();
-  const userIdBase = userName !== "guest" ? userName : `guest-${topik || "anon"}`;
-  const userId = slugify(userIdBase);
+  const userId = slugify(userName); // bisa "anon"
   const USERS_SET = "aff:users";
   const date = todayStr();
 
-  if (redis) {
+  if (redis && userId !== "anon") {
     try {
       const count = await redis.scard(USERS_SET);
       const isMember = await redis.sismember(USERS_SET, userId);
       if (!isMember && count >= MAX_USERS) {
-        return res
-          .status(403)
-          .json({ ok: false, message: "Slot pengguna telah penuh. Hubungi admin." });
+        return res.status(403).json({
+          ok: false,
+          message: "Slot pengguna telah penuh. Hubungi admin.",
+        });
       }
-    } catch {}
+    } catch {
+      // abaikan jika Redis bermasalah
+    }
   }
 
-  // Bangun prompt & panggil Gemini (dengan retry/fallback)
-  const prompt = buildPrompt({
-    variations: jumlah,
-    topik,
-    deskripsi,
-    linkProduk,
-    gaya,
-    panjang,
-  });
+  /* ---------- Prompt ---------- */
+  const prompt = `
+Tulis ${jumlah} variasi skrip promosi afiliasi dalam bahasa Indonesia.
+Produk: ${topik}
+Kelebihan: ${deskripsi.join(", ")}
+Link: ${linkProduk}
+Gaya: ${gaya}
+Panjang: ${panjang}
 
+KELUARAN HARUS JSON valid tanpa teks lain:
+{
+  "scripts": [
+    { "title": "Judul Variasi 1", "content": "Isi copy 1 (multi-paragraf boleh)" }
+  ]
+}
+  `.trim();
+
+  /* ---------- Panggil Gemini ---------- */
   let scripts = null;
-  try {
-    scripts = await callGeminiWithRetry({ prompt });
-  } catch (e) {
-    const code = e?.status || 500;
-    const friendly =
-      code === 503 || code === 429
-        ? "⚠️ Server AI sedang sibuk. Silakan coba lagi sebentar lagi."
-        : e?.message || "Terjadi kesalahan saat memproses permintaan.";
-    return res.status(code).json({ ok: false, message: friendly });
+
+  async function callGeminiModel(model) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+      model
+    )}:generateContent?key=${GEMINI_API_KEY}`;
+
+    const payload = {
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.9, topP: 0.9 },
+    };
+
+    const r = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const textBody = await r.text();
+
+    // Response tidak OK -> lempar error dengan body mentah
+    if (!r.ok) {
+      const err = new Error(
+        `Gemini error (${r.status}): ${textBody || r.statusText}`
+      );
+      err.status = r.status;
+      throw err;
+    }
+
+    // Parse kandidat
+    let j;
+    try {
+      j = textBody ? JSON.parse(textBody) : null;
+    } catch {
+      throw new Error(`Gagal parse JSON dari Gemini: ${textBody?.slice(0, 200)}`);
+    }
+
+    const text =
+      j?.candidates?.[0]?.content?.parts?.map((p) => p?.text).join("") ||
+      j?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "";
+
+    // Model kadang mengembalikan codefence
+    let parsed = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      const cleaned = String(text).replace(/```json|```/g, "").trim();
+      parsed = JSON.parse(cleaned);
+    }
+    if (!parsed || !Array.isArray(parsed.scripts)) {
+      throw new Error("Format balikan model tidak sesuai (tanpa 'scripts').");
+    }
+    return parsed.scripts;
   }
 
-  // Catat penggunaan (best-effort)
+  try {
+    if (!GEMINI_API_KEY) {
+      // fallback dummy agar UI tetap jalan saat dev-local
+      scripts = Array.from({ length: jumlah }).map((_, i) => ({
+        title: `Variasi ${i + 1} • ${topik}`,
+        content: `Contoh skrip (${i + 1}) untuk ${topik}\n\n${deskripsi.join(
+          " • "
+        )}\n\n${linkProduk}`,
+      }));
+    } else {
+      const modelsToTry = [PRIMARY_MODEL, ...FALLBACK_MODELS];
+
+      /** Retry policy kecil untuk 429/503 per model */
+      let lastErr = null;
+      for (const model of modelsToTry) {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            scripts = await callGeminiModel(model);
+            // Catat model yang dipakai kalau ingin
+            break;
+          } catch (e) {
+            lastErr = e;
+            // Retry hanya untuk 429/503
+            const status = e?.status || 0;
+            if (status === 429 || status === 503) {
+              // backoff singkat
+              await new Promise((r) =>
+                setTimeout(r, attempt === 0 ? 600 : 1200)
+              );
+              continue;
+            }
+            // error lain: coba model berikutnya
+            break;
+          }
+        }
+        if (scripts) break;
+      }
+      if (!scripts) throw lastErr || new Error("Gagal memanggil model Gemini.");
+    }
+  } catch (e) {
+    return res.status(500).json({
+      ok: false,
+      message: String(e?.message || e),
+    });
+  }
+
+  /* ---------- Catat pemakaian (tidak memblokir) ---------- */
   if (redis) {
     try {
       await redis.incr(`aff:global:used:${date}`);
       await redis.incr(`aff:user:used:${date}:${userId}`);
       await redis.hset(`aff:user:meta:${userId}`, {
         name: userName,
-        topic: topik,
         createdAt: Date.now(),
       });
       await redis.sadd(USERS_SET, userId);
