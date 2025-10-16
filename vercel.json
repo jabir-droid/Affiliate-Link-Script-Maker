@@ -1,6 +1,10 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/generate", "destination": "/api/app" },
+    { "source": "/api/quota", "destination": "/api/app" },
+    { "source": "/api/login-name", "destination": "/api/app" },
+    { "source": "/api/me", "destination": "/api/app" },
+    { "source": "/api/logout", "destination": "/api/app" },
+    { "source": "/api/admin/users", "destination": "/api/app" }
   ]
 }
