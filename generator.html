@@ -8,21 +8,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
-      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff;
+      --panel:#ffffff; --border:#e3e8f4; --txt:#0f172a; --muted:#475569;
+      --blue:#12b3ff; --purple:#7b5cff;
     }
     html,body{height:100%}
     body{
       margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      /* BG halus & rata + image */
       background:
-        linear-gradient(to bottom, #f7faff 0%, #eef3ff 100%),
+        linear-gradient(180deg,#f7faff 0%, #eef3ff 55%, #eaf0ff 100%),
         url("/bg/generator-code.jpg") center/cover no-repeat fixed;
       position:relative; isolation:isolate;
     }
+    /* titik-titik lembut */
     body::before{
       content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
       background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
-      background-size: 22px 22px; opacity:.4; mix-blend-mode:multiply;
+      background-size: 22px 22px; opacity:.35; mix-blend-mode:multiply;
     }
 
     .g-title{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -34,14 +36,14 @@
     .title-size{font-size:clamp(26px, 4.5vw, 44px); line-height:1.08}
     .section-pad{padding:clamp(16px, 3vw, 28px)}
 
-    /* efek press + ripple untuk tombol */
+    /* Press + Ripple */
     .btn-press{position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .2s ease,filter .2s ease;will-change:transform;}
     .btn-press:hover{transform:translateY(-1px);filter:saturate(1.02)}
     .btn-press:active{transform:scale(.985)}
     .ripple{position:absolute;border-radius:999px;transform:translate(-50%,-50%) scale(0);background:rgba(255,255,255,.5);animation:rip .6s ease-out forwards;pointer-events:none;}
     @keyframes rip{to{transform:translate(-50%,-50%) scale(10);opacity:0}}
 
-    /* Tombol opsi gaya & panjang */
+    /* Segmented controls */
     .seg input{display:none}
     .seg label{
       border:1px solid var(--border);background:#f9fbff;
@@ -53,20 +55,42 @@
     .seg input:checked + label{
       background:linear-gradient(90deg,rgba(18,179,255,.20),rgba(124,92,255,.20));
       border-color:#7b5cff;box-shadow:0 0 20px rgba(124,92,255,.20);
+      animation:pulseSel 1.8s ease-in-out infinite;
+    }
+    /* CTA pulse singkat */
+    .btn-press.is-pulsing{animation:ctaPulse .9s ease-out 1;}
+    @keyframes pulseSel{
+      0%{box-shadow:0 0 12px rgba(124,92,255,.18), 0 0 0 0 rgba(124,92,255,.22);}
+      50%{box-shadow:0 0 20px rgba(124,92,255,.28), 0 0 0 8px rgba(124,92,255,.08);}
+      100%{box-shadow:0 0 12px rgba(124,92,255,.18), 0 0 0 0 rgba(124,92,255,0);}
+    }
+    @keyframes ctaPulse{
+      0%{transform:translateY(0) scale(1);box-shadow:0 12px 36px rgba(123,92,255,.28);}
+      50%{transform:translateY(-1px) scale(1.01);box-shadow:0 18px 46px rgba(123,92,255,.36);}
+      100%{transform:translateY(0) scale(1);box-shadow:0 12px 36px rgba(123,92,255,.28);}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .seg input:checked + label,.btn-press.is-pulsing{animation:none !important;}
     }
 
-    /* Mobile (≤640) */
+    /* Responsive */
     @media (max-width:640px){
       .seg-style,.seg-length{display:grid;grid-template-columns:1fr;gap:12px}
       .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom)+14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
       main{padding-bottom:110px}
       #chips{display:flex;flex-wrap:wrap;gap:8px}
     }
-    @media (min-width:641px){ .seg-style,.seg-length{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))} }
+    @media (min-width:641px){
+      .seg-style,.seg-length{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+    }
+    @media (min-width:1025px){
+      .seg-length{grid-template-columns:repeat(3,1fr)}
+    }
   </style>
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
+    <!-- HEADER -->
     <div class="flex items-start justify-between gap-4">
       <div class="flex items-start gap-3 sm:gap-4">
         <button onclick="history.back()" class="grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl border border-[var(--border)] bg-white/80">←</button>
@@ -75,50 +99,105 @@
           <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
         </div>
       </div>
+
+      <!-- TOOLBAR kanan (desktop) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <button id="btnGuide" class="glass px-4 py-2 rounded-xl text-sm bg-white flex items-center gap-2 btn-press">
+          <span style="color:#0284c7">ℹ</span> Panduan
+        </button>
+        <div class="pill px-4 py-2 text-sm flex items-center gap-2">
+          Kuota: <b id="quotaNow">—</b> / 1000
+          <button id="btnRefreshQuota" class="ml-1 underline text-sky-600">Refresh</button>
+        </div>
+      </div>
     </div>
 
+    <!-- PANDUAN -->
+    <section id="guidePanel" class="glass mt-4 hidden">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(90deg,#60a5fa,#8b5cf6)"></span>
+          <h3 class="text-lg sm:text-xl font-extrabold">Panduan Penggunaan</h3>
+        </div>
+        <button id="closeGuide" class="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)] bg-white btn-press">✕</button>
+      </div>
+      <div class="section-pad">
+        <ol class="space-y-4 sm:space-y-5 text-[15px] sm:text-[17px] leading-relaxed">
+          <li>1. Masukkan <b>link produk</b> & info dasar.</li>
+          <li>2. Tambahkan <b>kelebihan/keunggulan</b> (≥1).</li>
+          <li>3. Pilih <b>gaya bahasa</b> yang sesuai.</li>
+          <li>4. Tentukan <b>panjang tulisan</b>.</li>
+          <li>5. Klik <b>Mulai Hasilkan</b>.</li>
+          <li>6. <b>Salin hasil</b> atau download.</li>
+        </ol>
+      </div>
+    </section>
+
     <!-- FORM -->
-    <section class="glass mt-6">
+    <section class="glass mt-5">
       <div class="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2 bg-white/60">
         <span>📝</span><h2 class="text-[18px] sm:text-[22px] font-extrabold">Form Input Produk</h2>
       </div>
 
       <div class="section-pad grid gap-5 sm:gap-6">
         <div>
-          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk</label>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-600">*</span></label>
           <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
         </div>
+
         <div>
-          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk</label>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-600">*</span></label>
           <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
         </div>
 
         <div>
-          <label class="block mb-3 text-[var(--muted)] font-semibold">Gaya Bahasa</label>
-          <div class="seg seg-style">
-            <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label for="sty1" class="btn-press">Santai & Ramah</label>
-            <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2" class="btn-press">Formal & Informatif</label>
-            <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3" class="btn-press">Promosi Soft Selling</label>
-            <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label for="sty4" class="btn-press">Penulisan Naskah Iklan (AIDA/PAS)</label>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-600">*</span></label>
+            <button id="addDescBtn" class="px-4 py-2 rounded-xl text-white btn-press" style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">+ Tambah</button>
           </div>
+          <input id="descInput" class="inp" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
+          <div id="chips" class="mt-2 flex flex-wrap gap-2"></div>
         </div>
 
         <div>
-          <label class="block mb-3 text-[var(--muted)] font-semibold">Panjang Tulisan</label>
-          <div class="seg seg-length">
-            <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1" class="btn-press">Pendek (1 paragraf)</label>
-            <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2" class="btn-press">Sedang (2-3 paragraf)</label>
-            <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3" class="btn-press">Panjang (artikel mini)</label>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Jumlah Variasi Konten</label>
+          <input id="count" type="number" min="1" max="10" value="3" class="inp">
+          <p class="text-xs mt-1 text-[var(--muted)]">Antara 1–10 variasi</p>
+        </div>
+
+        <div class="grid gap-6 sm:gap-8">
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Gaya Bahasa</label>
+            <div class="seg seg-style">
+              <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label for="sty1" class="btn-press">Santai & Ramah</label>
+              <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2" class="btn-press">Formal & Informatif</label>
+              <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3" class="btn-press">Promosi Soft Selling</label>
+              <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label for="sty4" class="btn-press">Penulisan Naskah Iklan (AIDA/PAS)</label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Panjang Tulisan</label>
+            <div class="seg seg-length">
+              <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1" class="btn-press">Pendek (1 paragraf)</label>
+              <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2" class="btn-press">Sedang (2-3 paragraf)</label>
+              <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3" class="btn-press">Panjang (artikel mini)</label>
+            </div>
           </div>
         </div>
 
-        <button id="btnGenerate" class="hidden sm:inline-flex mt-4 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta btn-press">
+        <!-- CTA normal (tablet/desktop) -->
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta btn-press">
           ✨ Mulai Hasilkan
         </button>
+        <span id="err" class="text-rose-600"></span>
       </div>
     </section>
+
+    <section id="results" class="mt-8 grid gap-6"></section>
   </main>
 
+  <!-- Sticky CTA untuk HP -->
   <div class="sm:hidden sticky-cta">
     <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta btn-press">
       ✨ Mulai Hasilkan
@@ -126,17 +205,136 @@
   </div>
 
   <script>
-    // Ripple global untuk semua elemen berkelas btn-press
-    document.querySelectorAll('.btn-press').forEach(btn=>{
-      btn.addEventListener('click',function(e){
-        const r=document.createElement('span');
-        const rect=this.getBoundingClientRect();
-        const size=Math.max(rect.width, rect.height);
-        r.className='ripple'; r.style.width=r.style.height=size+'px';
-        r.style.left=(e.clientX-rect.left)+'px'; r.style.top=(e.clientY-rect.top)+'px';
-        this.appendChild(r); setTimeout(()=>r.remove(), 600);
-      },{passive:true});
+    /* ====== Ripple untuk semua .btn-press ====== */
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.btn-press');
+      if(!btn) return;
+      const r=document.createElement('span');
+      const rect=btn.getBoundingClientRect();
+      const size=Math.max(rect.width, rect.height);
+      r.className='ripple';
+      r.style.width=r.style.height=size+'px';
+      r.style.left=(e.clientX-rect.left)+'px';
+      r.style.top=(e.clientY-rect.top)+'px';
+      btn.appendChild(r);
+      setTimeout(()=>r.remove(), 600);
+    }, {passive:true});
+
+    /* ====== CTA pulse singkat ====== */
+    ['#btnGenerate','#btnGenerateMobile'].forEach(sel=>{
+      const el=document.querySelector(sel);
+      if(!el) return;
+      el.addEventListener('click', ()=>{
+        el.classList.add('is-pulsing');
+        setTimeout(()=>el.classList.remove('is-pulsing'), 950);
+      }, {passive:true});
     });
+
+    /* ====== Panel Panduan ====== */
+    const panel = document.getElementById('guidePanel');
+    const openBtn = document.getElementById('btnGuide');
+    const closeBtn = document.getElementById('closeGuide');
+    openBtn?.addEventListener('click',()=> panel.classList.toggle('hidden'));
+    closeBtn?.addEventListener('click',()=> panel.classList.add('hidden'));
+
+    /* ====== Kuota ====== */
+    async function loadQuota(){
+      try{
+        const r=await fetch('/api/quota');
+        const j=await r.json();
+        document.getElementById('quotaNow').textContent = j?.remaining ?? '—';
+      }catch{
+        document.getElementById('quotaNow').textContent = '—';
+      }
+    }
+    document.getElementById('btnRefreshQuota')?.addEventListener('click', loadQuota);
+    loadQuota();
+
+    /* ====== Chips Kelebihan ====== */
+    const chipsEl=document.getElementById('chips');
+    const inputEl=document.getElementById('descInput');
+    const addBtn=document.getElementById('addDescBtn');
+    let chips=[];
+    function renderChips(){
+      chipsEl.innerHTML='';
+      chips.forEach((t,i)=>{
+        const tag=document.createElement('span');
+        tag.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';
+        tag.style.cssText='background:#eef2ff;border:1px solid var(--border)';
+        tag.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;
+        tag.querySelector('button').onclick=e=>{
+          chips.splice(+e.target.dataset.i,1);
+          renderChips();
+        };
+        chipsEl.appendChild(tag);
+      });
+    }
+    function addChip(){
+      const v=inputEl.value.trim();
+      if(!v) return;
+      chips.push(v);
+      inputEl.value='';
+      renderChips();
+    }
+    inputEl.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){ e.preventDefault(); addChip(); }
+    });
+    addBtn?.addEventListener('click', addChip);
+
+    /* ====== Generate ====== */
+    async function doGenerate(btn){
+      const err=document.getElementById('err'); err.textContent='';
+      const url=document.getElementById('productUrl').value.trim();
+      const topic=document.getElementById('productTopic').value.trim();
+      const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
+      const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
+      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+      const descriptions=[...chips];
+      if(!url) return err.textContent='Link Produk wajib diisi.';
+      if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
+      if(descriptions.length<1) return err.textContent='Minimal 1 kelebihan / keunggulan.';
+
+      const original=btn.innerHTML; btn.disabled=true; btn.innerHTML='Sedang meracik…';
+      try{
+        const r=await fetch('/api/generate',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
+            // kompatibilitas lama:
+            link:url, topic, descriptions, style, length, generateCount:count, count
+          })
+        });
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{};
+        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
+        renderResults(j.scripts||[]); loadQuota();
+      }catch(e){ err.textContent=e.message; }
+      finally{ btn.disabled=false; btn.innerHTML=original; }
+    }
+    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this) });
+    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this) });
+
+    function renderResults(scripts){
+      const box=document.getElementById('results'); box.innerHTML='';
+      scripts.forEach((s,i)=>{
+        const card=document.createElement('div'); card.className='glass p-5 sm:p-6';
+        card.innerHTML=`
+          <h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#3b82f6">Variasi ${i+1} • ${escapeHtml(s.title||'')}</h3>
+          <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base">${escapeHtml(s.content||'')}</p>
+          <div class="mt-4 flex justify-end">
+            <button class="px-4 py-2 rounded-lg text-white btn-press" style="background:#334155" data-copy>Salin</button>
+          </div>`;
+        card.querySelector('[data-copy]').onclick=()=>{ 
+          navigator.clipboard.writeText(s.content||'').then(()=>{
+            const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500);
+          }); 
+        };
+        box.appendChild(card);
+      });
+      if (window.innerWidth <= 640 && scripts.length) {
+        window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
+      }
+    }
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
   </script>
 </body>
 </html>
