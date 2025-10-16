@@ -14,15 +14,12 @@ function redisClient() {
 
 /* ----------------------------- Konstanta/env ---------------------------- */
 const MAX_USERS = Number(process.env.MAX_USERS || 50);
-// Model utama yang kamu set sebelumnya; tetap dipakai sebagai prioritas
 const PRIMARY_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
-// Cadangan jika overload/limit (urut prioritas)
 const FALLBACK_MODELS = [
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
   "gemini-pro",
 ].filter((m) => m !== PRIMARY_MODEL);
-
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
 /* -------------------------------- Utils -------------------------------- */
@@ -62,18 +59,14 @@ Format keluaran HARUS JSON valid, tanpa teks lain:
 
 function parseGeminiTextToJSON(text) {
   if (!text) throw new Error("Model tidak mengembalikan teks.");
-  // Buang fence kalau ada
   let raw = String(text).replace(/```json|```/g, "").trim();
-  // Coba parse apa adanya
   try {
     return JSON.parse(raw);
-  } catch (_) {
-    // Ambil substring JSON pertama (simple heuristic)
+  } catch {
     const start = raw.indexOf("{");
     const end = raw.lastIndexOf("}");
     if (start >= 0 && end > start) {
-      const sliced = raw.slice(start, end + 1);
-      return JSON.parse(sliced);
+      return JSON.parse(raw.slice(start, end + 1));
     }
     throw new Error("Format balikan model tidak sesuai (tanpa 'scripts').");
   }
@@ -104,13 +97,7 @@ async function callGeminiOnce({ model, prompt }) {
     throw err;
   }
 
-  let j = null;
-  try {
-    j = JSON.parse(bodyText);
-  } catch {
-    throw new Error("Gagal membaca balasan dari model.");
-  }
-
+  const j = JSON.parse(bodyText);
   const text =
     j?.candidates?.[0]?.content?.parts?.map((p) => p?.text).join("") ||
     j?.candidates?.[0]?.content?.parts?.[0]?.text ||
@@ -127,30 +114,30 @@ async function callGeminiWithRetry({ prompt }) {
   if (!GEMINI_API_KEY) {
     // Fallback dev agar UI tetap jalan
     return [
-      { title: "Contoh 1", content: "Ini contoh hasil dummy karena API Key kosong." },
+      {
+        title: "Contoh 1",
+        content:
+          "Ini contoh hasil dummy karena API Key kosong. Tambahkan GEMINI_API_KEY di environment untuk hasil asli.",
+      },
     ];
   }
 
-  const allModels = [PRIMARY_MODEL, ...FALLBACK_MODELS];
-
+  const all = [PRIMARY_MODEL, ...FALLBACK_MODELS];
   let lastErr = null;
-  for (let m = 0; m < allModels.length; m++) {
-    const model = allModels[m];
-    // 3x retry per model dengan exponential backoff + jitter
-    const maxRetry = 3;
-    for (let i = 0; i < maxRetry; i++) {
+
+  for (const model of all) {
+    for (let i = 0; i < 3; i++) {
       try {
         return await callGeminiOnce({ model, prompt });
       } catch (e) {
         lastErr = e;
         const retriable = [429, 500, 502, 503, 504].includes(e?.status);
-        if (!retriable || i === maxRetry - 1) break; // pindah model / keluar
-        const base = 1000 * Math.pow(2, i); // 1s, 2s, 4s
-        const jitter = Math.floor(Math.random() * 350); // jitter kecil
+        if (!retriable || i === 2) break;
+        const base = 1000 * Math.pow(2, i); // 1s,2s,4s
+        const jitter = Math.floor(Math.random() * 350);
         await delay(base + jitter);
       }
     }
-    // Jika gagal dengan model ini, coba model berikutnya.
   }
   throw lastErr || new Error("Gagal memanggil model AI.");
 }
@@ -163,7 +150,8 @@ export default async function handler(req, res) {
   }
 
   const b = typeof req.body === "object" ? req.body : {};
-  const userName = String(b.userName || b.nama || "").trim();
+  // Nama TIDAK wajib lagi — default "guest"
+  const userName = String(b.userName || b.nama || "guest").trim();
   const linkProduk = String(b.linkProduk || b.link || "").trim();
   const topik = String(b.topik || b.topic || "").trim();
   const deskripsi = Array.isArray(b.deskripsi)
@@ -178,9 +166,7 @@ export default async function handler(req, res) {
     Math.min(8, Number(b.jumlah || b.count || b.generateCount || 1))
   );
 
-  // Validasi – minimal 1 kelebihan (sesuai permintaan terbaru)
-  if (!userName)
-    return res.status(400).json({ ok: false, message: "Nama wajib diisi." });
+  // Validasi minimal
   if (!linkProduk)
     return res
       .status(400)
@@ -194,9 +180,10 @@ export default async function handler(req, res) {
       .status(400)
       .json({ ok: false, message: "Minimal 1 kelebihan/keunggulan." });
 
-  // Batas pengguna via Redis (jika tersedia)
+  // Redis + batas pengguna (best-effort)
   const redis = redisClient();
-  const userId = slugify(userName);
+  const userIdBase = userName !== "guest" ? userName : `guest-${topik || "anon"}`;
+  const userId = slugify(userIdBase);
   const USERS_SET = "aff:users";
   const date = todayStr();
 
@@ -209,11 +196,10 @@ export default async function handler(req, res) {
           .status(403)
           .json({ ok: false, message: "Slot pengguna telah penuh. Hubungi admin." });
       }
-    } catch {
-      // Lewatkan saja—jangan gagalkan request
-    }
+    } catch {}
   }
 
+  // Bangun prompt & panggil Gemini (dengan retry/fallback)
   const prompt = buildPrompt({
     variations: jumlah,
     topik,
@@ -227,7 +213,6 @@ export default async function handler(req, res) {
   try {
     scripts = await callGeminiWithRetry({ prompt });
   } catch (e) {
-    // Jika overload/limit—kembalikan 503 agar front-end bisa kasih pesan ramah
     const code = e?.status || 500;
     const friendly =
       code === 503 || code === 429
@@ -243,6 +228,7 @@ export default async function handler(req, res) {
       await redis.incr(`aff:user:used:${date}:${userId}`);
       await redis.hset(`aff:user:meta:${userId}`, {
         name: userName,
+        topic: topik,
         createdAt: Date.now(),
       });
       await redis.sadd(USERS_SET, userId);
