@@ -1,44 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Affiliate Link Script Maker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Script Engine AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --fg:#e6e9f2; --muted:#c5cee0;
-      --panel:rgba(8,13,23,.72); --border:rgba(148,163,184,.18);
-      --g1:#60a5fa; --g2:#a78bfa;
+      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
+      --blue:#12b3ff; --purple:#7b5cff;
     }
-    *{box-sizing:border-box}
     body{
-      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      color:var(--fg);
+      margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1100px 520px at 0% -10%, rgba(96,165,250,.16), transparent 60%),
-        radial-gradient(1100px 520px at 100% 0%, rgba(167,139,250,.14), transparent 60%),
-        url("/bg/landing-city.jpg") center/cover fixed no-repeat;
+        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
-    .wrap{max-width:1100px;margin:0 auto;padding:42px 20px 64px}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:28px;padding:56px 28px;text-align:center;backdrop-filter:blur(10px)}
-    .title{margin:0 0 12px;font-weight:900;line-height:1.06;letter-spacing:-.02em;
-      font-size:clamp(36px,6.6vw,74px);
-      background:linear-gradient(90deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .sub{max-width:820px;margin:12px auto 28px;color:var(--muted);font-size:clamp(15px,2.2vw,18px)}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:14px;
-      background:linear-gradient(90deg,#23b1ff,#6a5cff);color:#fff;font-weight:800;text-decoration:none}
-    footer{margin-top:24px;text-align:center;color:#a6b1c6;font-size:14px}
+    .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.06; letter-spacing:-.02em}
+    .subtitle{font-size:clamp(16px,2.1vw,22px)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
+    .feature{padding:24px; border-radius:20px; background:var(--panel); border:1px solid var(--border); text-align:center}
+    .icon-emoji{font-size:38px; line-height:1}
+    .grid-feat{display:grid;gap:18px;grid-template-columns:1fr}
+    @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
+    @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card">
-      <h1 class="title">Affiliate Link Script<br/>Maker</h1>
-      <p class="sub">Generator skrip afiliasi tercepat! Tempel link produk, salin skripnya, dan pasang di web atau media sosial Anda tanpa ribet.</p>
-      <a class="btn" href="/generator.html">Mulai Generate →</a>
+  <main class="max-w-6xl mx-auto px-5 sm:px-6">
+
+    <!-- HERO -->
+    <section class="pt-14 sm:pt-16 lg:pt-24 pb-8 text-center">
+      <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
+      <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
+        Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
+      </p>
     </section>
-    <footer>© 2025 — Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</footer>
+
+    <!-- 4 FITUR -->
+    <section class="mt-4 sm:mt-8">
+      <div class="grid-feat">
+        <div class="feature">
+          <div class="icon-emoji mb-3">🧠</div>
+          <h3 class="text-lg font-extrabold">Mesin AI Cerdas</h3>
+          <p class="text-slate-700 mt-1.5">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+        </div>
+        <div class="feature">
+          <div class="icon-emoji mb-3">⚡</div>
+          <h3 class="text-lg font-extrabold">Proses Kilat</h3>
+          <p class="text-slate-700 mt-1.5">Dari link jadi naskah siap pakai hanya dalam detik.</p>
+        </div>
+        <div class="feature">
+          <div class="icon-emoji mb-3">🎛️</div>
+          <h3 class="text-lg font-extrabold">Penuh Kendali</h3>
+          <p class="text-slate-700 mt-1.5">Atur gaya bahasa, panjang, dan jumlah variasi.</p>
+        </div>
+        <div class="feature">
+          <div class="icon-emoji mb-3">📥</div>
+          <h3 class="text-lg font-extrabold">Langsung Eksekusi</h3>
+          <p class="text-slate-700 mt-1.5">Salin sekali klik atau unduh untuk bank konten Anda.</p>
+        </div>
+      </div>
+
+      <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
+        <a href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
+          ✨ Generate Skrip Sekarang!
+        </a>
+      </div>
+    </section>
+
+    <footer class="text-center text-slate-600 mt-10 mb-8">
+      © 2025 – Dibuat untuk Mempermudah promosi afiliasi.
+    </footer>
   </main>
 </body>
 </html>
