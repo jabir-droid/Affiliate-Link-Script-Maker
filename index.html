@@ -9,124 +9,91 @@
   <style>
     :root{
       --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
-      --blue:#12b3ff; --purple:#7b5cff;
+      --blue:#12b3ff; --purple:#7b5cff; --cta:#ff8a00;
     }
+    *{box-sizing:border-box}
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      /* BG halus & rata */
       background:
-        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 600px at 15% -10%, rgba(233,241,255,.85) 0%, rgba(233,241,255,0) 70%),
+        radial-gradient(1200px 600px at 85% 0%,  rgba(239,231,255,.85) 0%, rgba(239,231,255,0) 70%),
+        linear-gradient(180deg,#f7faff 0%, #eef3ff 55%, #eaf0ff 100%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
+      position:relative; isolation:isolate;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
+      background-size: 22px 22px; opacity:.30; mix-blend-mode:multiply;
     }
     .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    /* FIX huruf 'g' terpotong: line-height dan padding bawah */
-    .title-size{
-      font-size:clamp(34px,7.8vw,86px);
-      line-height:1.12;
-      letter-spacing:-.02em;
-      display:inline-block;
-      padding-bottom:6px;
-    }
+    .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.12; letter-spacing:-.02em}
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
-
-    /* CTA + ripple */
-    .cta{
-      position:relative; overflow:hidden;
-      background:linear-gradient(90deg,var(--blue),var(--purple));
-      color:#fff; box-shadow:0 18px 40px rgba(123,92,255,.30);
-      transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
-      will-change:transform;
-    }
-    .cta:hover{ transform:translateY(-1px); box-shadow:0 22px 52px rgba(123,92,255,.34); filter:saturate(1.02) }
-    .cta:active{ transform:scale(.98) }
-    .ripple{
-      position:absolute; border-radius:999px; transform:translate(-50%,-50%) scale(0);
-      background:rgba(255,255,255,.45); animation:rip .6s ease-out forwards; pointer-events:none;
-    }
-    @keyframes rip{ to{ transform:translate(-50%,-50%) scale(10); opacity:0 } }
-
-    /* Kartu fitur berwarna + reaksi */
-    .feature{
-      padding:24px; border-radius:20px; text-align:center;
-      border:1px solid var(--border);
-      transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
-      will-change:transform;
-    }
-    .feature:hover{ transform:translateY(-3px); filter:saturate(1.02) }
-    .feature:active{ transform:scale(.99) }
-
-    /* 4 varian warna (beda dari background) */
-    .feat-1{ background:linear-gradient(180deg,#e0f2fe,#eef2ff) }         /* biru muda → lilac */
-    .feat-2{ background:linear-gradient(180deg,#fef9c3,#ffe4e6) }         /* kuning pucat → pink */
-    .feat-3{ background:linear-gradient(180deg,#dcfce7,#e0f2fe) }         /* hijau mint → biru muda */
-    .feat-4{ background:linear-gradient(180deg,#fae8ff,#e9d5ff) }         /* ungu muda */
-
-    .icon-emoji{font-size:38px; line-height:1}
-    .grid-feat{display:grid;gap:18px;grid-template-columns:1fr}
+    .feature{padding:26px;border-radius:20px;background:var(--panel);border:1px solid var(--border);
+      box-shadow:0 14px 34px rgba(15,23,42,.10);text-align:center;transform:translateZ(0);transition:.18s ease}
+    .feature:hover{transform:translateY(-3px); box-shadow:0 18px 44px rgba(15,23,42,.16)}
+    .feature:active{transform:translateY(0) scale(.99)}
+    .icon-emoji{font-size:40px; line-height:1}
+    .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
+
+    .cta{
+      background:linear-gradient(90deg,var(--blue),var(--purple));
+      color:#fff; border-radius:18px; box-shadow:0 20px 45px rgba(123,92,255,.35);
+      transform:translateZ(0); transition:transform .16s ease, box-shadow .16s ease;
+    }
+    .cta:hover{transform:translateY(-2px); box-shadow:0 26px 60px rgba(123,92,255,.42)}
+    .cta:active{transform:translateY(0) scale(.98)}
   </style>
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6">
 
     <!-- HERO -->
-    <section class="pt-14 sm:pt-16 lg:pt-24 pb-8 text-center">
+    <section class="pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
       <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
       <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
         Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
       </p>
     </section>
 
-    <!-- 4 FITUR -->
-    <section class="mt-4 sm:mt-8">
+    <!-- FITUR -->
+    <section class="mt-6 sm:mt-10">
       <div class="grid-feat">
-        <div class="feature feat-1">
+        <div class="feature">
           <div class="icon-emoji mb-3">🧠</div>
-          <h3 class="text-lg font-extrabold">Mesin AI Cerdas</h3>
-          <p class="text-slate-700 mt-1.5">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+          <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
+          <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
         </div>
-        <div class="feature feat-2">
+        <div class="feature">
           <div class="icon-emoji mb-3">⚡</div>
-          <h3 class="text-lg font-extrabold">Proses Kilat</h3>
-          <p class="text-slate-700 mt-1.5">Dari link jadi naskah siap pakai hanya dalam detik.</p>
+          <h3 class="text-xl font-extrabold">Proses Kilat</h3>
+          <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
         </div>
-        <div class="feature feat-3">
+        <div class="feature">
           <div class="icon-emoji mb-3">🎛️</div>
-          <h3 class="text-lg font-extrabold">Penuh Kendali</h3>
-          <p class="text-slate-700 mt-1.5">Atur gaya bahasa, panjang, dan jumlah variasi.</p>
+          <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
+          <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
         </div>
-        <div class="feature feat-4">
+        <div class="feature">
           <div class="icon-emoji mb-3">📥</div>
-          <h3 class="text-lg font-extrabold">Langsung Eksekusi</h3>
-          <p class="text-slate-700 mt-1.5">Salin sekali klik atau unduh untuk bank konten Anda.</p>
+          <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
+          <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
         </div>
       </div>
 
       <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
-        <a href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
+        <a href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 text-lg font-extrabold">
           ✨ Generate Skrip Sekarang!
         </a>
       </div>
     </section>
 
-    <footer class="text-center text-slate-600 mt-10 mb-8">
-      © 2025 – Dibuat untuk Mempermudah promosi afiliasi.
+    <footer class="text-center text-slate-600 mt-12 mb-8">
+      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
     </footer>
   </main>
-
-  <script>
-    // Ripple untuk semua elemen .cta (termasuk anchor)
-    document.querySelectorAll('.cta').forEach(btn=>{
-      btn.addEventListener('click',function(e){
-        const r=document.createElement('span');
-        const rect=this.getBoundingClientRect();
-        const size=Math.max(rect.width, rect.height);
-        r.className='ripple'; r.style.width=r.style.height=size+'px';
-        r.style.left=(e.clientX-rect.left)+'px'; r.style.top=(e.clientY-rect.top)+'px';
-        this.appendChild(r); setTimeout(()=>r.remove(), 600);
-      }, {passive:true});
-    });
-  </script>
 </body>
 </html>
