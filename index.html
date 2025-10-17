@@ -14,75 +14,79 @@
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        radial-gradient(1100px 480px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1100px 520px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
+    .hero{position:relative; overflow:visible;}
     .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .title-size{font-size: clamp(44px, 9.5vw, 104px); line-height:1.05; letter-spacing:-.02em; padding-bottom:2px}
-    @media (min-width:768px) and (max-width:1180px){ .title-size{ font-size: clamp(44px, 7.2vw, 92px); } }
+    .title-size{font-size:clamp(46px,8.5vw,100px); line-height:1.04; letter-spacing:-.02em}
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
-
-    .panel{background:var(--panel); border:1px solid var(--border); border-radius:18px; box-shadow:0 18px 40px rgba(15,23,42,.10)}
-    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
-    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
-
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
+    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
+    .icon-emoji{font-size:40px; line-height:1}
     .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
-    .feature{padding:26px; border-radius:20px; background:var(--panel); border:1px solid var(--border); text-align:center; transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease}
-    .feature:hover{ transform: translateY(-4px); border-color: rgba(123,92,255,.35); box-shadow:0 24px 55px rgba(123,92,255,.18), 0 6px 16px rgba(15,23,42,.06); background: rgba(255,255,255,.92) }
-    .feature:active{ transform: translateY(-1px) scale(.995) }
-    .icon-emoji{font-size:40px; line-height:1}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 18px 40px rgba(123,92,255,.28)}
+
+    /* sentuh/hover universal */
+    .touchy{transition:transform .12s ease, box-shadow .12s ease}
+    .touchy:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(2,32,71,.08)}
+    .touchy:active{transform:translateY(0); box-shadow:0 6px 12px rgba(2,32,71,.10)}
+
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none;transition: box-shadow .15s, border-color .15s}
+    .inp:focus{border-color:#5b7cfa;box-shadow:0 0 0 6px rgba(91,124,250,.18)}
   </style>
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6">
 
     <!-- HERO -->
-    <section class="pt-14 sm:pt-16 lg:pt-24 text-center">
+    <section class="hero pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
       <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
       <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
         Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
       </p>
     </section>
 
-    <!-- LOGIN: kolom nama + SATU tombol -->
-    <section class="panel max-w-3xl mx-auto mt-6 p-4 sm:p-5">
-      <label class="block text-[13px] text-slate-500 font-semibold mb-2">
-        Masukkan <span class="text-slate-800">Nama Lynk.id</span> yang valid untuk masuk.
-      </label>
-      <input id="loginName" class="inp" placeholder="contoh: bimart2025" autocomplete="off" />
-      <!-- tombol tunggal di bawah kolom nama -->
-      <button id="btnLogin" class="w-full mt-3 cta px-6 py-4 rounded-2xl text-white font-extrabold text-base hover:brightness-[1.03] active:scale-[.99] transition">
-        Masuk & Mulai
-      </button>
-      <p id="loginErr" class="text-[13px] text-rose-600 mt-2"></p>
-    </section>
-
     <!-- FITUR -->
-    <section class="mt-8 sm:mt-10">
+    <section class="mt-6 sm:mt-10">
       <div class="grid-feat">
-        <div class="feature">
+        <div class="feature touchy">
           <div class="icon-emoji mb-3">🧠</div>
           <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
           <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
         </div>
-        <div class="feature">
+        <div class="feature touchy">
           <div class="icon-emoji mb-3">⚡</div>
           <h3 class="text-xl font-extrabold">Proses Kilat</h3>
           <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
         </div>
-        <div class="feature">
+        <div class="feature touchy">
           <div class="icon-emoji mb-3">🎛️</div>
           <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
           <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
         </div>
-        <div class="feature">
+        <div class="feature touchy">
           <div class="icon-emoji mb-3">📥</div>
           <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
           <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOGIN -->
+    <section class="mt-10 max-w-2xl mx-auto">
+      <div class="feature touchy text-left">
+        <label class="block font-bold text-slate-800 mb-2">Nama Pengguna Lynk.id</label>
+        <input id="loginName" class="inp touchy" placeholder="Ketik nama pengguna Anda">
+        <p class="text-sm text-slate-500 mt-2">Pastikan nama sesuai dengan akun Lynk.id Anda.</p>
+
+        <div class="mt-4">
+          <button id="btnLogin" class="cta w-full rounded-2xl px-6 py-4 font-extrabold touchy">
+            Masuk &amp; Mulai
+          </button>
+          <div id="loginErr" class="text-rose-600 text-sm mt-2"></div>
         </div>
       </div>
     </section>
@@ -93,49 +97,34 @@
   </main>
 
   <script>
-    const nameInput = document.getElementById('loginName');
-    const btnLogin  = document.getElementById('btnLogin');
-    const errEl     = document.getElementById('loginErr');
+    const btnLogin = document.getElementById('btnLogin');
+    btnLogin.addEventListener('click', async () => {
+      const name = (document.getElementById('loginName').value || '').trim();
+      const err  = document.getElementById('loginErr');
+      err.textContent = '';
+      if(!name){ err.textContent='Nama wajib diisi.'; return; }
 
-    async function doLogin(){
-      errEl.textContent = '';
-      const name = (nameInput.value || '').trim();
-      if(!name){ errEl.textContent = 'Nama wajib diisi.'; return; }
-
-      const original = btnLogin.textContent;
       btnLogin.disabled = true;
-      btnLogin.textContent = 'Memeriksa…';
+      const original = btnLogin.textContent;
+      btnLogin.textContent = '⏳ Memeriksa...';
 
       try{
-        let r = await fetch('/api/login-name', {
+        const r = await fetch('/api/login-name', {
           method:'POST',
-          headers:{ 'Content-Type':'application/json' },
+          headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ name })
         });
-        const raw = await r.text();
-        let j=null; try{ j = raw ? JSON.parse(raw) : null }catch{}
-        if(!r.ok || !j || !j.ok) throw new Error(j?.message || 'Server error.');
-
-        btnLogin.textContent = 'Berhasil ✓';
-        setTimeout(()=> location.href='/generator.html', 400);
+        const j = await r.json();
+        if(!r.ok || !j?.ok) throw new Error(j?.message || 'Server error.');
+        // gunakan href (bukan replace) agar back HP bisa kembali
+        window.location.href = '/generator.html';
       }catch(e){
-        errEl.textContent = String(e.message || e);
+        err.textContent = e.message || 'Server error.';
       }finally{
-        setTimeout(()=>{ btnLogin.disabled = false; btnLogin.textContent = original; }, 500);
+        btnLogin.disabled = false;
+        btnLogin.textContent = original;
       }
-    }
-
-    btnLogin.addEventListener('click', doLogin);
-    nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
-
-    // Opsional: kalau sudah login, langsung ke generator
-    (async () => {
-      try{
-        const r = await fetch('/api/me');
-        const j = await r.json().catch(()=>null);
-        if (j && j.ok) location.href = '/generator.html';
-      }catch{}
-    })();
+    });
   </script>
 </body>
 </html>
