@@ -6,7 +6,6 @@
   <title>Script Engine AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-
   <style>
     :root{
       --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
@@ -19,49 +18,23 @@
         radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
-
-    /* ====== Judul besar & aman (huruf 'g' tidak kepotong) ====== */
-    .title-grad{
-      background:linear-gradient(90deg,#5b7cfa,#8b5cf6);
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-    }
-    .title-size{
-      font-size: clamp(44px, 9.5vw, 104px);
-      line-height: 1.05;
-      letter-spacing: -.02em;
-      padding-bottom: 2px;
-    }
-    @media (min-width:768px) and (max-width:1180px){
-      .title-size{ font-size: clamp(44px, 7.2vw, 92px); }
-    }
-
+    .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-size{font-size: clamp(44px, 9.5vw, 104px); line-height:1.05; letter-spacing:-.02em; padding-bottom:2px}
+    @media (min-width:768px) and (max-width:1180px){ .title-size{ font-size: clamp(44px, 7.2vw, 92px); } }
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
 
-    /* ====== Elemen umum ====== */
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 18px 40px rgba(123,92,255,.28)}
     .panel{background:var(--panel); border:1px solid var(--border); border-radius:18px; box-shadow:0 18px 40px rgba(15,23,42,.10)}
     .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
     .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
 
-    /* ====== Grid fitur ====== */
     .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
-
-    /* Kartu fitur: hover/press effect */
-    .feature{
-      padding:26px; border-radius:20px; background:var(--panel);
-      border:1px solid var(--border); text-align:center;
-      transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
-    }
-    .feature:hover{
-      transform: translateY(-4px);
-      border-color: rgba(123,92,255,.35);
-      box-shadow:0 24px 55px rgba(123,92,255,.18), 0 6px 16px rgba(15,23,42,.06);
-      background: rgba(255,255,255,.92);
-    }
-    .feature:active{ transform: translateY(-1px) scale(.995); }
+    .feature{padding:26px; border-radius:20px; background:var(--panel); border:1px solid var(--border); text-align:center; transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease}
+    .feature:hover{ transform: translateY(-4px); border-color: rgba(123,92,255,.35); box-shadow:0 24px 55px rgba(123,92,255,.18), 0 6px 16px rgba(15,23,42,.06); background: rgba(255,255,255,.92) }
+    .feature:active{ transform: translateY(-1px) scale(.995) }
     .icon-emoji{font-size:40px; line-height:1}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 18px 40px rgba(123,92,255,.28)}
   </style>
 </head>
 <body>
@@ -75,18 +48,17 @@
       </p>
     </section>
 
-    <!-- LOGIN (di bawah judul) -->
+    <!-- LOGIN: kolom nama + SATU tombol -->
     <section class="panel max-w-3xl mx-auto mt-6 p-4 sm:p-5">
-      <div class="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-4">
-        <div class="flex-1">
-          <label class="block text-[13px] text-slate-500 font-semibold mb-2">Masukkan <span class="text-slate-800">Nama Lynk.id</span> yang valid untuk masuk.</label>
-          <input id="loginName" class="inp" placeholder="contoh: bimart2025" autocomplete="off" />
-          <p id="loginErr" class="text-[13px] text-rose-600 mt-2"></p>
-        </div>
-        <button id="btnLogin" class="shrink-0 cta px-6 sm:px-7 py-4 rounded-2xl text-white font-extrabold text-base hover:brightness-[1.03] active:scale-[.99] transition">
-          Masuk
-        </button>
-      </div>
+      <label class="block text-[13px] text-slate-500 font-semibold mb-2">
+        Masukkan <span class="text-slate-800">Nama Lynk.id</span> yang valid untuk masuk.
+      </label>
+      <input id="loginName" class="inp" placeholder="contoh: bimart2025" autocomplete="off" />
+      <!-- tombol tunggal di bawah kolom nama -->
+      <button id="btnLogin" class="w-full mt-3 cta px-6 py-4 rounded-2xl text-white font-extrabold text-base hover:brightness-[1.03] active:scale-[.99] transition">
+        Masuk & Mulai
+      </button>
+      <p id="loginErr" class="text-[13px] text-rose-600 mt-2"></p>
     </section>
 
     <!-- FITUR -->
@@ -113,13 +85,6 @@
           <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
         </div>
       </div>
-
-      <!-- CTA satu saja -->
-      <div class="max-w-4xl mx-auto mt-8 sm:mt-10">
-        <a id="ctaStart" href="/generator.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold hover:brightness-[1.03] active:scale-[.99] transition">
-          ✨ Generate Skrip Sekarang!
-        </a>
-      </div>
     </section>
 
     <footer class="text-center text-slate-600 mt-12 mb-8">
@@ -128,11 +93,9 @@
   </main>
 
   <script>
-    // LOGIN
     const nameInput = document.getElementById('loginName');
     const btnLogin  = document.getElementById('btnLogin');
     const errEl     = document.getElementById('loginErr');
-    const ctaStart  = document.getElementById('ctaStart');
 
     async function doLogin(){
       errEl.textContent = '';
@@ -144,18 +107,17 @@
       btnLogin.textContent = 'Memeriksa…';
 
       try{
-        const r = await fetch('/api/login-name', {
+        let r = await fetch('/api/login-name', {
           method:'POST',
           headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({ name })
         });
-        const txt = await r.text();
-        let j = null; try { j = txt ? JSON.parse(txt) : null } catch(e){}
+        const raw = await r.text();
+        let j=null; try{ j = raw ? JSON.parse(raw) : null }catch{}
         if(!r.ok || !j || !j.ok) throw new Error(j?.message || 'Server error.');
 
-        // Berhasil -> arahkan ke generator
         btnLogin.textContent = 'Berhasil ✓';
-        setTimeout(()=> location.href='/generator.html', 450);
+        setTimeout(()=> location.href='/generator.html', 400);
       }catch(e){
         errEl.textContent = String(e.message || e);
       }finally{
@@ -166,8 +128,14 @@
     btnLogin.addEventListener('click', doLogin);
     nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
 
-    // Jika user belum login, CTA tetap hidup (guard tetap dilakukan di generator).
-    // Jika mau paksa login sebelum CTA, bisa dicek /api/me dulu di sini.
+    // Opsional: kalau sudah login, langsung ke generator
+    (async () => {
+      try{
+        const r = await fetch('/api/me');
+        const j = await r.json().catch(()=>null);
+        if (j && j.ok) location.href = '/generator.html';
+      }catch{}
+    })();
   </script>
 </body>
 </html>
