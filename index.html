@@ -13,159 +13,166 @@
     }
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      /* background halus & rata (tanpa “potongan”) */
       background:
-        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 520px at -10% -10%, rgba(231,241,255,.92) 0%, transparent 60%),
+        radial-gradient(1200px 520px at 110% -10%, rgba(239,230,255,.92) 0%, transparent 60%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
     .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
     .title-size{font-size:clamp(34px,7.8vw,86px); line-height:1.06; letter-spacing:-.02em}
     .subtitle{font-size:clamp(16px,2.1vw,22px)}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
-    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
-    .icon-emoji{font-size:40px; line-height:1}
+    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center; transition:.25s transform,.25s box-shadow}
+    .feature:hover{ transform: translateY(-2px); box-shadow:0 24px 50px rgba(15,23,42,.14) }
+    .icon-wrap{ width:64px;height:64px;border-radius:16px;margin:0 auto 12px;
+      background:linear-gradient(180deg, rgba(18,179,255,.25), rgba(124,92,255,.25));
+      display:grid;place-items:center; box-shadow:0 10px 30px rgba(123,92,255,.22);
+    }
+    .icon-emoji{font-size:30px; line-height:1}
     .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
     @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
     @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
-    .panel{background:var(--panel);border:1px solid var(--border);border-radius:20px;box-shadow:0 18px 40px rgba(15,23,42,.10)}
-    input[type="text"]{outline:none}
+
+    /* Kartu login */
+    .login-card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 18px 40px rgba(15,23,42,.10);
+    }
+    .login-inp{ width:100%; border:2px solid rgba(15,23,42,.06); background:#fff; padding:16px 18px; border-radius:16px; outline:none; transition:.2s border,.2s box-shadow }
+    .login-inp:focus{ border-color:#60a5fa; box-shadow:0 0 0 6px rgba(96,165,250,.18) }
+    .btn-grad{
+      background:linear-gradient(90deg,var(--blue),var(--purple));
+      color:#fff; font-weight:800; border-radius:14px; padding:14px 22px;
+      transition: transform .06s ease;
+      box-shadow:0 20px 45px rgba(123,92,255,.35);
+    }
+    .btn-grad:active{ transform: scale(.98) }
+    /* cegah huruf g kepotong */
+    .title-size, .subtitle, .login-inp { padding-bottom:2px }
   </style>
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6">
 
     <!-- HERO -->
-    <section class="pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
+    <section class="pt-14 sm:pt-16 lg:pt-24 pb-6 text-center">
       <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
       <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
         Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
       </p>
     </section>
 
-    <!-- LOGIN -->
-<section class="max-w-3xl mx-auto mt-8">
-  <form id="gateForm" class="rounded-2xl p-4 sm:p-5 bg-white/85 border border-slate-200 backdrop-blur">
-    <label class="block mb-2 text-slate-700 font-semibold">
-      Masukkan <b>Nama Lynk.id</b> yang valid untuk masuk.
-    </label>
-    <div class="flex gap-3 items-stretch">
-      <input id="gateName"
-             type="text"
-             autocomplete="off"
-             placeholder="contoh: bimart2025"
-             class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-4 focus:ring-sky-200" />
-      <button id="gateBtn"
-              type="submit"
-              class="px-6 py-3 rounded-xl text-white font-bold"
-              style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">
-        Masuk
-      </button>
-    </div>
-    <p id="gateMsg" class="mt-2 text-sm text-rose-600"></p>
-  </form>
-</section>
-
-<script>
-(function () {
-  const form = document.getElementById('gateForm');
-  const nameEl = document.getElementById('gateName');
-  const msg = document.getElementById('gateMsg');
-  const btn = document.getElementById('gateBtn');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    msg.textContent = '';
-    const name = (nameEl.value || '').trim();
-    if (!name) { msg.textContent = 'Nama wajib diisi.'; return; }
-
-    btn.disabled = true;
-    const old = btn.textContent;
-    btn.textContent = 'Memproses…';
-
-    try {
-      const r = await fetch('/api/login-name', {
-        method: 'POST',                       // <- WAJIB POST
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
-      // backend selalu merespons JSON
-      const j = await r.json().catch(() => ({}));
-
-      if (!r.ok || !j.ok) {
-        msg.textContent = j.message || 'Gagal login.';
-      } else {
-        // sukses: cookie diset oleh server → arahkan ke generator
-        location.href = '/generator.html';
-      }
-    } catch (err) {
-      msg.textContent = 'Terjadi kesalahan jaringan.';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = old;
-    }
-  });
-})();
-</script>
-
     <!-- FITUR -->
-    <section class="mt-8 sm:mt-10">
+    <section class="mt-6 sm:mt-10">
       <div class="grid-feat">
         <div class="feature">
-          <div class="icon-emoji mb-3">🧠</div>
+          <div class="icon-wrap"><span class="icon-emoji">🧠</span></div>
           <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
           <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
         </div>
         <div class="feature">
-          <div class="icon-emoji mb-3">⚡</div>
+          <div class="icon-wrap"><span class="icon-emoji">⚡</span></div>
           <h3 class="text-xl font-extrabold">Proses Kilat</h3>
           <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
         </div>
         <div class="feature">
-          <div class="icon-emoji mb-3">🎛️</div>
+          <div class="icon-wrap"><span class="icon-emoji">🎛️</span></div>
           <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
           <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
         </div>
         <div class="feature">
-          <div class="icon-emoji mb-3">📥</div>
+          <div class="icon-wrap"><span class="icon-emoji">📥</span></div>
           <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
           <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
         </div>
       </div>
-
-      <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
-        <a href="/generator.html"
-           class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
-          ✨ Generate Skrip Sekarang!
-        </a>
-      </div>
     </section>
 
-    <footer class="text-center text-slate-600 mt-12 mb-8">
+    <!-- LOGIN DIPINDAH KE BAWAH FITUR -->
+    <section class="login-card mt-10 sm:mt-12 p-4 sm:p-5">
+      <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <label for="loginName" class="font-semibold text-slate-700">
+          Masukkan <span class="font-extrabold">Nama Lynk.id</span> yang valid untuk masuk.
+        </label>
+        <div class="flex-1"></div>
+      </div>
+
+      <div class="mt-3 grid gap-3 md:grid-cols-[1fr_auto]">
+        <input id="loginName" class="login-inp" placeholder="contoh: bimart2025" autocomplete="username" />
+        <button id="btnLogin" class="btn-grad md:self-stretch">Masuk</button>
+      </div>
+      <p id="loginMsg" class="mt-2 text-sm"></p>
+    </section>
+
+    <footer class="text-center text-slate-600 mt-10 mb-8">
       © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
     </footer>
   </main>
 
   <script>
-    async function loginByName(){
-      const name = document.getElementById('loginName').value.trim();
-      const err  = document.getElementById('loginErr');
-      err.textContent = '';
-      if(!name){ err.textContent = 'Nama wajib diisi'; return; }
+    const $ = s => document.querySelector(s);
+    const msg = $("#loginMsg");
+    function showMsg(text, ok=false){
+      msg.textContent = text;
+      msg.style.color = ok ? "#059669" : "#dc2626"; // hijau / merah
+    }
+    function toJsonSafe(text){
+      try { return JSON.parse(text); } catch { return null; }
+    }
+    async function postJSON(url, payload){
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      const raw = await r.text();          // baca sebagai text dulu
+      const j = toJsonSafe(raw) || {};     // lalu coba parse
+      return { ok:r.ok, status:r.status, body:j, raw };
+    }
+    async function login(){
+      const name = ($("#loginName").value || "").trim().toLowerCase();
+      if (!name){ showMsg("Nama wajib diisi."); return; }
 
-      try{
-        const r = await fetch('/api/login-name', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ name })
-        });
-        const txt = await r.text();
-        let j; try { j = JSON.parse(txt) } catch { throw new Error(txt) }
-        if(!r.ok || !j.ok) throw new Error(j.message || 'Gagal login');
-        location.href = '/generator.html';
-      }catch(e){
-        err.textContent = e.message;
+      $("#btnLogin").disabled = true;
+      $("#btnLogin").textContent = "Memeriksa…";
+
+      // Coba endpoint utama → fallback jika error / tidak ada
+      let res = await postJSON("/api/login-name", { name });
+      if (!res.ok || !res.body || res.body.ok === false){
+        // 404/405/500 → fallback ke /api/nama-login
+        if (res.status === 404 || res.status === 405 || res.status === 500){
+          try{
+            res = await postJSON("/api/nama-login", { name });
+          }catch{}
+        }
+      }
+
+      $("#btnLogin").disabled = false;
+      $("#btnLogin").textContent = "Masuk";
+
+      if (res && res.body && res.body.ok){
+        showMsg("Berhasil masuk. Mengalihkan…", true);
+        setTimeout(()=> location.href = "/generator.html", 400);
+      }else{
+        // tampilkan pesan server jika ada, kalau tidak, “Server error.”
+        const serverMsg = res?.body?.message || "";
+        showMsg(serverMsg ? serverMsg : "Server error.");
       }
     }
+
+    $("#btnLogin").addEventListener("click", login);
+    $("#loginName").addEventListener("keydown", (e)=>{ if(e.key === "Enter") login(); });
+
+    // Jika sudah login (cookie sesi sudah ada), langsung arahkan ke generator
+    (async function autoForward(){
+      try{
+        const r = await fetch("/api/me");
+        const j = await r.json().catch(()=>null);
+        if (j && j.ok) location.href = "/generator.html";
+      }catch{}
+    })();
   </script>
 </body>
 </html>
