@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/jabir-droid/Affiliate-Link-Script-Maker#readme",
   "dependencies": {
-    "@upstash/redis": "^1.35.5"
+    "@upstash/redis": "^1.28.2"
   }
 }

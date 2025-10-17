@@ -1,53 +1,67 @@
 // api/_utils.js
 import { Redis } from "@upstash/redis";
-import crypto from "crypto";
 
-export function redisClient() {
-  const url = process.env.KV_REST_API_URL || process.env.AFFILIATE_SCRIPT_KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.AFFILIATE_SCRIPT_KV_REST_API_TOKEN;
+export function makeRedis() {
+  const url =
+    process.env.KV_REST_API_URL || process.env.AFFILIATE_SCRIPT_KV_REST_API_URL;
+  const token =
+    process.env.KV_REST_API_TOKEN || process.env.AFFILIATE_SCRIPT_KV_REST_API_TOKEN;
   if (!url || !token) return null;
-  return new Redis({ url, token });
-}
-
-export function slugify(name = "") {
-  return String(name)
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-const SECRET = process.env.ADMIN_SECRET || "devsecret";
-
-export function sign(payloadObj) {
-  const payload = JSON.stringify(payloadObj);
-  const b64 = Buffer.from(payload).toString("base64url");
-  const sig = crypto.createHmac("sha256", SECRET).update(b64).digest("hex");
-  return `${b64}.${sig}`;
-}
-
-export function verify(token = "") {
   try {
-    const [b64, sig] = token.split(".");
-    if (!b64 || !sig) return null;
-    const expect = crypto.createHmac("sha256", SECRET).update(b64).digest("hex");
-    if (sig !== expect) return null;
-    const payload = JSON.parse(Buffer.from(b64, "base64url").toString());
-    return payload || null;
-  } catch {
+    return new Redis({ url, token });
+  } catch (e) {
+    console.error("Redis init failed:", e?.message || e);
     return null;
   }
 }
 
-export function getCookie(req, name) {
-  const m = (req.headers.cookie || "").match(new RegExp(`(?:^|; )${name}=([^;]+)`));
-  return m ? decodeURIComponent(m[1]) : null;
+export function json(res, status, obj) {
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.end(JSON.stringify(obj));
 }
 
-export function setHttpOnlyCookie(res, name, value, maxAgeDays = 30) {
-  const maxAge = maxAgeDays * 24 * 60 * 60;
-  res.setHeader("Set-Cookie",
-    `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}; ${
-      process.env.VERCEL ? "Secure;" : ""
-    }`);
+export async function readJson(req) {
+  const chunks = [];
+  for await (const c of req) chunks.push(c);
+  if (!chunks.length) return {};
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return {};
+  }
+}
+
+export function slugify(s) {
+  return String(s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 60);
+}
+
+export function setCookie(res, name, val, { days = 30 } = {}) {
+  const maxAge = days * 24 * 60 * 60;
+  const cookie = `${name}=${encodeURIComponent(val)}; Path=/; Max-Age=${maxAge}; SameSite=Lax; HttpOnly; Secure`;
+  res.setHeader("Set-Cookie", cookie);
+}
+
+export function clearCookie(res, name) {
+  res.setHeader(
+    "Set-Cookie",
+    `${name}=; Path=/; Max-Age=0; SameSite=Lax; HttpOnly; Secure`
+  );
+}
+
+export function getCookie(req, name) {
+  const raw = req.headers?.cookie || "";
+  const map = Object.fromEntries(
+    raw.split(";").map((p) => {
+      const i = p.indexOf("=");
+      if (i === -1) return [p.trim(), ""];
+      return [p.slice(0, i).trim(), decodeURIComponent(p.slice(i + 1))];
+    })
+  );
+  return map[name];
 }
