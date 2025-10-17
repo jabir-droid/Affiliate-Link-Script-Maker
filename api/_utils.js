@@ -24,10 +24,16 @@ export function parseCookies(req) {
     return acc;
   }, {});
 }
+
+export function getCookie(req, name) {
+  return parseCookies(req)[name];
+}
+
 export function setCookie(res, name, val, { maxAge = 60 * 60 * 24 * 30, path = "/" } = {}) {
   const cookie = `${name}=${encodeURIComponent(val)}; Path=${path}; Max-Age=${maxAge}; HttpOnly; SameSite=Lax`;
   res.setHeader("Set-Cookie", cookie);
 }
+
 export function clearCookie(res, name) {
   res.setHeader("Set-Cookie", `${name}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`);
 }
