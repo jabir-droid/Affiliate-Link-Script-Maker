@@ -43,18 +43,69 @@
     </section>
 
     <!-- LOGIN -->
-    <section class="max-w-3xl mx-auto panel p-5 sm:p-6 mt-2">
-      <div class="text-center text-slate-600 font-semibold mb-3">
-        Masukkan <span class="text-slate-900">Nama Lynk.id</span> yang valid untuk masuk.
-      </div>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input id="loginName" type="text" placeholder="contoh: bimart2025"
-               class="flex-1 rounded-xl border border-slate-300 bg-white/80 px-4 py-3 text-slate-900">
-        <button onclick="loginByName()"
-                class="rounded-xl px-6 py-3 font-extrabold cta">Masuk</button>
-      </div>
-      <div id="loginErr" class="text-rose-600 mt-2 text-sm"></div>
-    </section>
+<section class="max-w-3xl mx-auto mt-8">
+  <form id="gateForm" class="rounded-2xl p-4 sm:p-5 bg-white/85 border border-slate-200 backdrop-blur">
+    <label class="block mb-2 text-slate-700 font-semibold">
+      Masukkan <b>Nama Lynk.id</b> yang valid untuk masuk.
+    </label>
+    <div class="flex gap-3 items-stretch">
+      <input id="gateName"
+             type="text"
+             autocomplete="off"
+             placeholder="contoh: bimart2025"
+             class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-4 focus:ring-sky-200" />
+      <button id="gateBtn"
+              type="submit"
+              class="px-6 py-3 rounded-xl text-white font-bold"
+              style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">
+        Masuk
+      </button>
+    </div>
+    <p id="gateMsg" class="mt-2 text-sm text-rose-600"></p>
+  </form>
+</section>
+
+<script>
+(function () {
+  const form = document.getElementById('gateForm');
+  const nameEl = document.getElementById('gateName');
+  const msg = document.getElementById('gateMsg');
+  const btn = document.getElementById('gateBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = '';
+    const name = (nameEl.value || '').trim();
+    if (!name) { msg.textContent = 'Nama wajib diisi.'; return; }
+
+    btn.disabled = true;
+    const old = btn.textContent;
+    btn.textContent = 'Memproses…';
+
+    try {
+      const r = await fetch('/api/login-name', {
+        method: 'POST',                       // <- WAJIB POST
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+      // backend selalu merespons JSON
+      const j = await r.json().catch(() => ({}));
+
+      if (!r.ok || !j.ok) {
+        msg.textContent = j.message || 'Gagal login.';
+      } else {
+        // sukses: cookie diset oleh server → arahkan ke generator
+        location.href = '/generator.html';
+      }
+    } catch (err) {
+      msg.textContent = 'Terjadi kesalahan jaringan.';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = old;
+    }
+  });
+})();
+</script>
 
     <!-- FITUR -->
     <section class="mt-8 sm:mt-10">
