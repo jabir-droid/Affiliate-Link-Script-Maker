@@ -4,92 +4,97 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --txt:#0f172a; --muted:#475569; --panel:#ffffff; --border:#e6ebf4;
-      --blue:#12b3ff; --purple:#7b5cff; --field:#f9fbff;
-    }
-    body{margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+    :root{ --txt:#0f172a; --muted:#475569; --border:#e3e8f4; --blue:#12b3ff; --purple:#7b5cff }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; color:var(--txt);
       background:
-        radial-gradient(900px 420px at 15% -10%, rgba(229,244,255,.85) 0%, transparent 60%),
-        radial-gradient(900px 420px at 95% 0%, rgba(240,233,255,.85) 0%, transparent 60%),
-        linear-gradient(180deg,#ffffff, #f5f8ff 45%, #eef4ff);
+        radial-gradient(1200px 520px at 0% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 520px at 100% -10%, rgba(239,230,255,.85) 0%, transparent 60%),
+        linear-gradient(180deg,#f6f9ff,#eef2ff 60%, #f9f9ff);
+      min-height:100dvh; display:grid; place-items:center; padding:28px 16px;
     }
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
-    .label{color:var(--muted); font-weight:600}
-    .inp{width:100%;border:1px solid var(--border);background:var(--field);padding:14px 16px;border-radius:14px;color:var(--txt);outline:none;transition:.2s}
-    .inp:focus{border-color:#6ea8ff;box-shadow:0 0 0 4px rgba(110,168,255,.18)}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); box-shadow:0 12px 36px rgba(123,92,255,.28); color:#fff}
-    .cta:active{transform:translateY(1px)}
-    .tap:hover{transform:translateY(-1px); box-shadow:0 14px 36px rgba(16,24,40,.18)}
-    .tap{transition:.25s ease}
-    .title{font-size:clamp(28px,4.6vw,46px); line-height:1.08}
+    .card{
+      width:min(560px,92vw); background:#fff; border:1px solid var(--border); border-radius:18px;
+      box-shadow:0 20px 50px rgba(15,23,42,.10); padding:24px 22px;
+    }
+    .head{ text-align:center; margin-bottom:12px }
+    .title{ font-weight:900; letter-spacing:-.02em; margin:0; font-size:clamp(26px,5vw,40px); 
+      background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .desc{ color:var(--muted); margin:.35rem 0 0 }
+    label{ display:block; font-weight:600; margin:14px 0 8px }
+    .inp{
+      width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:14px; background:#f8fbff;
+      outline:none; transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    .inp:focus{ border-color:#7c5cff; box-shadow:0 0 0 4px rgba(124,92,255,.18) }
+    .help{ color:#64748b; font-size:12px; margin-top:6px }
+    .row{ display:flex; gap:12px; flex-wrap:wrap }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;
+      padding:14px 18px;border-radius:14px;border:none;color:#fff;font-weight:800;cursor:pointer;
+      background:linear-gradient(90deg,var(--blue),var(--purple)); box-shadow:0 16px 42px rgba(123,92,255,.30);
+      transition:transform .08s ease;
+    }
+    .btn:active{ transform:translateY(1px) }
+    .toolbar{ display:flex; justify-content:space-between; gap:10px; margin-bottom:8px }
+    .btn-ghost{
+      padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;color:#0f172a;font-weight:700;cursor:pointer
+    }
+    .err{ color:#e11d48; margin-top:8px; min-height:20px }
+    footer{ text-align:center; color:#64748b; margin-top:16px }
   </style>
 </head>
 <body>
-  <main class="max-w-3xl mx-auto px-5 sm:px-6 py-10">
-    <a href="/" class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-5">← Kembali</a>
+  <main class="card">
+    <div class="toolbar">
+      <button onclick="history.back()" class="btn-ghost">← Kembali</button>
+      <div></div>
+    </div>
+    <header class="head">
+      <h1 class="title">Login</h1>
+      <p class="desc">Masukkan data pembelian Anda untuk melanjutkan.</p>
+    </header>
 
-    <section class="card p-6 sm:p-8">
-      <h1 class="title font-extrabold mb-1">Login</h1>
-      <p class="text-slate-600 mb-6">Masuk untuk menggunakan generator skrip.</p>
+    <form id="f" onsubmit="return doLogin(event)">
+      <label for="name">Nama Pembeli</label>
+      <input class="inp" id="name" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli." autocomplete="name" />
+      <div class="help"></div>
 
-      <div class="grid gap-5">
-        <div>
-          <label class="label block mb-2">Nama Pembeli</label>
-          <input id="loginName" class="inp" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli.">
-        </div>
-        <div>
-          <label class="label block mb-2">Nomor Handphone</label>
-          <input id="loginPhone" class="inp" placeholder="Contoh: 081234567890 (sesuai saat membeli)">
-        </div>
+      <label for="phone" style="margin-top:12px">Nomor Handphone</label>
+      <input class="inp" id="phone" placeholder="Contoh: 081234567890 (sesuai saat membeli)" inputmode="numeric" />
+      <div class="help"></div>
 
-        <div id="loginErr" class="text-rose-600"></div>
+      <div class="err" id="err"></div>
+      <button class="btn" type="submit">Masuk</button>
+    </form>
 
-        <button id="btnLogin" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta tap">
-          🚀 Masuk
-        </button>
-      </div>
-    </section>
+    <footer>© 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</footer>
   </main>
 
   <script>
-    const btn = document.getElementById('btnLogin');
-    const err = document.getElementById('loginErr');
+    async function doLogin(e){
+      e.preventDefault();
+      const err = document.getElementById('err'); err.textContent = '';
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
 
-    async function doLogin(){
-      err.textContent='';
-      const name = document.getElementById('loginName').value.trim();
-      const phone = document.getElementById('loginPhone').value.trim(); // disimpan kalau nanti mau dipakai
-
-      if(!name){ err.textContent='Nama wajib diisi.'; return; }
-
-      const original = btn.innerHTML;
-      btn.disabled = true;
-      btn.innerHTML = '⏳ Memproses...';
+      if(!name){ err.textContent='Nama wajib diisi.'; return }
+      if(!/^(0|\+62)\d{7,15}$/.test(phone)){ err.textContent='Nomor HP tidak valid.'; return }
 
       try{
-        // backend saat ini butuh "name" saja; phone bisa ditambahkan backend jika diperlukan
         const r = await fetch('/api/login-name', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ name, phone })
         });
-        const j = await r.json();
-        if(!r.ok || !j.ok){ throw new Error(j?.message || 'Server error'); }
-        // sukses → ke generator
+        const j = await r.json().catch(()=> ({}));
+        if(!r.ok || !j.ok) throw new Error(j.message || 'Server error.');
         location.href = '/generator.html';
-      }catch(e){
-        err.textContent = e.message || 'Server error.';
-      }finally{
-        btn.disabled = false;
-        btn.innerHTML = original;
-      }
+      }catch(e){ err.textContent = e.message || 'Server error.' }
     }
-    btn.addEventListener('click', doLogin);
-    document.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
   </script>
 </body>
 </html>

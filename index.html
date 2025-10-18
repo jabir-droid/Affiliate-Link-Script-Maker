@@ -4,80 +4,84 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Script Engine AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.92); --border:rgba(15,23,42,.10);
-      --blue:#12b3ff; --purple:#7b5cff; --card:#f7faff;
+      --txt:#0f172a; --muted:#475569; 
+      --blue:#12b3ff; --purple:#7b5cff; --pink:#ff7ad9; 
+      --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.08);
     }
+    *{box-sizing:border-box}
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1200px 540px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1200px 540px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 520px at 0% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 520px at 100% -10%, rgba(239,230,255,.85) 0%, transparent 60%),
         url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
-    .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .title-fix{font-size:clamp(38px,8vw,92px); line-height:1.07; letter-spacing:-.02em; padding-bottom:.08em;} /* hindari 'g' kepotong */
-    .subtitle{font-size:clamp(16px,2.1vw,22px)}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
-    .feature{padding:28px; border-radius:20px; background:var(--card); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:left}
-    .icon-badge{width:54px; height:54px; border-radius:14px; display:grid; place-items:center;
-      background:linear-gradient(135deg,#2dd4ff,#8b5cf6); color:#fff; box-shadow:0 10px 30px rgba(49,130,206,.35)}
-    .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
-    @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
-    @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
-    .tap:hover,.tap:focus-visible{transform:translateY(-2px); box-shadow:0 24px 44px rgba(16,24,40,.18)}
-    .tap{transition:.25s ease}
+    .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 48px}
+    .title{
+      font-weight:900; line-height:1.02; letter-spacing:-.02em; text-align:center;
+      font-size:clamp(42px,8.8vw,96px);
+      background:linear-gradient(90deg,#5b7cfa,#7c5cff);
+      -webkit-background-clip:text;background-clip:text;color:transparent
+    }
+    .subtitle{ text-align:center; color:var(--muted); font-size:clamp(16px,2vw,20px); margin-top:8px }
+    .feat-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:28px}
+    @media(min-width:900px){ .feat-grid{grid-template-columns:repeat(4,1fr)} }
+    .feat{padding:28px;border-radius:22px;border:1px solid var(--border);background:var(--panel);text-align:center;box-shadow:0 16px 42px rgba(15,23,42,.12)}
+    .badge{
+      width:84px;height:84px;margin:4px auto 16px;border-radius:22px;
+      background:linear-gradient(140deg,#39c6ff,#7b5cff 60%,#ff7ad9); 
+      display:grid;place-items:center;filter:drop-shadow(0 18px 36px rgba(123,92,255,.35))
+    }
+    .badge span{font-size:42px}
+    .feat h3{font-size:24px;margin:0 0 8px}
+    .feat p{color:#1f2937b3;margin:0}
+    .cta{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:18px 28px;border-radius:16px;margin:30px auto 0; font-weight:800; font-size:18px; color:#fff;
+      background:linear-gradient(90deg,var(--blue),var(--purple));
+      box-shadow:0 22px 52px rgba(123,92,255,.35);
+      border:none; cursor:pointer; transition:transform .08s ease, filter .2s ease;
+    }
+    .cta:active{transform:translateY(1px)}
+    footer{margin-top:40px;text-align:center;color:#475569}
   </style>
 </head>
 <body>
-  <main class="max-w-6xl mx-auto px-5 sm:px-6">
+  <main class="wrap">
+    <h1 class="title">Script Engine AI</h1>
+    <p class="subtitle">Ubah link produk jadi skrip konten siap pakai dalam hitungan detik.</p>
 
-    <!-- HERO -->
-    <section class="pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
-      <h1 class="title-grad title-fix font-extrabold">Script Engine AI</h1>
-      <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
-        Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
-      </p>
+    <section class="feat-grid">
+      <article class="feat">
+        <div class="badge"><span>🧠</span></div>
+        <h3>Mesin AI Cerdas</h3>
+        <p>Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+      </article>
+      <article class="feat">
+        <div class="badge"><span>⚡️</span></div>
+        <h3>Proses Kilat</h3>
+        <p>Dari link jadi naskah siap pakai dalam detik.</p>
+      </article>
+      <article class="feat">
+        <div class="badge"><span>🎛️</span></div>
+        <h3>Penuh Kendali</h3>
+        <p>Atur gaya, panjang tulisan, dan jumlah variasi.</p>
+      </article>
+      <article class="feat">
+        <div class="badge"><span>📥</span></div>
+        <h3>Langsung Eksekusi</h3>
+        <p>Salin atau unduh hasil untuk bank konten Anda.</p>
+      </article>
     </section>
 
-    <!-- FITUR (kartu kontras) -->
-    <section class="mt-6 sm:mt-10">
-      <div class="grid-feat">
-        <div class="feature tap">
-          <div class="icon-badge mb-4">🧠</div>
-          <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
-          <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
-        </div>
-        <div class="feature tap">
-          <div class="icon-badge mb-4">⚡</div>
-          <h3 class="text-xl font-extrabold">Proses Kilat</h3>
-          <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
-        </div>
-        <div class="feature tap">
-          <div class="icon-badge mb-4">🎛️</div>
-          <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
-          <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
-        </div>
-        <div class="feature tap">
-          <div class="icon-badge mb-4">📥</div>
-          <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
-          <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
-        </div>
-      </div>
+    <div style="text-align:center">
+      <a class="cta" href="/login.html">✨ Generate Skrip Sekarang</a>
+    </div>
 
-      <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
-        <a href="/login.html" class="cta w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold tap">
-          ✨ Generate Skrip Sekarang
-        </a>
-      </div>
-    </section>
-
-    <footer class="text-center text-slate-600 mt-12 mb-8">
-      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
-    </footer>
+    <footer>© 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</footer>
   </main>
 </body>
 </html>
