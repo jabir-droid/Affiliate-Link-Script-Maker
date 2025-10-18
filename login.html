@@ -4,97 +4,56 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{ --txt:#0f172a; --muted:#475569; --border:#e3e8f4; --blue:#12b3ff; --purple:#7b5cff }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial; color:var(--txt);
-      background:
-        radial-gradient(1200px 520px at 0% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1200px 520px at 100% -10%, rgba(239,230,255,.85) 0%, transparent 60%),
-        linear-gradient(180deg,#f6f9ff,#eef2ff 60%, #f9f9ff);
-      min-height:100dvh; display:grid; place-items:center; padding:28px 16px;
-    }
-    .card{
-      width:min(560px,92vw); background:#fff; border:1px solid var(--border); border-radius:18px;
-      box-shadow:0 20px 50px rgba(15,23,42,.10); padding:24px 22px;
-    }
-    .head{ text-align:center; margin-bottom:12px }
-    .title{ font-weight:900; letter-spacing:-.02em; margin:0; font-size:clamp(26px,5vw,40px); 
-      background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .desc{ color:var(--muted); margin:.35rem 0 0 }
-    label{ display:block; font-weight:600; margin:14px 0 8px }
-    .inp{
-      width:100%; padding:14px 16px; border:1px solid var(--border); border-radius:14px; background:#f8fbff;
-      outline:none; transition: box-shadow .15s ease, border-color .15s ease;
-    }
-    .inp:focus{ border-color:#7c5cff; box-shadow:0 0 0 4px rgba(124,92,255,.18) }
-    .help{ color:#64748b; font-size:12px; margin-top:6px }
-    .row{ display:flex; gap:12px; flex-wrap:wrap }
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;
-      padding:14px 18px;border-radius:14px;border:none;color:#fff;font-weight:800;cursor:pointer;
-      background:linear-gradient(90deg,var(--blue),var(--purple)); box-shadow:0 16px 42px rgba(123,92,255,.30);
-      transition:transform .08s ease;
-    }
-    .btn:active{ transform:translateY(1px) }
-    .toolbar{ display:flex; justify-content:space-between; gap:10px; margin-bottom:8px }
-    .btn-ghost{
-      padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;color:#0f172a;font-weight:700;cursor:pointer
-    }
-    .err{ color:#e11d48; margin-top:8px; min-height:20px }
-    footer{ text-align:center; color:#64748b; margin-top:16px }
+    :root{ --border:#e5e7eb; --blue:#12b3ff; --purple:#7b5cff; }
+    body{ font-family:Inter,system-ui,Segoe UI,Roboto,Arial; background:linear-gradient(180deg,#f7fbff 0%,#eef5ff 100%) fixed }
+    .btn-primary{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 12px 38px rgba(123,92,255,.28)}
+    .btn-primary:hover{opacity:.95}
+    .inp{width:100%;border:1px solid var(--border);background:#fff;padding:14px 16px;border-radius:14px;outline:none}
+    .inp:focus{border-color:#7c5cff; box-shadow:0 0 0 3px rgba(124,92,255,.15)}
   </style>
 </head>
-<body>
-  <main class="card">
-    <div class="toolbar">
-      <button onclick="history.back()" class="btn-ghost">← Kembali</button>
-      <div></div>
-    </div>
-    <header class="head">
-      <h1 class="title">Login</h1>
-      <p class="desc">Masukkan data pembelian Anda untuk melanjutkan.</p>
-    </header>
+<body class="min-h-screen flex items-center">
+  <main class="w-full max-w-xl mx-auto px-5">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-center mb-2">Login</h1>
+    <p class="text-center text-slate-600 mb-6">Masukkan nama & nomor HP Anda untuk melanjutkan.</p>
 
-    <form id="f" onsubmit="return doLogin(event)">
-      <label for="name">Nama Pembeli</label>
-      <input class="inp" id="name" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli." autocomplete="name" />
-      <div class="help"></div>
-
-      <label for="phone" style="margin-top:12px">Nomor Handphone</label>
-      <input class="inp" id="phone" placeholder="Contoh: 081234567890 (sesuai saat membeli)" inputmode="numeric" />
-      <div class="help"></div>
-
-      <div class="err" id="err"></div>
-      <button class="btn" type="submit">Masuk</button>
-    </form>
-
-    <footer>© 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</footer>
+    <section class="bg-white/90 border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-lg">
+      <div class="grid gap-4">
+        <div>
+          <label class="block font-semibold mb-2">Nama Pembeli</label>
+          <input id="name" class="inp" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli.">
+        </div>
+        <div>
+          <label class="block font-semibold mb-2">Nomor Handphone</label>
+          <input id="phone" class="inp" placeholder="Contoh: 081234567890 (sesuai saat membeli)">
+        </div>
+        <button id="btnLogin" class="btn-primary w-full rounded-2xl py-4 font-extrabold text-lg">🚀 Masuk</button>
+        <p id="err" class="text-rose-600 text-sm"></p>
+      </div>
+      <div class="mt-4">
+        <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50">← Kembali</a>
+      </div>
+    </section>
   </main>
 
   <script>
-    async function doLogin(e){
-      e.preventDefault();
-      const err = document.getElementById('err'); err.textContent = '';
+    async function post(url, data){
+      const r = await fetch(url,{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+      const t = await r.text(); try { return JSON.parse(t) } catch { return { ok:false, message:t } }
+    }
+    document.getElementById('btnLogin').addEventListener('click', async ()=>{
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
-
-      if(!name){ err.textContent='Nama wajib diisi.'; return }
-      if(!/^(0|\+62)\d{7,15}$/.test(phone)){ err.textContent='Nomor HP tidak valid.'; return }
-
-      try{
-        const r = await fetch('/api/login-name', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ name, phone })
-        });
-        const j = await r.json().catch(()=> ({}));
-        if(!r.ok || !j.ok) throw new Error(j.message || 'Server error.');
-        location.href = '/generator.html';
-      }catch(e){ err.textContent = e.message || 'Server error.' }
-    }
+      const err = document.getElementById('err'); err.textContent='';
+      if(!name){ err.textContent='Nama wajib diisi.'; return; }
+      if(!/^\d{8,15}$/.test(phone)){ err.textContent='Nomor HP tidak valid.'; return; }
+      const j = await post('/api/login-name', { name, phone });
+      if(!j.ok){ err.textContent = j.message || 'Server error.'; return; }
+      location.href = '/generator.html';
+    });
   </script>
 </body>
 </html>
