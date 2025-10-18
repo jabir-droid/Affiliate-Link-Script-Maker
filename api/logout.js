@@ -1,7 +1,14 @@
 // api/logout.js
-import { json, clearCookie } from "./_utils";
+const { json, clearCookie, SESSION_COOKIE } = require("./_utils");
 
-export default async function handler(req, res) {
-  clearCookie(res, "aff_name");
-  return json(res, 200, { ok: true });
-}
+module.exports = async (req, res) => {
+  try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      return json(res, 405, { ok: false, message: "Method Not Allowed" });
+    }
+    clearCookie(res, SESSION_COOKIE);
+    return json(res, 200, { ok: true });
+  } catch (e) {
+    return json(res, 500, { ok: false, message: String(e?.message || e) });
+  }
+};
