@@ -201,194 +201,196 @@
     </button>
   </div>
 
-  <script>
-    /* ===== Panel panduan ===== */
-    const panel = document.getElementById('guidePanel');
-    const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
-    openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
-    document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
+<script>
+  /* ===== Panel panduan ===== */
+  const panel = document.getElementById('guidePanel');
+  const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
+  openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
+  document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
 
-    /* ===== Kuota ===== */
-    async function loadQuota(){
-      try{
-        const r=await fetch('/api/quota'); const j=await r.json();
-        const val = j?.remaining ?? '—';
-        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
-      }catch{
-        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
-      }
+  /* ===== Kuota ===== */
+  async function loadQuota(){
+    try{
+      const r=await fetch('/api/quota'); const j=await r.json();
+      const val = j?.remaining ?? '—';
+      ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
+    }catch{
+      ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
     }
-    ;['btnRefreshQuota','btnRefreshQuota_m'].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.addEventListener('click', loadQuota);
-    });
-    loadQuota();
+  }
+  ;['btnRefreshQuota','btnRefreshQuota_m'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.addEventListener('click', loadQuota);
+  });
+  loadQuota();
 
-    /* ===== Chips kelebihan ===== */
-    const chipsEl=document.getElementById('chips'); const inputEl=document.getElementById('descInput');
-    const btnTop=document.getElementById('addDescTop'); let chips=[];
-    const renderChips=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);renderChips()};chipsEl.appendChild(s);})};
-    const addChip=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; renderChips();};
-    inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChip(); }});
-    btnTop?.addEventListener('click', addChip);
+  /* ===== Chips kelebihan ===== */
+  const chipsEl=document.getElementById('chips'); const inputEl=document.getElementById('descInput');
+  const btnTop=document.getElementById('addDescTop'); let chips=[];
+  const renderChips=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);renderChips()};chipsEl.appendChild(s);})};
+  const addChip=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; renderChips();};
+  inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChip(); }});
+  btnTop?.addEventListener('click', addChip);
 
-    /* ===== Emoji formatter: rapi & terstruktur ===== */
-    function formatEmojisNeatly(raw) {
-      if (!raw) return '';
-      let text = String(raw).replace(/\r\n/g, '\n').replace(/\t/g,' ').replace(/[ \u00A0]+/g,' ');
-      const paras = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+  /* ===== Emoji formatter: rapi & terstruktur ===== */
+  function formatEmojisNeatly(raw) {
+    if (!raw) return '';
+    let text = String(raw).replace(/\r\n/g, '\n').replace(/\t/g,' ').replace(/[ \u00A0]+/g,' ');
+    const paras = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
 
-      const bulletPool = ['🚀','✨','💡','🌟','✅'];
-      const hasLeadEmoji = (s) => /^[^\w]*(?:🚀|✨|💡|🌟|✅|📌|💥|🔥)/.test(s);
+    const bulletPool = ['🚀','✨','💡','🌟','✅'];
+    const hasLeadEmoji = (s) => /^[^\w]*(?:🚀|✨|💡|🌟|✅|📌|💥|🔥)/.test(s);
 
-      // bullet hanya di paragraf pertama
-      if (paras.length && !hasLeadEmoji(paras[0])) {
-        paras[0] = `${bulletPool[0]} ${paras[0]}`;
-      }
-
-      const ctaRegexes = [
-        /\b(cek|lihat|kunjungi|beli|pesan|klik)\b(?:\s+(selengkapnya|detail|tautan|link|di\s*sini|sekarang))?/gi
-      ];
-      const urlRegex = /(https?:\/\/[^\s\])>]+[^\s\])]*)/gi;
-
-      const enhance = (p) => {
-        let s = p;
-        s = s.replace(/\s*([,.;:!?])\s*/g, '$1 ');
-
-        // tambahkan 👉 di frasa CTA
-        ctaRegexes.forEach(re => {
-          s = s.replace(re, (m) => (/👉/.test(m) ? m : `${m} 👉`));
-        });
-
-        // URL ke baris baru dengan 👉
-        s = s.replace(urlRegex, (m) => `\n👉 ${m}`);
-
-        s = s.replace(/👉(?:\s*👉)+/g, '👉');
-        return s.trim();
-      };
-
-      return paras.map(enhance).join('\n\n');
+    if (paras.length && !hasLeadEmoji(paras[0])) {
+      paras[0] = `${bulletPool[0]} ${paras[0]}`;
     }
 
-    /* ===== Generate ===== */
-    async function doGenerate(btn){
-      const err=document.getElementById('err'); err.textContent='';
-      const url=document.getElementById('productUrl').value.trim();
-      const topic=document.getElementById('productTopic').value.trim();
-      const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
-      const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
-      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
-      const descriptions=[...chips];
-      if(!url) return err.textContent='Link Produk wajib diisi.';
-      if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
-      if(descriptions.length<2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
-      const original=btn.innerHTML; btn.disabled=true; btn.innerHTML='⏳ Tunggu sebentar…  AI sedang meracik kata-kata untuk Anda...';
+    const ctaRegexes = [
+      /\b(cek|lihat|kunjungi|beli|pesan|klik)\b(?:\s+(selengkapnya|detail|tautan|link|di\s*sini|sekarang))?/gi
+    ];
+    const urlRegex = /(https?:\/\/[^\s\])>]+[^\s\])]*)/gi;
 
-      try{
-        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
-            link:url, topic, descriptions, style, length, generateCount:count, count })
-        });
-        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{};
-        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
-        renderResults(j.scripts||[]); loadQuota();
-      }catch(e){ err.textContent=e.message; }
-      finally{ btn.disabled=false; btn.innerHTML=original; }
-    }
-    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this) });
-    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this) });
+    const enhance = (p) => {
+      let s = p.replace(/\s*([,.;:!?])\s*/g, '$1 ');
+      ctaRegexes.forEach(re => { s = s.replace(re, (m) => (/👉/.test(m) ? m : `${m} 👉`)); });
+      s = s.replace(urlRegex, (m) => `\n👉 ${m}`);
+      s = s.replace(/👉(?:\s*👉)+/g, '👉');
+      return s.trim();
+    };
 
-    /* ===== Render hasil ===== */
-    function renderResults(scripts){
-      const box=document.getElementById('results'); box.innerHTML='';
+    return paras.map(enhance).join('\n\n');
+  }
 
-      scripts.forEach((s,i)=>{
-        const title=(s.title||'').trim();
-        const content=formatEmojisNeatly((s.content||'').trim());
+  /* ===== Generate ===== */
+  async function doGenerate(btn){
+    const err=document.getElementById('err'); err.textContent='';
+    const url=document.getElementById('productUrl').value.trim();
+    const topic=document.getElementById('productTopic').value.trim();
+    const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
+    const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
+    const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+    const descriptions=[...chips];
 
-        const card=document.createElement('div'); 
-        card.className='glass p-5 sm:p-6 touch-card';
-        card.innerHTML=`
-          <h3 class="text-xl sm:text-2xl font-extrabold text-blue-600 mb-3">${escapeHtml(title)}</h3>
-          <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base" data-body>${escapeHtml(content)}</p>
-          <div class="mt-4 flex gap-2 justify-end">
-            <button class="px-4 py-2 rounded-lg text-white touch-btn" style="background:#334155" data-copy>Salin</button>
-            <button class="px-4 py-2 rounded-lg touch-btn" style="background:#e5e7eb" data-edit>Edit</button>
-          </div>
-        `;
+    if(!url) return err.textContent='Link Produk wajib diisi.';
+    if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
+    if(descriptions.length<2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
 
-        card.querySelector('[data-copy]').onclick=()=>{
-          const b=card.querySelector('[data-body]').innerText;
-          navigator.clipboard.writeText(b).then(()=>{
-            const btn=card.querySelector('[data-copy]'); btn.textContent='Tersalin!'; setTimeout(()=>btn.textContent='Salin',1400);
-          });
-        };
-        card.querySelector('[data-edit]').onclick=()=>{
-          const current = card.querySelector('[data-body]').innerText;
-          openEditModal(current,(next)=>{ card.querySelector('[data-body]').textContent = next; });
-        };
-        box.appendChild(card);
+    const original=btn.innerHTML; btn.disabled=true; btn.innerHTML='⏳ Tunggu sebentar…  AI sedang meracik kata-kata untuk Anda...';
+
+    try{
+      const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
+          link:url, topic, descriptions, style, length, generateCount:count, count })
       });
+      const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{};
+      if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
+      renderResults(j.scripts||[]); loadQuota();
+    }catch(e){ err.textContent=e.message; }
+    finally{ btn.disabled=false; btn.innerHTML=original; }
+  }
+  document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this) });
+  document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this) });
 
-      if (window.innerWidth <= 640 && scripts.length) window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
-    }
+  /* ===== Render hasil ===== */
+  function renderResults(scripts){
+    const box=document.getElementById('results'); box.innerHTML='';
 
-    /* ===== Modal Edit (textarea nyaman) ===== */
-    function openEditModal(initial, onSave){
-      const wrap = document.createElement('div');
-      wrap.style.cssText = `position:fixed; inset:0; background:rgba(2,6,23,.42); z-index:60; display:grid; place-items:center; padding:16px`;
-      wrap.innerHTML = `
-        <div style="max-width:780px; width:100%; background:white; border-radius:16px; border:1px solid #e5e7eb; box-shadow:0 22px 60px rgba(2,6,23,.2);">
-          <div style="padding:18px 20px; border-bottom:1px solid #eef2ff; font-weight:800; font-size:18px;">Edit konten</div>
-          <div style="padding:16px 20px;">
-            <textarea id="__editArea" class="touch-textarea" style="width:100%; height:220px; padding:14px 16px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; resize:vertical; font: 15px/1.6 Inter, system-ui, sans-serif;"></textarea>
-          </div>
-          <div style="padding:14px 20px; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #eef2ff;">
-            <button id="__ok"   class="touch-btn" style="background:linear-gradient(90deg,#12b3ff,#7b5cff); color:#fff; padding:10px 16px; border-radius:10px; font-weight:800;">Simpan</button>
-            <button id="__cancel" class="touch-btn" style="background:#f1f5f9; padding:10px 16px; border-radius:10px; font-weight:700;">Batal</button>
-          </div>
+    scripts.forEach((s,i)=>{
+      const title=(s.title||'').trim();
+      const content=formatEmojisNeatly((s.content||'').trim());
+
+      const card=document.createElement('div'); 
+      card.className='glass p-5 sm:p-6 touch-card';
+      card.innerHTML=`
+        <h3 class="text-xl sm:text-2xl font-extrabold text-blue-600 mb-3">${escapeHtml(title)}</h3>
+        <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base" data-body>${escapeHtml(content)}</p>
+        <div class="mt-4 flex gap-2 justify-end">
+          <button class="px-4 py-2 rounded-lg text-white touch-btn" style="background:#334155" data-copy>Salin</button>
+          <button class="px-4 py-2 rounded-lg touch-btn" style="background:#e5e7eb" data-edit>Edit</button>
         </div>
       `;
-      document.body.appendChild(wrap);
-      const ta = wrap.querySelector('#__editArea'); ta.value = initial;
-      wrap.querySelector('#__ok').onclick = ()=>{ onSave(ta.value); document.body.removeChild(wrap); };
-      wrap.querySelector('#__cancel').onclick = ()=> document.body.removeChild(wrap);
-    }
 
-    /* ===== Unduh semua (.txt) ===== */
-    document.getElementById('btnDownloadAll').addEventListener('click', ()=>{
-      const cards=[...document.querySelectorAll('#results [data-body]')];
-      if(!cards.length) return alert('Belum ada hasil.');
-      const txt=cards.map((el,idx)=>{
-        const title=el.closest('.glass').querySelector('h3')?.innerText||`Variasi ${idx+1}`;
-        return `${title}\n${el.innerText}\n`;
-      }).join('\n------------------------\n\n');
-      const blob=new Blob([txt],{type:'text/plain'});
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='skrip-affiliasi.txt';
-      a.click();
-      URL.revokeObjectURL(a.href);
+      card.querySelector('[data-copy]').onclick=()=>{
+        const b=card.querySelector('[data-body]').innerText;
+        navigator.clipboard.writeText(b).then(()=>{
+          const btn=card.querySelector('[data-copy]'); btn.textContent='Tersalin!'; setTimeout(()=>btn.textContent='Salin',1400);
+        });
+      };
+      card.querySelector('[data-edit]').onclick=()=>{
+        const current = card.querySelector('[data-body]').innerText;
+        openEditModal(current,(next)=>{ card.querySelector('[data-body]').textContent = next; });
+      };
+      box.appendChild(card);
     });
 
-    /* ===== Export PDF (via print window) ===== */
-    document.getElementById('btnExportPDF').addEventListener('click', ()=>{
-      const cards=[...document.querySelectorAll('#results .glass')];
-      if(!cards.length) return alert('Belum ada hasil.');
-      const html=cards.map((c)=>`<div style="margin-bottom:18px;padding:16px;border:1px solid #e5e7eb;border-radius:12px">
-        <h3 style="margin:0 0 8px 0;font:700 18px Inter;color:#2563eb;">${c.querySelector('h3')?.innerText||''}</h3>
-        <pre style="white-space:pre-wrap;margin:0;font:400 14px/1.6 Inter;color:#0f172a">${c.querySelector('[data-body]')?.innerText||''}</pre>
-      </div>`).join('');
-      const w=window.open('','_blank','width=1000,height=800');
-      w.document.write(`<!doctype html><html><head><title>Export PDF</title></head>
-      <body style="margin:24px;background:#fff;font-family:Inter,system-ui">
-      <h1 style="font:800 22px Inter;margin:0 0 16px 0">Hasil Skrip</h1>
-      ${html}
-      <script>window.onload=()=>{setTimeout(()=>window.print(),250)}</script>
-      </body></html>`);
-      w.document.close();
-    });
+    if (window.innerWidth <= 640 && scripts.length) window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
+  }
 
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-  </script>
+  /* ===== Modal Edit (textarea nyaman) ===== */
+  function openEditModal(initial, onSave){
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:fixed; inset:0; background:rgba(2,6,23,.42); z-index:60; display:grid; place-items:center; padding:16px`;
+    wrap.innerHTML = `
+      <div style="max-width:780px; width:100%; background:white; border-radius:16px; border:1px solid #e5e7eb; box-shadow:0 22px 60px rgba(2,6,23,.2);">
+        <div style="padding:18px 20px; border-bottom:1px solid #eef2ff; font-weight:800; font-size:18px;">Edit konten</div>
+        <div style="padding:16px 20px;">
+          <textarea id="__editArea" class="touch-textarea" style="width:100%; height:220px; padding:14px 16px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; resize:vertical; font: 15px/1.6 Inter, system-ui, sans-serif;"></textarea>
+        </div>
+        <div style="padding:14px 20px; display:flex; gap:10px; justify-content:flex-end; border-top:1px solid #eef2ff;">
+          <button id="__ok"   class="touch-btn" style="background:linear-gradient(90deg,#12b3ff,#7b5cff); color:#fff; padding:10px 16px; border-radius:10px; font-weight:800;">Simpan</button>
+          <button id="__cancel" class="touch-btn" style="background:#f1f5f9; padding:10px 16px; border-radius:10px; font-weight:700;">Batal</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    const ta = wrap.querySelector('#__editArea'); ta.value = initial;
+    wrap.querySelector('#__ok').onclick = ()=>{ onSave(ta.value); document.body.removeChild(wrap); };
+    wrap.querySelector('#__cancel').onclick = ()=> document.body.removeChild(wrap);
+  }
+
+  /* ===== Unduh semua (.txt) ===== */
+  document.getElementById('btnDownloadAll').addEventListener('click', ()=>{
+    const cards=[...document.querySelectorAll('#results [data-body]')];
+    if(!cards.length) return alert('Belum ada hasil.');
+    const txt=cards.map((el,idx)=>{
+      const title=el.closest('.glass').querySelector('h3')?.innerText||`Variasi ${idx+1}`;
+      return `${title}\n${el.innerText}\n`;
+    }).join('\n------------------------\n\n');
+    const blob=new Blob([txt],{type:'text/plain'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='skrip-affiliasi.txt';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  /* ===== Export PDF (via print window) ===== */
+  document.getElementById('btnExportPDF').addEventListener('click', ()=>{
+    const cards=[...document.querySelectorAll('#results .glass')];
+    if(!cards.length) return alert('Belum ada hasil.');
+    const html=cards.map((c)=>`<div style="margin-bottom:18px;padding:16px;border:1px solid #e5e7eb;border-radius:12px">
+      <h3 style="margin:0 0 8px 0;font:700 18px Inter;color:#2563eb;">${c.querySelector('h3')?.innerText||''}</h3>
+      <pre style="white-space:pre-wrap;margin:0;font:400 14px/1.6 Inter;color:#0f172a">${c.querySelector('[data-body]')?.innerText||''}</pre>
+    </div>`).join('');
+    const w=window.open('','_blank','width=1000,height=800');
+    w.document.write(`<!doctype html><html><head><title>Export PDF</title></head>
+    <body style="margin:24px;background:#fff;font-family:Inter,system-ui">
+    <h1 style="font:800 22px Inter;margin:0 0 16px 0">Hasil Skrip</h1>
+    ${html}
+    <script>window.onload=()=>{setTimeout(()=>window.print(),250)}</script>
+    </body></html>`);
+    w.document.close();
+  });
+
+  /* ===== Utility: escape HTML benar ===== */
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#39;'
+    }[m]));
+  }
+</script>
 </body>
 </html>
