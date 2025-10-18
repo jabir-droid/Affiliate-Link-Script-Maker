@@ -9,32 +9,36 @@
   <style>
     :root{
       --bg1:#ffffff; --panel:#ffffff; --border:#e3e8f4;
-      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff;
+      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff; --field:#f7faff;
     }
     html,body{height:100%}
     body{
       margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      /* BG halus & rata */
       background:
-        radial-gradient(1200px 800px at 50% -10%, rgba(255,255,255,.88) 0%, rgba(255,255,255,.35) 40%, rgba(255,255,255,.12) 70%, rgba(255,255,255,0) 100%),
+        radial-gradient(1200px 540px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1200px 540px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
         url("/bg/generator-code.jpg") center/cover no-repeat fixed;
-      background-attachment: fixed, fixed;
       position:relative; isolation:isolate;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
+      background-size: 22px 22px; opacity:.35; mix-blend-mode:multiply;
     }
     .g-title{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
     .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
     .pill{background:#f3f6ff;border:1px solid var(--border);border-radius:12px}
-    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none;transition: box-shadow .15s, border-color .15s}
-    .inp:focus{border-color:#5b7cfa;box-shadow:0 0 0 6px rgba(91,124,250,.18)}
+    .inp{width:100%;border:1px solid var(--border);background:var(--field);padding:14px 16px;border-radius:14px;color:var(--txt);outline:none;transition:.2s}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 4px rgba(78,168,255,.18)}
     .seg input{display:none}
-    .seg label{border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600; transition: box-shadow .15s, border-color .15s}
-    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.18), rgba(124,92,255,.18));border-color:#7c5cff;box-shadow:0 0 0 6px rgba(124,92,255,.12)}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 12px 36px rgba(123,92,255,.28);color:#fff}
-    .title-size{font-size:clamp(26px, 4.5vw, 44px); line-height:1.08}
+    .seg label{border:1px solid var(--border);background:var(--field);padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600;transition:.2s}
+    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.18), rgba(124,92,255,.18));border-color:#7c5cff;box-shadow:0 0 18px rgba(124,92,255,.20)}
+    .seg label:hover{transform:translateY(-1px)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 12px 36px rgba(123,92,255,.28);color:#fff;transition:.2s}
+    .cta:hover{transform:translateY(-1px)}
+    .cta:active{transform:translateY(1px)}
+    .title-size{font-size:clamp(26px,4.5vw,44px); line-height:1.08}
     .section-pad{padding:clamp(16px, 3vw, 28px)}
-    .touchy{transition:transform .12s ease, box-shadow .12s ease}
-    .touchy:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(2,32,71,.08)}
-    .touchy:active{transform:translateY(0); box-shadow:0 6px 12px rgba(2,32,71,.10)}
     @media (max-width:640px){
       .seg-style,.seg-length{display:grid;grid-template-columns:1fr;gap:12px}
       .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
@@ -55,18 +59,31 @@
 </head>
 <body>
   <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
-    <!-- HEADER -->
     <div class="flex items-start justify-between gap-4">
       <div class="flex items-start gap-3 sm:gap-4">
-        <button onclick="window.location.href='/'" class="grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl border border-[var(--border)] bg-white/80 touchy">←</button>
+        <button onclick="history.back()" class="grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl border border-[var(--border)] bg-white/80">←</button>
         <div>
-          <h1 class="g-title title-size font-extrabold">Detail Produk &amp; Konfigurasi</h1>
+          <h1 class="g-title title-size font-extrabold">Detail Produk & Konfigurasi</h1>
           <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
+
+          <!-- toolbar mobile -->
+          <div class="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3 lg:hidden">
+            <button id="btnGuide_m" class="glass px-4 py-2 rounded-xl text-sm bg-white flex items-center justify-center gap-2">
+              <span style="color:#0284c7">ℹ</span> Panduan
+            </button>
+            <div class="pill px-4 py-2 text-sm flex items-center justify-center gap-2">
+              Kuota: <b id="quotaNow_m">—</b> / 1000
+              <button id="btnRefreshQuota_m" class="ml-1 underline text-sky-600">Refresh</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- TOOLBAR desktop (kanan) -->
+      <!-- toolbar desktop -->
       <div class="hidden lg:flex items-center gap-3">
+        <button id="btnGuide" class="glass px-4 py-2 rounded-xl text-sm bg-white flex items-center gap-2">
+          <span style="color:#0284c7">ℹ</span> Panduan
+        </button>
         <div class="pill px-4 py-2 text-sm">
           Kuota: <b id="quotaNow">—</b> / 1000
           <button id="btnRefreshQuota" class="ml-1 underline text-sky-600">Refresh</button>
@@ -74,14 +91,14 @@
       </div>
     </div>
 
-    <!-- PANDUAN (opsional: bisa toggle sendiri jika perlu) -->
+    <!-- PANDUAN -->
     <section id="guidePanel" class="glass mt-4 hidden">
       <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(90deg,#60a5fa,#8b5cf6)"></span>
           <h3 class="text-lg sm:text-xl font-extrabold">Panduan Penggunaan</h3>
         </div>
-        <button id="closeGuide" class="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)] bg-white touchy">✕</button>
+        <button id="closeGuide" class="grid place-items-center w-9 h-9 rounded-lg border border-[var(--border)] bg-white">✕</button>
       </div>
       <div class="section-pad">
         <ol class="space-y-4 sm:space-y-5 text-[15px] sm:text-[17px] leading-relaxed">
@@ -96,7 +113,7 @@
     </section>
 
     <!-- FORM -->
-    <section class="glass mt-5 touchy">
+    <section class="glass mt-5">
       <div class="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2 bg-white/60">
         <span>📝</span><h2 class="text-[18px] sm:text-[22px] font-extrabold">Form Input Produk</h2>
       </div>
@@ -104,26 +121,26 @@
       <div class="section-pad grid gap-5 sm:gap-6">
         <div>
           <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-600">*</span></label>
-          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp touchy">
+          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
         </div>
 
         <div>
           <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-600">*</span></label>
-          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp touchy">
+          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
         </div>
 
         <div>
           <div class="flex items-center justify-between mb-2">
             <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-600">*</span></label>
-            <button id="addDescTop" class="hidden sm:inline px-4 py-2 rounded-xl text-white touchy" style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">+ Tambah</button>
+            <button id="addDescTop" class="hidden sm:inline px-4 py-2 rounded-xl text-white" style="background:linear-gradient(90deg,#12b3ff,#7b5cff)">+ Tambah</button>
           </div>
-          <input id="descInput" class="inp touchy" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
+          <input id="descInput" class="inp" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
           <div id="chips" class="mt-2 flex flex-wrap gap-2"></div>
         </div>
 
         <div>
           <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Jumlah Variasi Konten</label>
-          <input id="count" type="number" min="1" max="10" value="3" class="inp touchy">
+          <input id="count" type="number" min="1" max="10" value="3" class="inp">
           <p class="text-xs mt-1 text-[var(--muted)]">Antara 1–10 variasi</p>
         </div>
 
@@ -131,25 +148,25 @@
           <div>
             <label class="block mb-3 text-[var(--muted)] font-semibold">Gaya Bahasa</label>
             <div class="seg seg-style">
-              <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label class="touchy" for="sty1">Santai & Ramah</label>
-              <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label class="touchy" for="sty2">Formal & Informatif</label>
-              <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label class="touchy" for="sty3">Promosi Soft Selling</label>
-              <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label class="touchy" for="sty4">Penulisan Naskah Iklan (AIDA/PAS)</label>
+              <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label for="sty1">Santai & Ramah</label>
+              <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2">Formal & Informatif</label>
+              <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3">Promosi Soft Selling</label>
+              <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label for="sty4">Penulisan Naskah Iklan (AIDA/PAS)</label>
             </div>
           </div>
 
           <div>
             <label class="block mb-3 text-[var(--muted)] font-semibold">Panjang Tulisan</label>
             <div class="seg seg-length">
-              <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label class="touchy" for="len1">Pendek (1 paragraf)</label>
-              <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label class="touchy" for="len2">Sedang (2-3 paragraf)</label>
-              <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label class="touchy" for="len3">Panjang (artikel mini)</label>
+              <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1">Pendek (1 paragraf)</label>
+              <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2">Sedang (2-3 paragraf)</label>
+              <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3">Panjang (artikel mini)</label>
             </div>
           </div>
         </div>
 
         <!-- CTA normal (tablet/desktop) -->
-        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta touchy">
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta">
           ✨ Mulai Hasilkan
         </button>
         <span id="err" class="text-rose-600"></span>
@@ -157,83 +174,64 @@
     </section>
 
     <section id="results" class="mt-8 grid gap-6"></section>
-
-    <footer class="text-center text-slate-600 mt-10">
-      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
-    </footer>
   </main>
 
   <!-- Sticky CTA untuk HP -->
   <div class="sm:hidden sticky-cta">
-    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta touchy">
+    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta">
       ✨ Mulai Hasilkan
     </button>
   </div>
 
   <script>
-    // Kuota
+    // Toggler panduan (mobile & desktop)
+    const panel = document.getElementById('guidePanel');
+    const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
+    openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
+    document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
+
+    // Kuota (sinkron mobile & desktop)
     async function loadQuota(){
       try{
         const r=await fetch('/api/quota'); const j=await r.json();
         const val = j?.remaining ?? '—';
-        const el=document.getElementById('quotaNow'); if(el) el.textContent=val;
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
       }catch{
-        const el=document.getElementById('quotaNow'); if(el) el.textContent='—';
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
       }
     }
-    document.getElementById('btnRefreshQuota')?.addEventListener('click', loadQuota);
+    ;['btnRefreshQuota','btnRefreshQuota_m'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.addEventListener('click', loadQuota);
+    });
     loadQuota();
 
-    // Chips
-    const chipsEl=document.getElementById('chips');
-    const inputEl=document.getElementById('descInput');
+    // Chips kelebihan (MIN 1)
+    const chipsEl=document.getElementById('chips'); const inputEl=document.getElementById('descInput');
     const btnTop=document.getElementById('addDescTop'); let chips=[];
-    const render=()=>{
-      chipsEl.innerHTML='';
-      chips.forEach((t,i)=>{
-        const s=document.createElement('span');
-        s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm touchy';
-        s.style.cssText='background:#eef2ff;border:1px solid var(--border)';
-        s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;
-        s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);render()};
-        chipsEl.appendChild(s);
-      });
-    };
-    const add=()=>{
-      const v=inputEl.value.trim(); if(!v) return;
-      chips.push(v); inputEl.value=''; render();
-    };
+    const render=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);render()};chipsEl.appendChild(s);})};
+    const add=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; render();};
     inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(); }});
     btnTop?.addEventListener('click', add);
 
-    // Generate (menghitung juga input inline)
+    // Generate
     async function doGenerate(btn){
       const err=document.getElementById('err'); err.textContent='';
-
       const url=document.getElementById('productUrl').value.trim();
       const topic=document.getElementById('productTopic').value.trim();
       const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
       const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
       const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
-
-      // Kelebihan: chips + yang masih diketik
-      const inlineDesc = (document.getElementById('descInput').value || '').trim();
       const descriptions=[...chips];
-      if(inlineDesc) descriptions.push(inlineDesc);
-
-      if(!url)   return err.textContent='Link Produk wajib diisi.';
+      if(!url) return err.textContent='Link Produk wajib diisi.';
       if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
-      if(descriptions.length<1) return err.textContent='Minimal 1 kelebihan / keunggulan.';
+      if(descriptions.length<1) return err.textContent='Minimal 1 kelebihan / keunggulan.'; // <= sudah 1
 
-      const original=btn.innerHTML; btn.disabled=true;
-      btn.innerHTML='⏳ Tunggu sebentar…  AI sedang meracik kata-kata untuk Anda...';
-
+      const original=btn.innerHTML; btn.disabled=true; btn.innerHTML='⏳ Tunggu sebentar…  AI sedang meracik kata-kata untuk Anda...';
       try{
         const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count })
-        });
-        const j=await r.json();
-        if(!r.ok || !j?.ok) throw new Error(j?.message || 'Gagal generate');
+          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count })});
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}; 
+        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
         renderResults(j.scripts||[]); loadQuota();
       }catch(e){ err.textContent=e.message; }
       finally{ btn.disabled=false; btn.innerHTML=original; }
@@ -243,14 +241,13 @@
 
     function renderResults(scripts){
       const box=document.getElementById('results'); box.innerHTML='';
-      scripts.forEach((s,i)=>{
-        const card=document.createElement('div'); card.className='glass p-5 sm:p-6 touchy';
-        card.innerHTML=`
-          <h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#3b82f6">${escapeHtml(s.title||'')}</h3>
-          <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base">${escapeHtml(s.content||'')}</p>
-          <div class="mt-4 flex items-center gap-2 justify-end">
-            <button class="px-4 py-2 rounded-lg text-white touchy" style="background:#334155" data-copy>Salin</button>
-          </div>`;
+      scripts.forEach((s)=>{
+        const card=document.createElement('div'); card.className='glass p-5 sm:p-6';
+        card.innerHTML=`<h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#3b82f6">${escapeHtml(s.title||'')}</h3>
+                        <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base">✨ ${escapeHtml(s.content||'')}</p>
+                        <div class="mt-4 flex gap-2 justify-end">
+                          <button class="px-4 py-2 rounded-lg text-white" style="background:#334155" data-copy>Salin</button>
+                        </div>`;
         card.querySelector('[data-copy]').onclick=()=>{ navigator.clipboard.writeText(s.content||'').then(()=>{ const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500); }); };
         box.appendChild(card);
       });
