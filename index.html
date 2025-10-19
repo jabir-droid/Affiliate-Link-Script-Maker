@@ -1,93 +1,137 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Script Engine AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Script Engine AI — Beranda</title>
+
+  <!-- Contoh font umum yang biasa dipakai proyek kamu -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
-      --blue:#12b3ff; --purple:#7b5cff;
-    }
-    body{
-      margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      background:
-        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
-        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
-        url("/bg/landing-city.jpg") center/cover no-repeat fixed;
-    }
-    .hero{position:relative; overflow:visible;}
-    .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
-    .title-size{font-size:clamp(40px,8.8vw,96px); line-height:1.06; letter-spacing:-.02em} /* perbesar & aman "g" */
-    .subtitle{font-size:clamp(16px,2.1vw,22px)}
-    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
-    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
-    .icon-emoji{font-size:42px; line-height:1}
-    .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
-    @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
-    @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
+/* --- descender safety for letters like g, y, p in large headings --- */
+.descender-safe{
+  display:inline-block;
+  line-height: 1.12;
+  padding-bottom: .15em;
+  transform: translateY(-0.03em);
+}
 
-    /* --- Efek sentuhan universal --- */
-    .touch-card { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; will-change: transform, box-shadow; }
-    .touch-card:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(15,23,42,.16); }
-    .touch-card:active { transform: translateY(-1px) scale(.997); }
-    .touch-input, .touch-select, .touch-textarea { transition: box-shadow .18s ease, border-color .18s ease, background-color .18s ease; }
-    .touch-input:focus, .touch-select:focus, .touch-textarea:focus { box-shadow: 0 0 0 4px rgba(79, 70, 229, .18); outline: none; }
-    .touch-btn { transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; }
-    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
-    .touch-btn:active { transform: translateY(1px) scale(.99); }
-    a.cta{ text-decoration: none; } /* hilangkan garis bawah */
+/* (Sisa CSS yang sudah ada di proyekmu tetap dipertahankan) */
+/* Letakkan CSS proyekmu di bawah ini bila ada: */
+
+/* Contoh struktur dasar halaman */
+:root{
+  --bg:#0b0b10;
+  --card:#12121a;
+  --soft:#1a1a25;
+  --pri:#7c5cff;
+  --txt:#eaeaf2;
+  --mut:#9aa0ac;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;}
+body{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  background: radial-gradient(1200px 700px at 20% -10%, #181828 0%, transparent 60%), var(--bg);
+  color: var(--txt);
+}
+a{color:inherit;text-decoration:none}
+.header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; position:sticky; top:0; background:linear-gradient(180deg,rgba(11,11,16,.9),rgba(11,11,16,.5) 80%,rgba(11,11,16,0));
+  backdrop-filter: blur(6px); border-bottom:1px solid #1b1c28;
+}
+.brand{display:flex; gap:10px; align-items:center}
+.brand .logo{
+  width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#8c7bff,#5ac8ff);box-shadow:0 8px 24px rgba(92,80,255,.28);
+}
+.brand .name{font-weight:800;letter-spacing:.3px}
+.nav a{opacity:.85;margin-left:16px}
+.hero{
+  padding:56px 20px 28px; text-align:center;
+}
+.title-grad{
+  background:linear-gradient(180deg,#ffffff,#c7c9d4);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.title-size{
+  font-size: clamp(32px, 5vw, 48px);
+  margin: 6px 0 10px;
+}
+.sub{color:var(--mut); max-width:760px; margin:0 auto 18px}
+.actions{display:flex; gap:12px; justify-content:center; margin-top:18px}
+.btn{
+  padding:12px 16px; border-radius:12px; border:1px solid #26273a;
+  background:linear-gradient(180deg,#171726,#0f1020);
+  box-shadow:0 10px 26px rgba(0,0,0,.28);
+  font-weight:600; letter-spacing:.2px;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.btn:hover{ transform: translateY(-1px); border-color:#2f3150; box-shadow:0 16px 34px rgba(124,92,255,.15) }
+.btn:active{ transform: translateY(1px) }
+.btn.primary{
+  background:linear-gradient(180deg,#7c5cff,#5b42ff);
+  border-color:#6a54ff;
+  box-shadow:0 14px 36px rgba(124,92,255,.35);
+}
+.btn.primary:hover{ box-shadow:0 18px 42px rgba(124,92,255,.42) }
+.btn.primary:active{ transform: translateY(1px) }
+.mainwrap{max-width:1040px;margin:24px auto;padding:0 20px}
+.cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px; margin:22px 0 40px}
+.card{
+  background:linear-gradient(180deg,#12121a,#0f0f16);
+  border:1px solid #222338;
+  border-radius:16px; padding:16px;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+.card:hover{ transform: translateY(-2px); border-color:#2a2b46; box-shadow:0 18px 40px rgba(124,92,255,.12) }
+.card h3{margin:0 0 8px; font-size:18px}
+.card p{margin:0;color:var(--mut)}
+.footer{color:#8f95a3; text-align:center; padding:26px 0 40px; border-top:1px solid #1b1c28}
   </style>
 </head>
 <body>
-  <main class="max-w-6xl mx-auto px-5 sm:px-6">
+  <header class="header">
+    <div class="brand">
+      <div class="logo"></div>
+      <div class="name">Script Engine AI</div>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Beranda</a>
+      <a href="generator.html">Generator</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
 
-    <!-- HERO -->
-    <section class="hero pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
-      <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
-      <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
-        Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
-      </p>
-    </section>
+  <section class="hero">
+    <h1 class="title-grad title-size font-extrabold descender-safe">Script Engine AI</h1>
+    <p class="sub">Ubah link produk menjadi skrip promosi afiliasi siap pakai — cepat, rapi, dan bisa dikustom gaya bahasanya.</p>
+    <div class="actions">
+      <a class="btn primary" href="generator.html">Mulai Generate</a>
+      <a class="btn" href="login.html">Masuk</a>
+    </div>
+  </section>
 
-    <!-- FITUR -->
-    <section class="mt-6 sm:mt-10">
-      <div class="grid-feat">
-        <div class="feature touch-card">
-          <div class="icon-emoji mb-3">🧠</div>
-          <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
-          <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
-        </div>
-        <div class="feature touch-card">
-          <div class="icon-emoji mb-3">⚡</div>
-          <h3 class="text-xl font-extrabold">Proses Kilat</h3>
-          <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
-        </div>
-        <div class="feature touch-card">
-          <div class="icon-emoji mb-3">🎛️</div>
-          <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
-          <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
-        </div>
-        <div class="feature touch-card">
-          <div class="icon-emoji mb-3">📥</div>
-          <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
-          <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
-        </div>
-      </div>
-
-      <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
-        <a href="/login.html" class="cta touch-btn w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
-          ✨ Generate Skrip Sekarang!
-        </a>
-      </div>
-    </section>
-
-    <footer class="text-center text-slate-600 mt-12 mb-8">
-      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
-    </footer>
+  <main class="mainwrap">
+    <div class="cards">
+      <article class="card">
+        <h3>Gaya Bahasa Fleksibel</h3>
+        <p>Pilih santai, semi-formal, atau persuasif. Semuanya tinggal klik.</p>
+      </article>
+      <article class="card">
+        <h3>Template Cepat</h3>
+        <p>Masukkan nama produk, keunggulan, dan variasi — hasil langsung jadi.</p>
+      </article>
+      <article class="card">
+        <h3>Siap Diposting</h3>
+        <p>Optimalkan untuk caption, deskripsi toko, atau landing page.</p>
+      </article>
+    </div>
   </main>
+
+  <footer class="footer">
+    © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+  </footer>
 </body>
 </html>
