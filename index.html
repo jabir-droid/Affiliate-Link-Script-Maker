@@ -1,142 +1,93 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Script Engine AI — Beranda</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Script Engine AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#0b1020;               /* charcoal/navy gelap */
-      --panel:#0f1426;            /* panel utama */
-      --panel2:#0b1120;           /* varian panel */
-      --border:rgba(255,255,255,.10);
-      --txt:#e8ecf5;              /* teks utama */
-      --muted:#a6b0c3;            /* teks sekunder */
-      --accent:#13f0a2;           /* neon green */
-      --accent2:#3aa0ff;          /* neon blue */
-      --gold:#d7b770;             /* emas lembut */
+      --txt:#0f172a; --muted:#475569; --panel:rgba(255,255,255,.88); --border:rgba(15,23,42,.10);
+      --blue:#12b3ff; --purple:#7b5cff;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
     body{
-      margin:0; color:var(--txt);
-      font-family: Inter, Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+      margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1200px 700px at 20% -10%, #141a2c 0%, transparent 60%),
-        var(--bg);
+        radial-gradient(1000px 420px at 10% -10%, rgba(231,241,255,.85) 0%, transparent 60%),
+        radial-gradient(1000px 450px at 95% 0%, rgba(239,230,255,.85) 0%, transparent 60%),
+        url("/bg/landing-city.jpg") center/cover no-repeat fixed;
     }
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1120px;margin:0 auto;padding:20px}
-    header{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:16px 0;
-    }
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:38px;height:38px;border-radius:12px;
-      background:conic-gradient(from 160deg, var(--accent2), var(--accent));
-      box-shadow:0 10px 28px rgba(19,240,162,.18);
-    }
-    .brand .name{font-weight:800;letter-spacing:.2px}
-    nav a{opacity:.9;margin-left:16px}
-    .hero{padding:48px 0 18px;text-align:center}
-    .title{
-      font-size: clamp(32px, 5.4vw, 52px);
-      line-height:1.08; letter-spacing:-.02em;
-      background:linear-gradient(90deg,#ffffff,#dfe6ff);
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-    }
-    .sub{max-width:780px;margin:10px auto 18px;color:var(--muted)}
-    .actions{display:flex;gap:12px;justify-content:center}
-    .btn{
-      padding:13px 18px;border-radius:14px;border:1px solid var(--border);
-      background:linear-gradient(180deg,#151a2f,#0f1326);
-      font-weight:700;
-      transition:transform .12s ease, box-shadow .2s ease, filter .2s ease;
-    }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 16px 36px rgba(0,0,0,.25)}
-    .btn:active{transform:translateY(1px) scale(.995)}
-    .btn.primary{
-      background:linear-gradient(90deg,var(--accent2),var(--accent));
-      color:#0b1020;border:0;box-shadow:0 20px 45px rgba(19,240,162,.18)
-    }
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:26px 0 40px}
-    .card{
-      background:linear-gradient(180deg,#10162a,#0d1224);
-      border:1px solid var(--border);border-radius:18px;padding:18px;
-      transition:transform .12s ease, box-shadow .2s ease;
-    }
-    .card:hover{transform:translateY(-2px);box-shadow:0 18px 42px rgba(124,92,255,.12)}
-    .card h3{margin:0 0 8px}
-    .muted{color:var(--muted)}
-    .icon-svg{width:42px;height:42px;display:inline-block;margin-bottom:8px}
-    footer{color:var(--muted);text-align:center;padding:28px 0 40px;border-top:1px solid rgba(255,255,255,.06);margin-top:20px}
-    /* section wrapper jarak lega */
-    .spacey > * + *{margin-top:clamp(12px,1.2vw,16px)}
+    .hero{position:relative; overflow:visible;}
+    .title-grad{background:linear-gradient(90deg,#5b7cfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-size{font-size:clamp(40px,8.8vw,96px); line-height:1.06; letter-spacing:-.02em} /* perbesar & aman "g" */
+    .subtitle{font-size:clamp(16px,2.1vw,22px)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff; box-shadow:0 20px 45px rgba(123,92,255,.35)}
+    .feature{padding:28px; border-radius:20px; background:var(--panel); border:1px solid var(--border); box-shadow:0 18px 40px rgba(15,23,42,.10); text-align:center}
+    .icon-emoji{font-size:42px; line-height:1}
+    .grid-feat{display:grid;gap:22px;grid-template-columns:1fr}
+    @media(min-width:820px){ .grid-feat{grid-template-columns:repeat(2,1fr)} }
+    @media(min-width:1140px){ .grid-feat{grid-template-columns:repeat(4,1fr)} }
+
+    /* --- Efek sentuhan universal --- */
+    .touch-card { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; will-change: transform, box-shadow; }
+    .touch-card:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(15,23,42,.16); }
+    .touch-card:active { transform: translateY(-1px) scale(.997); }
+    .touch-input, .touch-select, .touch-textarea { transition: box-shadow .18s ease, border-color .18s ease, background-color .18s ease; }
+    .touch-input:focus, .touch-select:focus, .touch-textarea:focus { box-shadow: 0 0 0 4px rgba(79, 70, 229, .18); outline: none; }
+    .touch-btn { transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; }
+    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
+    .touch-btn:active { transform: translateY(1px) scale(.99); }
+    a.cta{ text-decoration: none; } /* hilangkan garis bawah */
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo"></div>
-        <div class="name">Script Engine AI</div>
+  <main class="max-w-6xl mx-auto px-5 sm:px-6">
+
+    <!-- HERO -->
+    <section class="hero pt-14 sm:pt-16 lg:pt-24 pb-10 text-center">
+      <h1 class="title-grad title-size font-extrabold">Script Engine AI</h1>
+      <p class="subtitle text-slate-700 mt-4 max-w-3xl mx-auto">
+        Ubah link produk jadi skrip konten siap pakai dalam hitungan detik. Hemat waktu Anda, tingkatkan konversi.
+      </p>
+    </section>
+
+    <!-- FITUR -->
+    <section class="mt-6 sm:mt-10">
+      <div class="grid-feat">
+        <div class="feature touch-card">
+          <div class="icon-emoji mb-3">🧠</div>
+          <h3 class="text-xl font-extrabold">Mesin AI Cerdas</h3>
+          <p class="text-slate-700 mt-2">Dilatih khusus untuk membuat skrip afiliasi yang menjual.</p>
+        </div>
+        <div class="feature touch-card">
+          <div class="icon-emoji mb-3">⚡</div>
+          <h3 class="text-xl font-extrabold">Proses Kilat</h3>
+          <p class="text-slate-700 mt-2">Dari link jadi naskah siap pakai hanya dalam detik.</p>
+        </div>
+        <div class="feature touch-card">
+          <div class="icon-emoji mb-3">🎛️</div>
+          <h3 class="text-xl font-extrabold">Penuh Kendali</h3>
+          <p class="text-slate-700 mt-2">Atur gaya bahasa, panjang tulisan, dan jumlah variasi sesuai kebutuhan.</p>
+        </div>
+        <div class="feature touch-card">
+          <div class="icon-emoji mb-3">📥</div>
+          <h3 class="text-xl font-extrabold">Langsung Eksekusi</h3>
+          <p class="text-slate-700 mt-2">Salin sekali klik atau unduh hasil untuk bank konten Anda.</p>
+        </div>
       </div>
-      <nav>
-        <a href="index.html">Beranda</a>
-        <a href="generator.html">Generator</a>
-        <a href="login.html">Login</a>
-      </nav>
-    </header>
 
-    <section class="hero spacey">
-      <h1 class="title">Buat Skrip Afiliasi Premium dalam Hitungan Detik</h1>
-      <p class="sub">Tulis promosi yang rapi, meyakinkan, dan sesuai gaya—cukup isi detail produk lalu klik generate.</p>
-      <div class="actions">
-        <a class="btn primary" href="generator.html">Generate Skrip</a>
-        <a class="btn" href="login.html">Masuk</a>
+      <div class="max-w-3xl mx-auto mt-8 sm:mt-10">
+        <a href="/login.html" class="cta touch-btn w-full inline-flex items-center justify-center gap-3 px-8 py-5 rounded-2xl text-lg font-extrabold">
+          ✨ Generate Skrip Sekarang!
+        </a>
       </div>
     </section>
 
-    <!-- Fitur (ikon SVG line/duotone, tanpa emoji) -->
-    <section class="grid">
-      <article class="card">
-        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="1.6">
-          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#13f0a2"/><stop offset="1" stop-color="#3aa0ff"/></linearGradient></defs>
-          <rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 8h10M7 12h7M7 16h5"/>
-        </svg>
-        <h3>Gaya Fleksibel</h3>
-        <p class="muted">Pilih santai, semi-formal, atau persuasif. Hasil konsisten & siap pakai.</p>
-      </article>
-      <article class="card">
-        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="url(#g2)" stroke-width="1.6">
-          <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3aa0ff"/><stop offset="1" stop-color="#13f0a2"/></linearGradient></defs>
-          <path d="M13 2L3 14h7l-1 8 11-12h-7l1-8z"/>
-        </svg>
-        <h3>Proses Kilat</h3>
-        <p class="muted">Siapkan nama produk & keunggulan, klik, dan skrip langsung jadi.</p>
-      </article>
-      <article class="card">
-        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="url(#g3)" stroke-width="1.6">
-          <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#13f0a2"/><stop offset="1" stop-color="#3aa0ff"/></linearGradient></defs>
-          <circle cx="6" cy="12" r="3"/><circle cx="18" cy="7" r="3"/><path d="M9 12h6M6 15v5M18 10v9"/>
-        </svg>
-        <h3>Kendali Penuh</h3>
-        <p class="muted">Atur variasi, panjang, dan sentuhan CTA sesuai kebutuhanmu.</p>
-      </article>
-    </section>
-
-    <!-- Social proof + Use Cases (ringkas) -->
-    <section class="card spacey" style="padding:22px;">
-      <h3 style="margin:0">Dipercaya Creator & Marketer</h3>
-      <ul class="muted" style="margin:6px 0 0 18px; line-height:1.7">
-        <li><b>1.000.000+</b> skrip telah dibuat.</li>
-        <li>Rata-rata <b>hemat 80%</b> waktu menulis naskah.</li>
-        <li>Untuk: <b>Blogger</b>, <b>TikTok/IG Creator</b>, <b>Email Marketer</b>.</li>
-      </ul>
-    </section>
-
-    <footer>© 2025 Script Engine AI. All Rights Reserved.</footer>
-  </div>
+    <footer class="text-center text-slate-600 mt-12 mb-8">
+      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+    </footer>
+  </main>
 </body>
 </html>

@@ -1,83 +1,84 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login — Script Engine AI</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0b1020; --panel:#0f1426; --panel2:#0b1120; --border:rgba(255,255,255,.10);
-      --txt:#e8ecf5; --muted:#a6b0c3; --accent:#13f0a2; --accent2:#3aa0ff;
+      --txt:#0f172a; --muted:#475569; --panel:#ffffff; --border:#e2e8f0;
+      --blue:#12b3ff; --purple:#7b5cff;
     }
-    *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; color:var(--txt);
-      font-family: Inter, Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 700px at 20% -10%, #141a2c 0%, transparent 60%), var(--bg);
+      margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      /* background beda dari index/generator */
+      background:
+        radial-gradient(800px 360px at 15% -10%, rgba(219,234,254,.9) 0%, transparent 60%),
+        radial-gradient(900px 400px at 90% 0%, rgba(233,213,255,.88) 0%, transparent 60%),
+        linear-gradient(180deg,#f8fbff, #eef2ff);
     }
-    .wrap{max-width:960px;margin:0 auto;padding:22px}
-    .back{border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;width:44px;height:44px;border-radius:12px}
-    .back:hover{filter:brightness(1.06)}
-    .center{text-align:center;margin-top:22px}
-    h1{
-      font-size:clamp(28px,5vw,40px);line-height:1.08;letter-spacing:-.02em;margin:8px 0 6px;
-      background:linear-gradient(90deg,#ffffff,#dfe6ff);
-      -webkit-background-clip:text;background-clip:text;color:transparent;
-      font-weight:800;
-    }
-    .sub{color:var(--muted);margin:0}
-    .card{
-      background:linear-gradient(180deg,rgba(20,26,44,.9),rgba(14,18,30,.92));
-      border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(0,0,0,.24);
-      max-width:520px;margin:18px auto 0;padding:20px;
-    }
-    .lbl{display:block;margin:0 0 8px;color:#cfd6e6;font-weight:600}
-    .inp{
-      width:100%;padding:14px 14px;border-radius:14px;outline:none;
-      background:#0b1120;border:1px solid var(--border);color:#fff;
-      transition:box-shadow .18s ease,border-color .18s ease,transform .12s ease;
-    }
-    .inp:hover{border-color:#7c5cff;background:#0e1730}
-    .inp:focus{border-color:var(--accent2);box-shadow:0 0 0 4px rgba(58,160,255,.18)}
-    .btn{
-      width:100%;padding:14px 18px;border-radius:14px;border:0;font-weight:800;letter-spacing:.2px;
-      background:linear-gradient(90deg,var(--accent2),var(--accent));color:#0b1020;
-      box-shadow:0 18px 40px rgba(19,240,162,.18);
-      transition:transform .14s ease,filter .2s ease;
-    }
-    .btn:hover{filter:brightness(1.06)}
-    .btn:active{transform:translateY(1px) scale(.995)}
-    .err{color:#ff6b7a;font-size:13px;margin-top:8px;min-height:18px}
-    footer{color:var(--muted);text-align:center;margin:18px 0 30px}
+
+    /* Kartu login ramping */
+    .card{ background:var(--panel); border:1px solid var(--border); border-radius:18px;
+           box-shadow:0 18px 40px rgba(15,23,42,.08); }
+
+    .title-grad{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-size{font-size:clamp(28px,5.5vw,40px); line-height:1.08}
+
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
+
+    /* Efek sentuhan konsisten */
+    .touch-card { transition: transform .18s ease, box-shadow .18s ease; }
+    .touch-card:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(15,23,42,.15); }
+    .touch-card:active { transform: translateY(-1px) scale(.997); }
+
+    .touch-btn { transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; }
+    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
+    .touch-btn:active { transform: translateY(1px) scale(.99); }
+
+    .back-btn { border:1px solid var(--border); background:#ffffffd9; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <button class="back" onclick="history.back()">←</button>
+  <div class="max-w-6xl mx-auto px-5 sm:px-6 py-6">
+    <!-- tombol kembali atas -->
+    <button onclick="history.back()" class="back-btn touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">
+      ←
+    </button>
 
-    <section class="center">
-      <h1>Login</h1>
-      <p class="sub">Masukkan data sesuai pembelian untuk melanjutkan.</p>
+    <!-- header -->
+    <section class="text-center mt-6">
+      <h1 class="title-grad title-size font-extrabold">Login</h1>
+      <p class="text-slate-600 mt-2">Masukkan data sesuai pembelian untuk melanjutkan.</p>
     </section>
 
-    <section class="card">
-      <form id="loginForm" class="grid" style="gap:14px">
+    <!-- form card -->
+    <section class="max-w-md mx-auto mt-6 p-5 sm:p-6 card touch-card">
+      <form id="loginForm" class="grid gap-5">
         <div>
-          <label class="lbl" for="name">Nama Pembeli</label>
-          <input id="name" type="text" class="inp" placeholder="Nama saat pembelian" autocomplete="name">
+          <label for="name" class="block mb-2 text-slate-600 font-semibold">Nama Pembeli</label>
+          <input id="name" type="text" class="inp" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli." autocomplete="name">
         </div>
+
         <div>
-          <label class="lbl" for="phone">Nomor Handphone</label>
-          <input id="phone" type="tel" inputmode="numeric" pattern="[0-9]*" class="inp" placeholder="081234567890" autocomplete="tel">
+          <label for="phone" class="block mb-2 text-slate-600 font-semibold">Nomor Handphone</label>
+          <input id="phone" type="tel" inputmode="numeric" pattern="[0-9]*" class="inp"
+                 placeholder="Contoh: 081234567890 (sesuai saat membeli)" autocomplete="tel">
         </div>
-        <button id="submitBtn" type="submit" class="btn">Masuk</button>
-        <p id="err" class="err"></p>
+
+        <button id="submitBtn" type="submit"
+                class="touch-btn w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl text-base font-extrabold"
+                style="background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff;">
+          Masuk
+        </button>
+
+        <p id="err" class="text-rose-600 text-sm"></p>
       </form>
     </section>
-
-    <footer>© 2025 Script Engine AI. All Rights Reserved.</footer>
   </div>
 
   <script>
@@ -86,31 +87,48 @@
     const err  = document.getElementById('err');
 
     function clean(s){ return String(s||'').trim(); }
-    function validPhone(p){ const d=(p||'').replace(/\D/g,''); return d.length>=10 && d.length<=15; }
+
+    function validPhone(p){
+      const digits = (p||'').replace(/\D/g,'');
+      return digits.length >= 10 && digits.length <= 15;
+    }
 
     form.addEventListener('submit', async (e)=>{
-      e.preventDefault(); err.textContent='';
+      e.preventDefault();
+      err.textContent = '';
+
       const name  = clean(document.getElementById('name').value);
       const phone = clean(document.getElementById('phone').value);
-      if(!name){ err.textContent='Nama wajib diisi.'; return; }
-      if(!validPhone(phone)){ err.textContent='Nomor HP tidak valid (10–15 digit).'; return; }
 
-      const prev = btn.textContent; btn.disabled=true; btn.textContent='Memproses...';
+      if(!name)  return err.textContent = 'Nama wajib diisi.';
+      if(!validPhone(phone)) return err.textContent = 'Nomor HP tidak valid. Gunakan 10–15 digit angka.';
+
+      const prev = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Memproses...';
+
       try{
         const r = await fetch('/api/login-name', {
-          method:'POST', headers:{'Content-Type':'application/json'},
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone })
         });
         const j = await r.json().catch(()=>null);
-        if(!r.ok || !j?.ok) throw new Error(j?.message || 'Server error.');
-        location.href = 'generator.html';
-      }catch(ex){ err.textContent = ex.message || 'Server error.'; }
-      finally{ btn.disabled=false; btn.textContent=prev; }
+        if(!r.ok || !j?.ok){
+          throw new Error(j?.message || 'Server error.');
+        }
+        // sukses -> ke generator
+        location.href = '/generator.html';
+      }catch(ex){
+        err.textContent = ex.message || 'Server error.';
+      }finally{
+        btn.disabled = false; btn.textContent = prev;
+      }
     });
 
+    // Enter di input juga submit
     ['name','phone'].forEach(id=>{
       const el=document.getElementById(id);
-      el.addEventListener('keydown',(ev)=>{ if(ev.key==='Enter'){ form.requestSubmit(); }});
+      el.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ form.requestSubmit(); }});
     });
   </script>
 </body>
