@@ -1,124 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login — Script Engine AI</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
-/* --- descender safety for letters like g, y, p in large headings --- */
-.descender-safe{
-  display:inline-block;
-  line-height: 1.12;
-  padding-bottom: .15em;
-  transform: translateY(-0.03em);
-}
+    :root{
+      --txt:#0f172a; --muted:#475569; --panel:#ffffff; --border:#e2e8f0;
+      --blue:#12b3ff; --purple:#7b5cff;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      /* background beda dari index/generator */
+      background:
+        radial-gradient(800px 360px at 15% -10%, rgba(219,234,254,.9) 0%, transparent 60%),
+        radial-gradient(900px 400px at 90% 0%, rgba(233,213,255,.88) 0%, transparent 60%),
+        linear-gradient(180deg,#f8fbff, #eef2ff);
+    }
 
-/* --- touch/hover/active feedback for inputs --- */
-.inp{
-  transition: box-shadow .18s ease, border-color .18s ease, background-color .18s ease, transform .12s ease;
-}
-.inp:hover{
-  border-color:#7c5cff;
-  background:#ffffff;
-}
-.inp:active{
-  transform: translateY(1px);
-}
+    /* Kartu login ramping */
+    .card{ background:var(--panel); border:1px solid var(--border); border-radius:18px;
+           box-shadow:0 18px 40px rgba(15,23,42,.08); }
 
-/* (Sisa CSS proyek login) */
-:root{
-  --bg:#0b0b10;
-  --card:#12121a;
-  --soft:#1a1a25;
-  --pri:#7c5cff;
-  --txt:#eaeaf2;
-  --mut:#9aa0ac;
-}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%}
-body{
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
-  background: radial-gradient(1200px 700px at 20% -10%, #181828 0%, transparent 60%), var(--bg);
-  color:var(--txt);
-}
-.wrap{
-  min-height:100dvh;
-  display:grid; place-items:center; padding:24px;
-}
-.card{
-  width:min(520px, 92vw);
-  background:linear-gradient(180deg,#12121a,#0f0f16);
-  border:1px solid #222338;
-  border-radius:16px; padding:22px 18px 18px;
-  box-shadow:0 18px 44px rgba(0,0,0,.28);
-}
-.center{text-align:center}
-h1{
-  margin:8px 0 6px;
-  font-size: clamp(28px, 4.4vw, 40px);
-  background:linear-gradient(180deg,#fff,#d9dbe6);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-}
-p.sub{color:var(--mut); margin:0 0 18px}
-.row{display:grid; gap:10px; margin:12px 0}
-.lbl{font-size:14px; color:#b7bcc8}
-.inp{
-  width:100%; padding:12px 12px; border-radius:12px;
-  border:1px solid #2a2b44; background:#0e0f1c; color:var(--txt);
-  outline: none;
-}
-.inp:focus{
-  border-color:#7c5cff; box-shadow:0 0 0 3px rgba(124,92,255,.18);
-  background:#0f1020;
-}
-.actions{display:flex; gap:10px; justify-content:space-between; align-items:center; margin-top:8px}
-.btn{
-  padding:12px 16px; border-radius:12px; border:1px solid #26273a;
-  background:linear-gradient(180deg,#171726,#0f1020);
-  box-shadow:0 10px 26px rgba(0,0,0,.28);
-  font-weight:600; letter-spacing:.2px;
-  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
-}
-.btn:hover{ transform: translateY(-1px); border-color:#2f3150; box-shadow:0 16px 34px rgba(124,92,255,.15) }
-.btn:active{ transform: translateY(1px) }
-.btn.primary{
-  background:linear-gradient(180deg,#7c5cff,#5b42ff);
-  border-color:#6a54ff;
-  box-shadow:0 14px 36px rgba(124,92,255,.35);
-}
-.btn.primary:hover{ box-shadow:0 18px 42px rgba(124,92,255,.42) }
-.btn.primary:active{ transform: translateY(1px) }
-.note{color:#8f95a3; font-size:12.5px; text-align:center; margin-top:14px}
+    .title-grad{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-size{font-size:clamp(28px,5.5vw,40px); line-height:1.08}
+
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
+
+    /* Efek sentuhan konsisten */
+    .touch-card { transition: transform .18s ease, box-shadow .18s ease; }
+    .touch-card:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(15,23,42,.15); }
+    .touch-card:active { transform: translateY(-1px) scale(.997); }
+
+    .touch-btn { transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; }
+    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
+    .touch-btn:active { transform: translateY(1px) scale(.99); }
+
+    .back-btn { border:1px solid var(--border); background:#ffffffd9; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <div class="center">
-        <h1 class="title-grad title-size font-extrabold descender-safe">Login</h1>
-        <p class="sub">Masuk untuk mulai menghasilkan skrip afiliasi otomatis.</p>
-      </div>
+  <div class="max-w-6xl mx-auto px-5 sm:px-6 py-6">
+    <!-- tombol kembali atas -->
+    <button onclick="history.back()" class="back-btn touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">
+      ←
+    </button>
 
-      <form method="post" action="/api/me">
-        <div class="row">
-          <label class="lbl" for="email">Email</label>
-          <input id="email" name="email" type="email" class="inp" placeholder="nama@domain.com" required />
-        </div>
-        <div class="row">
-          <label class="lbl" for="pass">Kata sandi</label>
-          <input id="pass" name="password" type="password" class="inp" placeholder="••••••••" required />
+    <!-- header -->
+    <section class="text-center mt-6">
+      <h1 class="title-grad title-size font-extrabold">Login</h1>
+      <p class="text-slate-600 mt-2">Masukkan data sesuai pembelian untuk melanjutkan.</p>
+    </section>
+
+    <!-- form card -->
+    <section class="max-w-md mx-auto mt-6 p-5 sm:p-6 card touch-card">
+      <form id="loginForm" class="grid gap-5">
+        <div>
+          <label for="name" class="block mb-2 text-slate-600 font-semibold">Nama Pembeli</label>
+          <input id="name" type="text" class="inp" placeholder="Masukkan Nama yang Didaftarkan Saat Membeli." autocomplete="name">
         </div>
 
-        <div class="actions">
-          <a class="btn" href="index.html">Kembali</a>
-          <button class="btn primary" type="submit">Masuk</button>
+        <div>
+          <label for="phone" class="block mb-2 text-slate-600 font-semibold">Nomor Handphone</label>
+          <input id="phone" type="tel" inputmode="numeric" pattern="[0-9]*" class="inp"
+                 placeholder="Contoh: 081234567890 (sesuai saat membeli)" autocomplete="tel">
         </div>
+
+        <button id="submitBtn" type="submit"
+                class="touch-btn w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl text-base font-extrabold"
+                style="background:linear-gradient(90deg,var(--blue),var(--purple)); color:#fff;">
+          Masuk
+        </button>
+
+        <p id="err" class="text-rose-600 text-sm"></p>
       </form>
-
-      <div class="note">© 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.</div>
-    </div>
+    </section>
   </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const btn  = document.getElementById('submitBtn');
+    const err  = document.getElementById('err');
+
+    function clean(s){ return String(s||'').trim(); }
+
+    function validPhone(p){
+      const digits = (p||'').replace(/\D/g,'');
+      return digits.length >= 10 && digits.length <= 15;
+    }
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      err.textContent = '';
+
+      const name  = clean(document.getElementById('name').value);
+      const phone = clean(document.getElementById('phone').value);
+
+      if(!name)  return err.textContent = 'Nama wajib diisi.';
+      if(!validPhone(phone)) return err.textContent = 'Nomor HP tidak valid. Gunakan 10–15 digit angka.';
+
+      const prev = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Memproses...';
+
+      try{
+        const r = await fetch('/api/login-name', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone })
+        });
+        const j = await r.json().catch(()=>null);
+        if(!r.ok || !j?.ok){
+          throw new Error(j?.message || 'Server error.');
+        }
+        // sukses -> ke generator
+        location.href = '/generator.html';
+      }catch(ex){
+        err.textContent = ex.message || 'Server error.';
+      }finally{
+        btn.disabled = false; btn.textContent = prev;
+      }
+    });
+
+    // Enter di input juga submit
+    ['name','phone'].forEach(id=>{
+      const el=document.getElementById(id);
+      el.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ form.requestSubmit(); }});
+    });
+  </script>
 </body>
 </html>
