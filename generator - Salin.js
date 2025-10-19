@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Detail Produk & Konfigurasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
+      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1800px 800px at 50% -20%, rgba(231,241,255,.85) 0%, transparent 65%),
+        radial-gradient(1800px 900px at 50% 120%, rgba(239,230,255,.85) 0%, transparent 65%),
+        url("/bg/generator-code.jpg") center/cover no-repeat fixed; /* BG halus */
+      position:relative; isolation:isolate;
+    }
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
+      background-size: 22px 22px; opacity:.45; mix-blend-mode:multiply;
+    }
+    .g-title{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
+    .pill{background:#f3f6ff;border:1px solid var(--border);border-radius:12px}
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
+    .seg input{display:none}
+    .seg label{border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600}
+    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.18), rgba(124,92,255,.18));border-color:#7c5cff;box-shadow:0 0 18px rgba(124,92,255,.20)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 12px 36px rgba(123,92,255,.28);color:#fff}
+    .title-size{font-size:clamp(26px, 4.5vw, 44px); line-height:1.08}
+    .section-pad{padding:clamp(16px, 3vw, 28px)}
+    .btn-soft{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff}
+    .btn-grad{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border:0}
+    /* Mobile (≤640) */
+    @media (max-width:640px){
+      .seg-style,.seg-length{display:grid;grid-template-columns:1fr;gap:12px}
+      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
+      main{padding-bottom:110px}
+      #chips{display:flex;flex-wrap:wrap;gap:8px}
+    }
+    /* Tablet (641–1024) */
+    @media (min-width:641px) and (max-width:1024px){
+      .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+      .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+      main{padding-bottom:32px}
+    }
+    /* Desktop (≥1025) */
+    @media (min-width:1025px){
+      .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+      .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+      main{padding-bottom:32px}
+    }
+  </style>
+</head>
+<body>
+  <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
+    <!-- HEADER -->
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <button onclick="history.back()" class="btn-grad grid place-items-center w-11 h-11 sm:w-12 sm:h-12">←</button>
+        <div>
+          <h1 class="g-title title-size font-extrabold">Detail Produk & Konfigurasi</h1>
+          <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
+
+          <!-- TOOLBAR mobile/tablet (di bawah judul) -->
+          <div class="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3 lg:hidden">
+            <button id="btnGuide_m" class="btn-grad">ℹ Panduan</button>
+            <div class="pill px-4 py-2 text-sm flex items-center justify-center gap-2">
+              Kuota: <b id="quotaNow_m">—</b> / 1000
+              <button id="btnRefreshQuota_m" class="ml-2 btn-soft">Refresh</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR desktop (kanan) -->
+      <div class="hidden lg:flex items-center gap-3">
+        <button id="btnGuide" class="btn-grad">ℹ Panduan</button>
+        <div class="pill px-4 py-2 text-sm flex items-center gap-2">
+          Kuota: <b id="quotaNow">—</b> / 1000
+          <button id="btnRefreshQuota" class="btn-soft">Refresh</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANDUAN -->
+    <section id="guidePanel" class="glass mt-4 hidden">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(90deg,#60a5fa,#8b5cf6)"></span>
+          <h3 class="text-lg sm:text-xl font-extrabold">Panduan Penggunaan</h3>
+        </div>
+        <button id="closeGuide" class="btn-soft">✕</button>
+      </div>
+      <div class="section-pad">
+        <ol class="space-y-4 sm:space-y-5 text-[15px] sm:text-[17px] leading-relaxed">
+          <li>1. Masukkan <b>link produk</b> & info dasar.</li>
+          <li>2. Tambahkan <b>kelebihan/keunggulan</b> (minimal <b>2</b>).</li>
+          <li>3. Pilih <b>gaya bahasa</b> yang sesuai.</li>
+          <li>4. Tentukan <b>panjang tulisan</b>.</li>
+          <li>5. Klik <b>Mulai Hasilkan</b>.</li>
+          <li>6. <b>Salin</b>, <b>Edit</b>, <b>Unduh Semua</b> atau <b>Export PDF</b>.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section class="glass mt-5">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2 bg-white/60">
+        <span>📝</span><h2 class="text-[18px] sm:text-[22px] font-extrabold">Form Input Produk</h2>
+      </div>
+
+      <div class="section-pad grid gap-5 sm:gap-6">
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-600">*</span></label>
+          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-600">*</span></label>
+          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-600">*</span></label>
+            <button id="addDescTop" class="hidden sm:inline btn-grad">+ Tambah</button>
+          </div>
+          <input id="descInput" class="inp" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
+          <div id="chips" class="mt-2 flex flex-wrap gap-2"></div>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Jumlah Variasi Konten</label>
+          <input id="count" type="number" min="1" max="10" value="3" class="inp">
+          <p class="text-xs mt-1 text-[var(--muted)]">Antara 1–10 variasi</p>
+        </div>
+
+        <div class="grid gap-6 sm:gap-8">
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Gaya Bahasa</label>
+            <div class="seg seg-style">
+              <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label for="sty1">Santai & Ramah</label>
+              <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2">Formal & Informatif</label>
+              <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3">Promosi Soft Selling</label>
+              <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label for="sty4">Penulisan Naskah Iklan (AIDA/PAS)</label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Panjang Tulisan</label>
+            <div class="seg seg-length">
+              <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1">Pendek (1 paragraf)</label>
+              <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2">Sedang (2-3 paragraf)</label>
+              <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3">Panjang (artikel mini)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA normal (tablet/desktop) -->
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta">
+          ✨ Mulai Hasilkan
+        </button>
+        <span id="err" class="text-rose-600"></span>
+      </div>
+    </section>
+
+    <!-- AKSI MASSAL -->
+    <div id="bulkActions" class="mt-8 hidden">
+      <div class="glass flex flex-wrap items-center justify-end gap-3 p-4">
+        <button id="btnDownloadAll" class="btn-soft">Unduh Semua (.txt)</button>
+        <button id="btnPdfAll" class="btn-soft">Export Semua ke PDF</button>
+      </div>
+    </div>
+
+    <!-- HASIL -->
+    <section id="results" class="mt-8 grid gap-6"></section>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-600 mt-12">
+      © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+    </footer>
+  </main>
+
+  <!-- Sticky CTA untuk HP -->
+  <div class="sm:hidden sticky-cta">
+    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta">
+      ✨ Mulai Hasilkan
+    </button>
+  </div>
+
+  <!-- Modal Edit -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-slate-200">
+        <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 class="font-bold text-lg">Edit Konten</h3>
+          <button id="editClose" class="btn-soft">✕</button>
+        </div>
+        <div class="p-5">
+          <textarea id="editArea" class="w-full h-64 p-4 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-indigo-100"
+            style="font-family: Inter, system-ui; line-height: 1.6; font-size: 14px;"></textarea>
+        </div>
+        <div class="px-5 pb-5 flex justify-end gap-2">
+          <button id="editCancel" class="btn-soft">Batal</button>
+          <button id="editSave" class="px-4 py-2 rounded-lg text-white" style="background:#334155">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============== PANDUAN TOGGLER ==============
+    const panel = document.getElementById('guidePanel');
+    const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
+    openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
+    document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
+
+    // ============== KUOTA (sinkron mobile & desktop) ==============
+    async function loadQuota(){
+      try{
+        const r=await fetch('/api/quota'); const j=await r.json();
+        const val = j?.remaining ?? '—';
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
+      }catch{
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
+      }
+    }
+    ;['btnRefreshQuota','btnRefreshQuota_m'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.addEventListener('click', loadQuota);
+    });
+    loadQuota();
+
+    // ============== CHIPS KELEBIHAN ==============
+    const chipsEl=document.getElementById('chips'); 
+    const inputEl=document.getElementById('descInput');
+    const btnTop=document.getElementById('addDescTop'); 
+    let chips=[];
+    const renderChips=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)]">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);renderChips()};chipsEl.appendChild(s);})};
+    const addChip=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; renderChips();};
+    inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChip(); }});
+    btnTop?.addEventListener('click', addChip);
+
+    // ============== GENERATE ==============
+    async function doGenerate(btn){
+      const err=document.getElementById('err'); err.textContent='';
+      const url=document.getElementById('productUrl').value.trim();
+      const topic=document.getElementById('productTopic').value.trim();
+      const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
+      const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
+      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+      const descriptions=[...chips];
+
+      if(!url)   return err.textContent='Link Produk wajib diisi.';
+      if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
+      if((descriptions||[]).length < 2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
+
+      const original=btn.innerHTML; btn.disabled=true; 
+      btn.innerHTML='⏳ Tunggu sebentar… <span class="hidden sm:inline">AI sedang meracik kata-kata untuk Anda…</span>';
+
+      try{
+        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
+            link:url, topic, descriptions, style, length, generateCount:count, count })
+        });
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}
+        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
+        renderResults(j.scripts||[]); loadQuota();
+      }catch(e){ err.textContent=e.message; }
+      finally{ btn.disabled=false; btn.innerHTML=original; }
+    }
+    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this) });
+    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this) });
+
+    // ============== EMOJI KONTEKSTUAL ==============
+    function decorateContent(raw) {
+      if (!raw) return '';
+      const startEmojis = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
+      let text = String(raw);
+
+      // Baris ber-URL → tambah 👉 di akhir
+      text = text.split('\n').map(line => {
+        if (/(https?:\/\/\S+)/i.test(line)) return line.replace(/\s*$/, ' 👉');
+        return line;
+      }).join('\n');
+
+      // Kalimat CTA → tambah 👉 di akhir
+      text = text.replace(/((cek|klik|lihat|kunjungi|beli|pesan)(lah)?( di sini)?)([!.…])?/gi, (m)=> m.replace(/\s*$/, ' 👉'));
+
+      // Penekanan/positif → ✨
+      text = text.replace(/(hebat|mantap|recommended|unggul|terbaik|worth it|keren)([!.…])?/gi, (m)=> m.replace(/\s*$/, ' ✨'));
+
+      // Paragraf pertama: pembuka opsional (jika belum ada)
+      text = text.replace(/^([^\n\S]*)(?![✨🚀💡🎯⚡🔥🧠💎🌟📈])/,
+        (_, s) => s + (startEmojis[Math.floor(Math.random()*startEmojis.length)] + ' ')
+      );
+      return text;
+    }
+
+    // ============== MODAL EDIT ==============
+    const modal = document.getElementById('editModal');
+    const editArea = document.getElementById('editArea');
+    const editClose = document.getElementById('editClose');
+    const editCancel = document.getElementById('editCancel');
+    const editSave = document.getElementById('editSave');
+    let onSaveEdit = null;
+
+    function openEdit(initialText, saveCb){
+      editArea.value = initialText || '';
+      onSaveEdit = saveCb;
+      modal.classList.remove('hidden');
+      editArea.focus();
+    }
+    function closeEdit(){
+      modal.classList.add('hidden'); onSaveEdit = null;
+    }
+    editClose.onclick = closeEdit; editCancel.onclick = closeEdit;
+    editSave.onclick = ()=>{ if(onSaveEdit) onSaveEdit(editArea.value); closeEdit(); };
+
+    // ============== RENDER HASIL + AKSI MASSAL ==============
+    let _lastScripts = [];
+    function renderResults(scripts){
+      _lastScripts = (scripts||[]).map(s => ({ ...s }));
+      const box=document.getElementById('results'); 
+      const bulk=document.getElementById('bulkActions');
+      box.innerHTML='';
+
+      if (!_lastScripts.length){ bulk.classList.add('hidden'); return; }
+      bulk.classList.remove('hidden');
+
+      _lastScripts.forEach((s, i) => {
+        const decorated = decorateContent(s.content || '');
+        const titleSafe = escapeHtml(s.title || '');
+
+        const card=document.createElement('div'); 
+        card.className='glass p-5 sm:p-6';
+        card.innerHTML=`
+          <h3 class="text-lg sm:text-xl font-bold mb-2" style="color:#3b82f6">${titleSafe}</h3>
+          <p class="whitespace-pre-wrap leading-relaxed text-[15px] sm:text-base">${escapeHtml(decorated)}</p>
+          <div class="mt-4 flex flex-wrap gap-2 justify-end">
+            <button class="px-4 py-2 rounded-lg text-white" style="background:#334155" data-copy>Salin</button>
+            <button class="btn-soft" data-edit>Edit</button>
+          </div>`;
+
+        card.querySelector('[data-copy]').onclick=()=>{ 
+          navigator.clipboard.writeText(s.content||'').then(()=>{
+            const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500);
+          }); 
+        };
+        card.querySelector('[data-edit]').onclick=()=>{ 
+          openEdit(s.content||'', (val)=>{ _lastScripts[i].content = val; renderResults(_lastScripts); });
+        };
+        box.appendChild(card);
+      });
+
+      // Unduh semua (.txt)
+      document.getElementById('btnDownloadAll').onclick = ()=>{
+        const allText = _lastScripts.map((s, idx)=>`[${idx+1}] ${s.title||''}\n${s.content||''}`).join('\n\n---\n\n');
+        const blob=new Blob([allText],{type:'text/plain'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='skrip-semua.txt'; a.click(); URL.revokeObjectURL(a.href);
+      };
+      // Export semua ke PDF (via print)
+      document.getElementById('btnPdfAll').onclick = ()=>{
+        const html = _lastScripts.map((s, idx)=>`
+          <h3 style="margin:0 0 8px 0; color:#1d4ed8; font-size:16px; font-weight:800">${idx+1}. ${escapeHtml(s.title||'')}</h3>
+          <div style="white-space:pre-wrap; line-height:1.6; font-size:14px; margin:0 0 18px 0">${escapeHtml(s.content||'')}</div>
+        `).join('');
+        const w=window.open('','_blank');
+        w.document.write(`
+          <html><head><title>Hasil Script</title>
+          <style>body{font-family:Inter,system-ui; padding:24px}</style></head>
+          <body>${html}</body></html>`);
+        w.document.close(); w.focus(); w.print();
+      };
+
+      // Scroll ke hasil di HP
+      if (window.innerWidth <= 640 && _lastScripts.length)
+        window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
+    }
+
+    // Util HTML escape
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+  </script>
+</body>
+</html>
