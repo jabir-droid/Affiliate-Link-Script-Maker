@@ -27,12 +27,12 @@
       background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
       background-size: 22px 22px; opacity:.45; mix-blend-mode:multiply;
     }
+    /* PERBAIKAN: Menjamin huruf 'g' terlihat */
     .g-title{
       background:linear-gradient(90deg,#3b82f6,#8b5cf6);
       -webkit-background-clip:text;
       background-clip:text;
       color:transparent;
-      /* Menjamin huruf 'g' terlihat */
       padding-bottom: 5px; 
       margin-bottom: -5px;
     }
@@ -49,15 +49,13 @@
     .btn-soft{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff}
     .btn-grad{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border:0}
     
-    /* Efek sentuhan universal */
+    /* Efek sentuhan universal (Baru ditambahkan untuk konsistensi) */
     .touch-btn { 
         transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; 
         will-change: transform, box-shadow;
     }
     .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
     .touch-btn:active { transform: translateY(1px) scale(.99); }
-
-    /* Tombol kembali yang serasi */
     .back-btn-style { border:1px solid var(--border); background:#ffffffd9; }
 
     /* Tombol Tambah Keunggulan (Revisi Desain) */
@@ -75,14 +73,14 @@
         transform: translateY(-1px);
     }
 
-    /* REVISI: Progress Bar & Status */
+    /* Progress Bar & Status - dari revisi sebelumnya */
     .progress-container{
       margin-top: 18px; 
       transition: opacity .3s ease;
     }
     .progress-bar{
       height: 6px; 
-      background: #eef2ff; /* Light base */
+      background: #eef2ff;
       border-radius: 999px;
       overflow: hidden;
     }
@@ -112,10 +110,10 @@
     .typing-cursor {
       display: inline-block;
       width: 0.15em;
-      height: 1em; /* Tinggi kursor */
+      height: 1em; 
       margin-left: 2px;
       vertical-align: middle;
-      background-color: #1e40af; /* Warna kursor (dark blue) */
+      background-color: #1e40af; 
       animation: blink-cursor 0.75s step-end infinite;
     }
 
@@ -501,7 +499,7 @@
     // ============== EMOJI KONTEKSTUAL (REVISI FINAL) ==============
     function decorateContent(raw) {
       if (!raw) return '';
-      let text = String(raw); // Jangan trim di sini, biarkan indentasi asli tetap ada
+      let text = String(raw); 
       let lines = text.split('\n');
       
       const emojiMap = {
@@ -509,44 +507,45 @@
           'positif': '✨',   
           'ajakan': '👉',    
       };
+      
+      // Kata kunci untuk deteksi kalimat positif/penekanan
+      const positiveKeywords = /(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i;
+      // Kata kunci untuk deteksi kalimat CTA/ajakan
+      const ctaKeywords = /(dapatkan|beli|pesan|ceklah|klik di sini|tonton videonya)/i;
 
       let decoratedLines = lines.map(line => {
-          // Pertahankan spasi di awal/akhir baris agar format indentasi tetap ada
           let trimmedLine = line.trim(); 
-          if (!trimmedLine) return line; // Pertahankan baris kosong
+          if (!trimmedLine) return line; 
 
           // Cek apakah baris sudah diakhiri dengan emoji untuk mencegah duplikasi
           const endsWithEmoji = Object.values(emojiMap).some(emoji => trimmedLine.endsWith(emoji));
           if (endsWithEmoji) return line;
 
-          // 1. Tambahkan emoji LINK/AJAKAN jika ada URL
+          // Dapatkan spasi di awal baris asli untuk mempertahankan indentasi
+          let leadingSpaces = line.match(/^\s*/)[0];
+
+          // 1. Tambahkan emoji LINK (🔗) jika ada URL
           if (/(https?:\/\/\S+)/i.test(trimmedLine)) {
-              // Dapatkan spasi di awal baris asli, lalu tambahkan emoji di akhir baris
-              let leadingSpaces = line.match(/^\s*/)[0];
               return leadingSpaces + trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
           }
 
           // 2. Tambahkan emoji AJAKAN (👉) di akhir kalimat CTA
-          // Mencari kata-kata CTA: (dapatkan, beli, cek, klik, dll)
-          if (/(dapatkan|beli|pesan|ceklah|klik di sini)/i.test(trimmedLine)) {
-              // Ganti titik atau spasi di akhir kalimat dengan emoji, atau tambahkan di akhir
-              let leadingSpaces = line.match(/^\s*/)[0];
+          if (ctaKeywords.test(trimmedLine)) {
               return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
           } 
           
           // 3. Tambahkan emoji POSITIF (✨) di akhir kalimat penekanan
-          // Mencari kata-kata positif: (terbaik, mantap, unggul, worth it, keren)
-          else if (/(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i.test(trimmedLine)) {
-              let leadingSpaces = line.match(/^\s*/)[0];
+          else if (positiveKeywords.test(trimmedLine)) {
               return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
           }
           
-          return line; // Jika tidak ada kriteria yang cocok, kembalikan baris aslinya
+          return line; 
       });
 
       // Gabungkan kembali menggunakan line break yang sama
       return decoratedLines.join('\n').trim();
     }
+
 
     // ============== MODAL EDIT ==============
     const modal = document.getElementById('editModal');
