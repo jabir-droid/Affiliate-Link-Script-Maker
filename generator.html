@@ -498,10 +498,10 @@
     document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this, false) });
     document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this, true) });
 
-    // ============== EMOJI KONTEKSTUAL (FINAL REVISI) ==============
+    // ============== EMOJI KONTEKSTUAL (REVISI FINAL) ==============
     function decorateContent(raw) {
       if (!raw) return '';
-      let text = String(raw).trim();
+      let text = String(raw); // Jangan trim di sini, biarkan indentasi asli tetap ada
       let lines = text.split('\n');
       
       const emojiMap = {
@@ -510,34 +510,42 @@
           'ajakan': '👉',    
       };
 
-      // 1. Bersihkan duplikasi spasi, pastikan EYD, dan gunakan hanya satu emoji per kalimat/baris yang relevan.
       let decoratedLines = lines.map(line => {
-          let cleanLine = line.trim().replace(/\s+/g, ' '); // Bersihkan spasi ganda
-          
-          if (!cleanLine) return ''; // Skip baris kosong
+          // Pertahankan spasi di awal/akhir baris agar format indentasi tetap ada
+          let trimmedLine = line.trim(); 
+          if (!trimmedLine) return line; // Pertahankan baris kosong
 
-          // Cari URL dan tambahkan emoji LINK di akhir
-          if (/(https?:\/\/\S+)/i.test(cleanLine)) {
-              if (!cleanLine.endsWith(emojiMap.link)) {
-                  return cleanLine + ' ' + emojiMap.link; 
-              }
-              return cleanLine;
+          // Cek apakah baris sudah diakhiri dengan emoji untuk mencegah duplikasi
+          const endsWithEmoji = Object.values(emojiMap).some(emoji => trimmedLine.endsWith(emoji));
+          if (endsWithEmoji) return line;
+
+          // 1. Tambahkan emoji LINK/AJAKAN jika ada URL
+          if (/(https?:\/\/\S+)/i.test(trimmedLine)) {
+              // Dapatkan spasi di awal baris asli, lalu tambahkan emoji di akhir baris
+              let leadingSpaces = line.match(/^\s*/)[0];
+              return leadingSpaces + trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
           }
 
-          // Cari kata penekanan positif/ajakan
-          if (/(dapatkan|beli sekarang|ceklah|klik di sini)/i.test(cleanLine)) {
-               // Tambahkan AJAKAN (👉) di akhir kalimat CTA
-              return cleanLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
-          } else if (/(terbaik|mantap|unggul|worth it|keren)/i.test(cleanLine)) {
-               // Tambahkan POSITIF (✨) di akhir kalimat penekanan
-              return cleanLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
+          // 2. Tambahkan emoji AJAKAN (👉) di akhir kalimat CTA
+          // Mencari kata-kata CTA: (dapatkan, beli, cek, klik, dll)
+          if (/(dapatkan|beli|pesan|ceklah|klik di sini)/i.test(trimmedLine)) {
+              // Ganti titik atau spasi di akhir kalimat dengan emoji, atau tambahkan di akhir
+              let leadingSpaces = line.match(/^\s*/)[0];
+              return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
+          } 
+          
+          // 3. Tambahkan emoji POSITIF (✨) di akhir kalimat penekanan
+          // Mencari kata-kata positif: (terbaik, mantap, unggul, worth it, keren)
+          else if (/(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i.test(trimmedLine)) {
+              let leadingSpaces = line.match(/^\s*/)[0];
+              return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
           }
           
-          return cleanLine;
+          return line; // Jika tidak ada kriteria yang cocok, kembalikan baris aslinya
       });
 
-      // Gabungkan kembali, hilangkan baris kosong ganda
-      return decoratedLines.filter(l => l !== '').join('\n');
+      // Gabungkan kembali menggunakan line break yang sama
+      return decoratedLines.join('\n').trim();
     }
 
     // ============== MODAL EDIT ==============
