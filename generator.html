@@ -107,6 +107,22 @@
       color: #fff;
       background: linear-gradient(90deg, var(--blue), var(--purple));
     }
+    
+    /* Kursor Berkedip untuk Animasi Mengetik */
+    .typing-cursor {
+      display: inline-block;
+      width: 0.15em;
+      height: 1em; /* Tinggi kursor */
+      margin-left: 2px;
+      vertical-align: middle;
+      background-color: #1e40af; /* Warna kursor (dark blue) */
+      animation: blink-cursor 0.75s step-end infinite;
+    }
+
+    @keyframes blink-cursor {
+      from, to { opacity: 0 }
+      50% { opacity: 1 }
+    }
 
 
     @media (max-width:640px){
@@ -335,17 +351,50 @@
     btnTop?.addEventListener('click', addChip);
 
 
-    // ============== PROGRESS / STATUS (REVISI) ==============
+    // ============== PROGRESS / STATUS CONSTANTS ==============
     const P_STEPS = [
       { step: 1, title: 'AI sedang menganalisis link…', percent: 33 },
       { step: 2, title: 'Menulis skrip yang menjual…', percent: 66 },
       { step: 3, title: 'Merapikan & memfinalisasi naskah…', percent: 100 }
     ];
 
+    // ============== TYPING ANIMATION (NEW) ==============
+    async function startTypingAnimation(targetElement, text) {
+        targetElement.innerHTML = ''; // Clear content
+        
+        // Create text span and cursor
+        const textSpan = document.createElement('span');
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'typing-cursor'; 
+
+        targetElement.appendChild(textSpan);
+        targetElement.appendChild(cursorSpan);
+
+        const speed = 45; // ms per character
+        let i = 0;
+
+        return new Promise(resolve => {
+            function type() {
+                if (i < text.length) {
+                    textSpan.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Typing complete, remove cursor after a brief pause
+                    setTimeout(() => {
+                        cursorSpan.remove();
+                        resolve();
+                    }, 500); 
+                }
+            }
+            type();
+        });
+    }
+
+    // ============== PROGRESS / STATUS UI UPDATE ==============
     function updateProgress(stepIndex, isMobile = false) {
       const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
       const container = document.getElementById(`progressStatus${S_PREFIX}`);
-      const titleEl = document.getElementById(`statusTitle${S_PREFIX}`);
       const fillEl = document.getElementById(`progressFill${S_PREFIX}`);
       
       if (stepIndex === -1) { // Hide and reset
@@ -355,6 +404,7 @@
             const stepEl = document.getElementById(`step${i}${S_PREFIX}`);
             if(stepEl) stepEl.classList.remove('active');
         }
+        document.getElementById(`statusTitle${S_PREFIX}`).textContent = '...'; // Reset text
         return;
       }
       
@@ -362,7 +412,6 @@
       if (!currentStep) return;
 
       container.classList.remove('hidden');
-      titleEl.textContent = currentStep.title;
       fillEl.style.width = currentStep.percent + '%';
       
       // Update step highlight
@@ -378,7 +427,7 @@
     }
 
 
-    // ============== GENERATE (REVISI) ==============
+    // ============== GENERATE (MODIFIED) ==============
     async function doGenerate(btn, isMobile = false){
       const err=document.getElementById('err'); err.textContent='';
       const url=document.getElementById('productUrl').value.trim();
@@ -396,33 +445,44 @@
       btn.disabled=true; 
       btn.innerHTML='✨ Mulai Hasilkan'; // Tetap terlihat
       
-      let step = 0;
-      const advanceStep = (delay) => new Promise(resolve => setTimeout(() => {
-          if (step < P_STEPS.length) {
-              updateProgress(step++, isMobile);
+      const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
+      const titleEl = document.getElementById(`statusTitle${S_PREFIX}`);
+      
+      // Helper function to advance step and type
+      const advanceStepAndType = async (stepIndex, pauseAfterTyping = 0) => {
+          const currentStep = P_STEPS[stepIndex];
+          updateProgress(stepIndex, isMobile); // Update bar/steps
+          await startTypingAnimation(titleEl, currentStep.title);
+          if (pauseAfterTyping > 0) {
+              await new Promise(r => setTimeout(r, pauseAfterTyping));
           }
-          resolve();
-      }, delay));
+      };
 
       try{
-        // Step 1: Analyze Link (Simulated)
-        await advanceStep(0); 
-        await advanceStep(800); 
+        // Step 1: Analyze Link
+        await advanceStepAndType(0, 800); 
 
-        // Step 2: Write Script (Simulated)
-        await advanceStep(800); 
+        // Step 2: Write Script
+        await advanceStepAndType(1, 800); 
 
-        // Step 3: API Call (Actual process)
-        const r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count,
-            link:url, topic, descriptions, style, length, generateCount:count, count })
-        });
+        // Step 3: API Call & Typing
+        
+        // Start typing for Step 3 and run API call concurrently for speed
+        const typingPromise = advanceStepAndType(2); // No pause needed, will wait for API
+
+        const [r] = await Promise.all([
+          fetch('/api/generate',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count, link:url, topic, descriptions, style, length, generateCount:count, count })
+          }),
+          typingPromise // Ensure typing finishes before proceeding
+        ]);
+
         const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}
         if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
         
-        // Step 3 (Completion UI)
-        await advanceStep(800); 
-        
+        // Final UI Update
         renderResults(j.scripts||[]); loadQuota();
 
       }catch(e){ 
@@ -438,29 +498,46 @@
     document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this, false) });
     document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this, true) });
 
-    // ============== EMOJI KONTEKSTUAL ==============
+    // ============== EMOJI KONTEKSTUAL (FINAL REVISI) ==============
     function decorateContent(raw) {
       if (!raw) return '';
-      const startEmojis = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
-      let text = String(raw);
+      let text = String(raw).trim();
+      let lines = text.split('\n');
+      
+      const emojiMap = {
+          'link': '🔗',      
+          'positif': '✨',   
+          'ajakan': '👉',    
+      };
 
-      // Baris ber-URL → tambah 👉 di akhir
-      text = text.split('\n').map(line => {
-        if (/(https?:\/\/\S+)/i.test(line)) return line.replace(/\s*$/, ' 👉');
-        return line;
-      }).join('\n');
+      // 1. Bersihkan duplikasi spasi, pastikan EYD, dan gunakan hanya satu emoji per kalimat/baris yang relevan.
+      let decoratedLines = lines.map(line => {
+          let cleanLine = line.trim().replace(/\s+/g, ' '); // Bersihkan spasi ganda
+          
+          if (!cleanLine) return ''; // Skip baris kosong
 
-      // Kalimat CTA → tambah 👉 di akhir
-      text = text.replace(/((cek|klik|lihat|kunjungi|beli|pesan)(lah)?( di sini)?)([!.…])?/gi, (m)=> m.replace(/\s*$/, ' 👉'));
+          // Cari URL dan tambahkan emoji LINK di akhir
+          if (/(https?:\/\/\S+)/i.test(cleanLine)) {
+              if (!cleanLine.endsWith(emojiMap.link)) {
+                  return cleanLine + ' ' + emojiMap.link; 
+              }
+              return cleanLine;
+          }
 
-      // Penekanan/positif → ✨
-      text = text.replace(/(hebat|mantap|recommended|unggul|terbaik|worth it|keren)([!.…])?/gi, (m)=> m.replace(/\s*$/, ' ✨'));
+          // Cari kata penekanan positif/ajakan
+          if (/(dapatkan|beli sekarang|ceklah|klik di sini)/i.test(cleanLine)) {
+               // Tambahkan AJAKAN (👉) di akhir kalimat CTA
+              return cleanLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
+          } else if (/(terbaik|mantap|unggul|worth it|keren)/i.test(cleanLine)) {
+               // Tambahkan POSITIF (✨) di akhir kalimat penekanan
+              return cleanLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
+          }
+          
+          return cleanLine;
+      });
 
-      // Paragraf pertama: pembuka opsional (jika belum ada)
-      text = text.replace(/^([^\n\S]*)(?![✨🚀💡🎯⚡🔥🧠💎🌟📈])/,
-        (_, s) => s + (startEmojis[Math.floor(Math.random()*startEmojis.length)] + ' ')
-      );
-      return text;
+      // Gabungkan kembali, hilangkan baris kosong ganda
+      return decoratedLines.filter(l => l !== '').join('\n');
     }
 
     // ============== MODAL EDIT ==============
