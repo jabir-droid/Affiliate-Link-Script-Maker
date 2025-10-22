@@ -49,7 +49,7 @@
     .btn-soft{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff}
     .btn-grad{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border:0}
     
-    /* Efek sentuhan universal (Baru ditambahkan untuk konsistensi) */
+    /* Efek sentuhan universal */
     .touch-btn { 
         transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; 
         will-change: transform, box-shadow;
@@ -73,7 +73,7 @@
         transform: translateY(-1px);
     }
 
-    /* Progress Bar & Status - dari revisi sebelumnya */
+    /* Progress Bar & Status - DIBIARKAN ADA */
     .progress-container{
       margin-top: 18px; 
       transition: opacity .3s ease;
@@ -92,19 +92,7 @@
       will-change: width;
       box-shadow: 0 0 8px rgba(123,92,255,.5);
     }
-    .progress-step{
-      text-align: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      transition: background-color .3s, color .3s;
-    }
-    .progress-step.active{
-      color: #fff;
-      background: linear-gradient(90deg, var(--blue), var(--purple));
-    }
+    /* .progress-step dan .active DIHILANGKAN */
     
     /* Kursor Berkedip untuk Animasi Mengetik */
     .typing-cursor {
@@ -256,12 +244,7 @@
           <div class="progress-bar mb-2">
             <div id="progressFillDesktop" class="progress-fill"></div>
           </div>
-          <div class="flex justify-between max-w-sm mx-auto">
-            <span id="step1Desktop" class="progress-step">Step 1</span>
-            <span id="step2Desktop" class="progress-step">Step 2</span>
-            <span id="step3Desktop" class="progress-step">Step 3</span>
           </div>
-        </div>
       </div>
     </section>
 
@@ -288,12 +271,7 @@
       <div class="progress-bar mb-2">
         <div id="progressFillMobile" class="progress-fill"></div>
       </div>
-      <div class="flex justify-between max-w-xs mx-auto">
-        <span id="step1Mobile" class="progress-step">Step 1</span>
-        <span id="step2Mobile" class="progress-step">Step 2</span>
-        <span id="step3Mobile" class="progress-step">Step 3</span>
       </div>
-    </div>
   </div>
 
   <div id="editModal" class="fixed inset-0 z-50 hidden">
@@ -349,14 +327,14 @@
     btnTop?.addEventListener('click', addChip);
 
 
-    // ============== PROGRESS / STATUS CONSTANTS ==============
+    // ============== PROGRESS / STATUS CONSTANTS (STEP HANYA UNTUK LOGIKA INTERNAL) ==============
     const P_STEPS = [
       { step: 1, title: 'AI sedang menganalisis link…', percent: 33 },
       { step: 2, title: 'Menulis skrip yang menjual…', percent: 66 },
       { step: 3, title: 'Merapikan & memfinalisasi naskah…', percent: 100 }
     ];
 
-    // ============== TYPING ANIMATION (NEW) ==============
+    // ============== TYPING ANIMATION ==============
     async function startTypingAnimation(targetElement, text) {
         targetElement.innerHTML = ''; // Clear content
         
@@ -389,7 +367,7 @@
         });
     }
 
-    // ============== PROGRESS / STATUS UI UPDATE ==============
+    // ============== PROGRESS / STATUS UI UPDATE (DISIMPLIFIKASI) ==============
     function updateProgress(stepIndex, isMobile = false) {
       const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
       const container = document.getElementById(`progressStatus${S_PREFIX}`);
@@ -398,10 +376,6 @@
       if (stepIndex === -1) { // Hide and reset
         container.classList.add('hidden');
         fillEl.style.width = '0%';
-        for (let i = 1; i <= 3; i++) {
-            const stepEl = document.getElementById(`step${i}${S_PREFIX}`);
-            if(stepEl) stepEl.classList.remove('active');
-        }
         document.getElementById(`statusTitle${S_PREFIX}`).textContent = '...'; // Reset text
         return;
       }
@@ -412,16 +386,7 @@
       container.classList.remove('hidden');
       fillEl.style.width = currentStep.percent + '%';
       
-      // Update step highlight
-      for (let i = 1; i <= 3; i++) {
-        const stepEl = document.getElementById(`step${i}${S_PREFIX}`);
-        if (!stepEl) continue;
-        if (i <= currentStep.step) {
-            stepEl.classList.add('active');
-        } else {
-            stepEl.classList.remove('active');
-        }
-      }
+      // Catatan: Tidak ada lagi update highlight step 1,2,3
     }
 
 
@@ -496,7 +461,7 @@
     document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this, false) });
     document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this, true) });
 
-    // ============== EMOJI KONTEKSTUAL (REVISI FINAL) ==============
+    // ============== EMOJI KONTEKSTUAL (REVISI FINAL DENGAN LINK) ==============
     function decorateContent(raw) {
       if (!raw) return '';
       let text = String(raw); 
@@ -512,34 +477,42 @@
       const positiveKeywords = /(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i;
       // Kata kunci untuk deteksi kalimat CTA/ajakan
       const ctaKeywords = /(dapatkan|beli|pesan|ceklah|klik di sini|tonton videonya)/i;
+      // Emoji pembuka
+      const startEmojis = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
 
-      let decoratedLines = lines.map(line => {
+      let decoratedLines = lines.map((line, lineIndex) => {
           let trimmedLine = line.trim(); 
           if (!trimmedLine) return line; 
+
+          // Dapatkan spasi di awal baris asli untuk mempertahankan indentasi
+          let leadingSpaces = line.match(/^\s*/)[0];
+          let finalLine = trimmedLine;
 
           // Cek apakah baris sudah diakhiri dengan emoji untuk mencegah duplikasi
           const endsWithEmoji = Object.values(emojiMap).some(emoji => trimmedLine.endsWith(emoji));
           if (endsWithEmoji) return line;
-
-          // Dapatkan spasi di awal baris asli untuk mempertahankan indentasi
-          let leadingSpaces = line.match(/^\s*/)[0];
-
+          
           // 1. Tambahkan emoji LINK (🔗) jika ada URL
           if (/(https?:\/\/\S+)/i.test(trimmedLine)) {
-              return leadingSpaces + trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
+              finalLine = trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
           }
 
           // 2. Tambahkan emoji AJAKAN (👉) di akhir kalimat CTA
-          if (ctaKeywords.test(trimmedLine)) {
-              return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
+          else if (ctaKeywords.test(trimmedLine)) {
+              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
           } 
           
           // 3. Tambahkan emoji POSITIF (✨) di akhir kalimat penekanan
           else if (positiveKeywords.test(trimmedLine)) {
-              return leadingSpaces + trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
+              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
           }
           
-          return line; 
+          // 4. Tambahkan emoji pembuka di baris pertama (jika baris pertama dan belum ada emoji)
+          if (lineIndex === 0 && !finalLine.startsWith('✨') && !finalLine.startsWith('🚀')) {
+            finalLine = startEmojis[Math.floor(Math.random()*startEmojis.length)] + ' ' + finalLine;
+          }
+          
+          return leadingSpaces + finalLine; 
       });
 
       // Gabungkan kembali menggunakan line break yang sama
