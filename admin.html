@@ -3,41 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel Admin — Affiliate Link Script Maker</title>
+  <title>Admin Panel — Affiliate Script Maker</title>
   <style>
+    :root {
+      --bg-dark: #0b132b;
+      --bg-card: #1c2541;
+      --accent: #5bc0be;
+      --accent-hover: #6fffe9;
+      --danger: #ff4f5a;
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.7);
+    }
+
     body {
       font-family: "Inter", sans-serif;
-      background: linear-gradient(180deg, #0b132b, #1c2541, #3a506b);
-      color: #fff;
-      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg-dark), var(--bg-card));
+      color: var(--text);
       margin: 0;
+      padding: 0;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 2rem 1rem;
+      padding: 1.5rem 1rem;
     }
 
     h1 {
       font-size: 1.8rem;
-      text-align: center;
       margin-bottom: 1rem;
+      text-align: center;
+      letter-spacing: 1px;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 1.5rem;
-      max-width: 600px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.2rem;
       width: 100%;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      margin-bottom: 1rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+      max-width: 720px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      margin-bottom: 1.3rem;
+      transition: all 0.3s ease;
     }
 
     input, button {
@@ -47,136 +54,263 @@
       border-radius: 8px;
       border: none;
       margin-bottom: 1rem;
-      transition: all 0.2s ease;
+      transition: 0.25s all ease;
     }
 
     input {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.15);
       color: #fff;
     }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
     input:focus {
       outline: none;
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     button {
-      background: #5bc0be;
-      color: #0b132b;
       font-weight: 600;
       cursor: pointer;
+      background: var(--accent);
+      color: var(--bg-dark);
     }
+
     button:hover {
-      background: #6fffe9;
+      background: var(--accent-hover);
       transform: scale(1.02);
     }
 
-    .stats {
-      margin-top: 1rem;
-      text-align: center;
+    button.danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    button.danger:hover {
+      opacity: 0.8;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
-      color: #fff;
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-top: 0.8rem;
     }
 
     th, td {
-      padding: 0.5rem 0.8rem;
-      text-align: left;
+      padding: 0.6rem;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     th {
-      background: rgba(255, 255, 255, 0.15);
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
       text-transform: uppercase;
       letter-spacing: 1px;
+      font-size: 0.8rem;
     }
 
     .footer {
       margin-top: 2rem;
       font-size: 0.85rem;
-      opacity: 0.7;
+      color: var(--muted);
+      text-align: center;
+      width: 100%;
+    }
+
+    .fade-in {
+      animation: fade 0.4s ease forwards;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      h1 { font-size: 1.5rem; }
+      .card {
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      }
+      input, button {
+        font-size: 0.95rem;
+        padding: 0.7rem;
+      }
+      table {
+        font-size: 0.9rem;
+      }
+      th, td {
+        padding: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem 0.6rem;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+      button {
+        font-size: 0.9rem;
+      }
+      th, td {
+        font-size: 0.85rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📊 Panel Admin Kuota</h1>
+  <h1>⚙️ Admin Panel</h1>
 
-  <div class="card" id="loginCard">
-    <label for="adminKey">Masukkan Admin Key</label>
-    <input type="password" id="adminKey" placeholder="Contoh: bimart2025" />
-    <button id="checkBtn">🔑 Lihat Data Kuota</button>
+  <div class="card fade-in" id="loginCard">
+    <h3>Masukkan Admin Key</h3>
+    <input type="password" id="adminKey" placeholder="Ketik kunci admin rahasia..." />
+    <button id="loginBtn">🔑 Masuk</button>
   </div>
 
-  <div class="card" id="resultCard" style="display:none;">
-    <div class="stats">
-      <h2>📅 Tanggal: <span id="date"></span></h2>
-      <p>💥 Total Digunakan: <b id="used">0</b> | 💎 Sisa Kuota: <b id="remaining">0</b></p>
+  <div class="card fade-in" id="dashboard" style="display:none;">
+    <h3>📊 Statistik Kuota</h3>
+    <p id="quotaStats">Memuat data...</p>
+    <button id="refreshUsage">🔄 Perbarui</button>
+  </div>
+
+  <div class="card fade-in" id="userPanel" style="display:none;">
+    <h3>👥 Manajemen Pengguna</h3>
+    <div>
+      <input type="text" id="newUser" placeholder="Masukkan nama pengguna baru..." />
+      <button id="addUser">➕ Tambah User</button>
     </div>
+
     <table id="userTable">
       <thead>
-        <tr><th>Nama Pengguna</th><th>Jumlah Generate</th></tr>
+        <tr><th>Nama Pengguna</th><th>Aksi</th></tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
   <div class="footer">
-    © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+    © 2025 Affiliate Script Maker. All Rights Reserved.<br>(Admin Use Only)
   </div>
 
   <script>
-    const checkBtn = document.getElementById("checkBtn");
     const adminKeyInput = document.getElementById("adminKey");
+    const loginBtn = document.getElementById("loginBtn");
     const loginCard = document.getElementById("loginCard");
-    const resultCard = document.getElementById("resultCard");
-    const tbody = document.querySelector("#userTable tbody");
+    const dashboard = document.getElementById("dashboard");
+    const userPanel = document.getElementById("userPanel");
 
-    checkBtn.addEventListener("click", async () => {
-      const key = adminKeyInput.value.trim();
-      if (!key) {
-        alert("Masukkan Admin Key terlebih dahulu!");
-        return;
-      }
+    const quotaStats = document.getElementById("quotaStats");
+    const refreshUsage = document.getElementById("refreshUsage");
+    const newUser = document.getElementById("newUser");
+    const addUser = document.getElementById("addUser");
+    const userTableBody = document.querySelector("#userTable tbody");
 
-      checkBtn.disabled = true;
-      checkBtn.textContent = "⏳ Mengambil data...";
+    let adminKey = "";
 
+    loginBtn.addEventListener("click", async () => {
+      adminKey = adminKeyInput.value.trim();
+      if (!adminKey) return alert("Masukkan Admin Key terlebih dahulu.");
+
+      loginBtn.textContent = "🔄 Memverifikasi...";
       try {
-        const res = await fetch("/api/admin/usage", {
-          headers: { "x-admin-key": key }
-        });
+        const res = await fetch("/api/admin/usage", { headers: { "x-admin-key": adminKey } });
         const data = await res.json();
-
-        if (!data.ok) throw new Error(data.message || "Gagal memuat data");
-
-        // Tampilkan data
-        document.getElementById("date").textContent = data.date;
-        document.getElementById("used").textContent = data.globalUsed;
-        document.getElementById("remaining").textContent = data.remaining;
-
-        tbody.innerHTML = "";
-        if (data.perUser && data.perUser.length > 0) {
-          data.perUser.forEach((u) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `<td>${u.user}</td><td>${u.used}</td>`;
-            tbody.appendChild(row);
-          });
-        } else {
-          tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Belum ada pengguna hari ini</td></tr>`;
-        }
-
+        if (!data.ok) throw new Error("Kunci admin salah!");
         loginCard.style.display = "none";
-        resultCard.style.display = "block";
-      } catch (e) {
-        alert("❌ Gagal memuat data: " + e.message);
+        dashboard.style.display = "block";
+        userPanel.style.display = "block";
+        loadUsage();
+        loadUsers();
+      } catch (err) {
+        alert("❌ " + err.message);
       } finally {
-        checkBtn.disabled = false;
-        checkBtn.textContent = "🔑 Lihat Data Kuota";
+        loginBtn.textContent = "🔑 Masuk";
       }
     });
+
+    refreshUsage.addEventListener("click", loadUsage);
+    addUser.addEventListener("click", addNewUser);
+
+    async function loadUsage() {
+      quotaStats.textContent = "🔄 Memuat data kuota...";
+      try {
+        const res = await fetch("/api/admin/usage", { headers: { "x-admin-key": adminKey } });
+        const data = await res.json();
+        if (!data.ok) throw new Error("Gagal memuat kuota");
+        quotaStats.textContent = `📅 ${data.date} — Digunakan: ${data.globalUsed} | Sisa: ${data.remaining}`;
+      } catch {
+        quotaStats.textContent = "❌ Gagal memuat kuota";
+      }
+    }
+
+    async function loadUsers() {
+      userTableBody.innerHTML = `<tr><td colspan="2" class="center">🔄 Memuat...</td></tr>`;
+      try {
+        const res = await fetch("/api/admin/users", { headers: { "x-admin-key": adminKey } });
+        const data = await res.json();
+        if (!data.ok) throw new Error("Gagal memuat daftar pengguna");
+        userTableBody.innerHTML = "";
+        data.users.forEach(u => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${u}</td>
+            <td><button class="danger" onclick="deleteUser('${u}')">🗑️ Hapus</button></td>
+          `;
+          userTableBody.appendChild(tr);
+        });
+      } catch {
+        userTableBody.innerHTML = `<tr><td colspan="2" class="center">❌ Gagal memuat pengguna</td></tr>`;
+      }
+    }
+
+    async function addNewUser() {
+      const name = newUser.value.trim().toLowerCase();
+      if (!name) return alert("Nama pengguna wajib diisi!");
+      addUser.disabled = true;
+      addUser.textContent = "⏳ Menambah...";
+      try {
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "x-admin-key": adminKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.message || "Gagal menambah user");
+        newUser.value = "";
+        loadUsers();
+      } catch (err) {
+        alert("❌ " + err.message);
+      } finally {
+        addUser.disabled = false;
+        addUser.textContent = "➕ Tambah User";
+      }
+    }
+
+    async function deleteUser(name) {
+      if (!confirm(`Hapus akses pengguna '${name}'?`)) return;
+      try {
+        await fetch("/api/admin/users", {
+          method: "DELETE",
+          headers: { "x-admin-key": adminKey, "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        loadUsers();
+      } catch {
+        alert("❌ Gagal menghapus user");
+      }
+    }
   </script>
 </body>
 </html>
