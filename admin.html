@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin — Affiliate Link Script Maker</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(180deg, #0b132b, #1c2541, #3a506b);
+      color: #fff;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    input, button {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    button {
+      background: #5bc0be;
+      color: #0b132b;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6fffe9;
+      transform: scale(1.02);
+    }
+
+    .stats {
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      color: #fff;
+    }
+
+    th, td {
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.15);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Panel Admin Kuota</h1>
+
+  <div class="card" id="loginCard">
+    <label for="adminKey">Masukkan Admin Key</label>
+    <input type="password" id="adminKey" placeholder="Contoh: bimart2025" />
+    <button id="checkBtn">🔑 Lihat Data Kuota</button>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <div class="stats">
+      <h2>📅 Tanggal: <span id="date"></span></h2>
+      <p>💥 Total Digunakan: <b id="used">0</b> | 💎 Sisa Kuota: <b id="remaining">0</b></p>
+    </div>
+    <table id="userTable">
+      <thead>
+        <tr><th>Nama Pengguna</th><th>Jumlah Generate</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    © 2025 – Dilarang Menduplikasi dan Menyebarluaskan Tanpa Izin Pemilik.
+  </div>
+
+  <script>
+    const checkBtn = document.getElementById("checkBtn");
+    const adminKeyInput = document.getElementById("adminKey");
+    const loginCard = document.getElementById("loginCard");
+    const resultCard = document.getElementById("resultCard");
+    const tbody = document.querySelector("#userTable tbody");
+
+    checkBtn.addEventListener("click", async () => {
+      const key = adminKeyInput.value.trim();
+      if (!key) {
+        alert("Masukkan Admin Key terlebih dahulu!");
+        return;
+      }
+
+      checkBtn.disabled = true;
+      checkBtn.textContent = "⏳ Mengambil data...";
+
+      try {
+        const res = await fetch("/api/admin/usage", {
+          headers: { "x-admin-key": key }
+        });
+        const data = await res.json();
+
+        if (!data.ok) throw new Error(data.message || "Gagal memuat data");
+
+        // Tampilkan data
+        document.getElementById("date").textContent = data.date;
+        document.getElementById("used").textContent = data.globalUsed;
+        document.getElementById("remaining").textContent = data.remaining;
+
+        tbody.innerHTML = "";
+        if (data.perUser && data.perUser.length > 0) {
+          data.perUser.forEach((u) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td>${u.user}</td><td>${u.used}</td>`;
+            tbody.appendChild(row);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Belum ada pengguna hari ini</td></tr>`;
+        }
+
+        loginCard.style.display = "none";
+        resultCard.style.display = "block";
+      } catch (e) {
+        alert("❌ Gagal memuat data: " + e.message);
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.textContent = "🔑 Lihat Data Kuota";
+      }
+    });
+  </script>
+</body>
+</html>
