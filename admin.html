@@ -1,286 +1,177 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel • Affiliate Script Maker</title>
+  <title>Admin Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --card: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.12);
-      --fg: #e5ecff;
-      --muted:#9fb0d7;
-    }
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--fg); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      background:
-        radial-gradient(900px 380px at 12% -10%, rgba(34,197,245,.18), transparent 60%),
-        radial-gradient(900px 420px at 92% 0%, rgba(168,85,247,.18), transparent 60%),
-        #0b1220;
-    }
-    .card{background:var(--card); border:1px solid var(--border); border-radius:18px; backdrop-filter: blur(6px); box-shadow: 0 20px 40px rgba(0,0,0,.25);}
-    .btn-grad{background:linear-gradient(90deg,#0ea5e9,#22d3ee); color:#051225; font-weight:800}
-    .btn-grad:hover{filter:brightness(1.06); transform:translateY(-1px)}
-    .btn-grad:active{transform:translateY(0)}
-    .chip{border:1px solid var(--border); background:rgba(255,255,255,.08)}
-    .touch {transition: transform .12s ease, box-shadow .12s ease}
-    .touch:active{transform:scale(.98)}
-    .muted{color:var(--muted)}
-    .table thead th{font-weight:700; text-transform:uppercase; letter-spacing:.02em; font-size:.72rem; color:#b9c7ef}
-    .table td, .table th{border-bottom:1px solid rgba(255,255,255,.06)}
+    body{background:radial-gradient(1200px 500px at 10% -10%, #0ea5e922 0%, transparent 60%),
+                 radial-gradient(1200px 520px at 95% 0%, #8b5cf622 0%, transparent 60%),
+                 #0f172a;color:#e2e8f0}
+    .card{background:#0b1220cc;border:1px solid #1f2937;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+    .btn{background:linear-gradient(90deg,#06b6d4,#22c55e);color:#0b1220;font-weight:800;border-radius:12px;padding:.9rem 1.4rem}
+    .btn:active{transform:translateY(1px)}
+    .chip{background:#0ea5e933;border:1px solid #334155;padding:.35rem .6rem;border-radius:999px}
+    .input{width:100%;border:1px solid #334155;background:#0b1220;padding:.9rem 1rem;border-radius:12px;outline:none}
+    .input:focus{border-color:#22d3ee;box-shadow:0 0 0 3px #22d3ee33}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    th,td{padding:.75rem 1rem;border-bottom:1px solid #1f2937}
+    .muted{color:#94a3b8}
   </style>
 </head>
-<body>
-  <main class="max-w-5xl mx-auto px-5 sm:px-6 py-10">
+<body class="min-h-screen">
+  <main class="max-w-4xl mx-auto px-5 py-10">
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-center">⚙️ Admin Panel</h1>
+    <p class="text-center muted mt-2">Kelola pengguna & pantau kuota harian.</p>
 
-    <!-- Header -->
-    <header class="mb-8 text-center">
-      <h1 class="text-3xl sm:text-4xl font-extrabold">⚙️ Admin Panel</h1>
-      <p class="muted mt-2">Kelola pengguna & pantau kuota harian.</p>
-    </header>
+    <section class="card mt-6 p-4 flex items-center justify-between gap-3" id="statusBox">
+      <div><span id="statusBadge" class="chip">Memeriksa...</span>
+        <span id="statusText" class="ml-2">Mengecek koneksi API</span>
+      </div>
+      <button class="btn" id="btnRecheck">Cek Ulang</button>
+    </section>
 
-    <!-- Status koneksi env -->
-    <section id="envBox" class="card p-5 sm:p-6 mb-6 hidden">
-      <div class="flex flex-wrap items-center gap-3">
-        <span id="envBadge" class="px-3 py-1 rounded-full text-sm font-semibold chip">Memeriksa…</span>
-        <span id="envNote" class="muted text-sm"></span>
-        <button id="btnRecheck" class="ml-auto px-3 py-2 rounded-xl btn-grad touch text-sm">Cek Ulang</button>
+    <section class="card mt-6 p-6">
+      <h2 class="text-2xl font-extrabold mb-3 text-center">Masukkan Admin Key</h2>
+      <div class="flex gap-3 items-center">
+        <input id="admKey" type="password" class="input" placeholder="Masukkan admin key (rahasia)" />
+        <button class="btn" id="btnLogin">🔑 Masuk</button>
+      </div>
+      <p id="loginErr" class="text-rose-400 mt-2"></p>
+    </section>
+
+    <section class="card mt-6 p-6 hidden" id="mgmt">
+      <h2 class="text-xl font-bold">Manajemen Pengguna</h2>
+      <div class="mt-3 flex gap-3">
+        <input id="newUser" class="input" placeholder="Nama pengguna baru (huruf/angka, tanpa spasi)" />
+        <button class="btn" id="btnAdd">Tambah</button>
+      </div>
+      <div class="overflow-x-auto mt-5">
+        <table>
+          <thead><tr><th class="text-left">Nama Pengguna</th><th class="text-right">Aksi</th></tr></thead>
+          <tbody id="userRows"></tbody>
+        </table>
       </div>
     </section>
 
-    <!-- Login Card -->
-    <section id="loginCard" class="card p-5 sm:p-7 max-w-3xl mx-auto">
-      <h2 class="text-center text-2xl font-extrabold mb-4">Masukkan Admin Key</h2>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <input id="admKey" type="password" class="flex-1 px-4 py-3 rounded-xl bg-white/90 text-slate-900 outline-none"
-               placeholder="Ketik Admin Key Anda">
-        <button id="btnLogin" class="px-5 py-3 rounded-xl btn-grad touch text-base flex items-center justify-center gap-2">
-          🔑 Masuk
-        </button>
-      </div>
-      <p id="loginErr" class="text-rose-400 mt-3 text-sm"></p>
-    </section>
-
-    <!-- DASHBOARD -->
-    <section id="dash" class="hidden">
-      <!-- Toolbar -->
-      <div class="flex flex-wrap items-center gap-3 mb-4">
-        <button id="btnRefreshAll" class="px-4 py-2 rounded-xl btn-grad touch text-sm">Refresh Semua</button>
-        <span class="muted text-sm">|</span>
-        <button id="btnLogout" class="px-4 py-2 rounded-xl chip touch text-sm">Keluar</button>
-      </div>
-
-      <!-- Statistik -->
-      <div class="grid md:grid-cols-2 gap-5">
-        <div class="card p-5">
-          <h3 class="text-lg font-extrabold mb-2">📊 Statistik Kuota</h3>
-          <div id="usageBox" class="muted text-sm">Memuat…</div>
-        </div>
-
-        <div class="card p-5">
-          <h3 class="text-lg font-extrabold mb-3">👥 Manajemen Pengguna</h3>
-          <div class="flex flex-col sm:flex-row gap-3 mb-3">
-            <input id="newUser" class="flex-1 px-4 py-3 rounded-xl bg-white/90 text-slate-900 outline-none"
-                   placeholder="Nama pengguna baru">
-            <button id="btnAdd" class="px-4 py-3 rounded-xl btn-grad touch">Tambah</button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="table w-full text-sm">
-              <thead>
-                <tr><th class="text-left py-2">Nama Pengguna</th><th class="text-right py-2">Aksi</th></tr>
-              </thead>
-              <tbody id="userTbody">
-                <tr><td class="py-3 muted" colspan="2">Memuat…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <section class="card mt-6 p-6 hidden" id="stat">
+      <h2 class="text-xl font-bold">Statistik Harian</h2>
+      <p class="muted mt-1">Kuota harian: <b id="quota"></b> • Tanggal: <b id="tgl"></b></p>
+      <div class="overflow-x-auto mt-5">
+        <table>
+          <thead><tr><th class="text-left">Nama</th><th class="text-right">Dipakai</th></tr></thead>
+          <tbody id="usageRows"></tbody>
+        </table>
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="text-center muted text-sm mt-10">
+    <footer class="mt-10 text-center muted">
       © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
     </footer>
   </main>
 
   <script>
-  // ====== util kecil ======
-  const $ = (s)=>document.querySelector(s);
-  const show = (el, v)=> el.classList.toggle('hidden', !v);
-  const keyStore = {
-    get(){ return localStorage.getItem('admKey') || '' },
-    set(v){ localStorage.setItem('admKey', v) },
-    clear(){ localStorage.removeItem('admKey') }
-  };
-  async function safeJson(r){
-    const t = await r.text();
-    try { return JSON.parse(t) } catch { return { ok:false, message:t || r.statusText } }
-  }
-  function errOut(el,msg){ el.textContent = msg || ''; }
+    const sBadge = document.getElementById('statusBadge');
+    const sText  = document.getElementById('statusText');
+    const btnRe  = document.getElementById('btnRecheck');
 
-  // ====== cek env ======
-  async function checkEnv(){
-    show($('#envBox'), true);
-    $('#envBadge').textContent = 'Memeriksa…';
-    $('#envNote').textContent  = '';
-    try{
-      const r = await fetch('/api/admin/env');
-      const j = await safeJson(r);
-      if(!j.ok) throw new Error(j.message || 'Gagal memeriksa');
-
-      const ok = j.adminSecret && j.kvUrl && j.kvToken && (j.kvReachable || true);
-      $('#envBadge').textContent = ok ? 'Siap' : 'Perlu Konfigurasi';
-      $('#envBadge').classList.toggle('chip', !ok);
-      $('#envBadge').classList.toggle('btn-grad', ok);
-      $('#envNote').textContent =
-        `AdminSecret=${j.adminSecret?'✓':'×'} • KV_URL=${j.kvUrl?'✓':'×'} • KV_TOKEN=${j.kvToken?'✓':'×'} • Redis=${j.kvReachable?'✓':'×'}`;
-    }catch(e){
-      $('#envBadge').textContent = 'Gagal';
-      $('#envNote').textContent = 'Endpoint tidak tersedia / jaringan bermasalah.';
-    }
-  }
-
-  // ====== login try ======
-  async function tryLogin(adm){
-    errOut($('#loginErr'),'');
-    if(!adm) { errOut($('#loginErr'),'Admin Key wajib diisi'); return false; }
-
-    // uji header sederhana ke /api/ping
-    try{
-      const r = await fetch('/api/ping', { headers: { 'x-admin-key': adm }});
-      await r.text(); // kita hanya butuh konektivitas; otorisasi diuji saat hit endpoint admin
-      keyStore.set(adm);
-      return true;
-    }catch(e){
-      errOut($('#loginErr'), 'Server tidak merespons dengan benar');
-      return false;
-    }
-  }
-
-  // ====== muat penggunaan ======
-  async function loadUsage(){
-    const adm = keyStore.get();
-    const box = $('#usageBox');
-    box.textContent = 'Memuat…';
-    try{
-      const r = await fetch('/api/usage', { headers: { 'x-admin-key': adm }});
-      const j = await safeJson(r);
-      if(!j.ok) throw new Error(j.message || 'Unauthorized');
-
-      const remain = Math.max(0,(Number(j.quota_daily||1000)-Number(j.global_used||0)));
-      let html = `
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Tanggal</div><div class="font-bold text-base">${j.date}</div></div>
-          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Kuota Harian</div><div class="font-bold text-base">${j.quota_daily}</div></div>
-          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Terpakai (Global)</div><div class="font-bold text-base">${j.global_used}</div></div>
-          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Sisa</div><div class="font-bold text-base">${remain}</div></div>
-        </div>
-      `;
-      if(Array.isArray(j.per_user) && j.per_user.length){
-        html += `<div class="mt-2">
-          <div class="muted text-xs mb-1">Per Pengguna</div>
-          <div class="space-y-1">` +
-            j.per_user.map(u=>`<div class="flex items-center justify-between chip px-3 py-2 rounded-xl">
-              <span class="font-semibold">${u.name}</span>
-              <span class="muted">${u.used} kali</span>
-            </div>`).join('') +
-          `</div></div>`;
-      }else{
-        html += `<div class="muted">Belum ada penggunaan per-pengguna hari ini.</div>`;
+    async function check() {
+      try{
+        const r = await fetch('/api/ping');
+        const j = await r.json();
+        if (j.ok) {
+          sBadge.textContent = 'OK';
+          sBadge.style.background = '#22c55e33';
+          sText.textContent = 'Endpoint tersedia.';
+        } else throw new Error('no ok');
+      }catch{
+        sBadge.textContent='Gagal';
+        sBadge.style.background='#ef444433';
+        sText.textContent='Endpoint tidak tersedia / jaringan bermasalah.';
       }
-      box.innerHTML = html;
-    }catch(e){
-      box.textContent = 'Gagal memuat: ' + (e.message || 'Unknown');
     }
-  }
+    btnRe.onclick = check;
+    check();
 
-  // ====== muat daftar user ======
-  async function loadUsers(){
-    const adm = keyStore.get();
-    const tb = $('#userTbody');
-    tb.innerHTML = `<tr><td class="py-3 muted" colspan="2">Memuat…</td></tr>`;
-    try{
-      const r = await fetch('/api/users', { headers: { 'x-admin-key': adm }});
-      const j = await safeJson(r);
-      if(!j.ok) throw new Error(j.message || 'Unauthorized');
+    let ADMIN_KEY = "";
 
-      const list = (j.users||[]).map(u => (typeof u === 'string' ? {name:u} : (u.id?{name:u.id}:u)));
-      if(!list.length){ tb.innerHTML = `<tr><td class="py-3 muted" colspan="2">Belum ada pengguna.</td></tr>`; return; }
+    async function admFetch(path, opts={}){
+      const h = opts.headers || {};
+      h['x-admin-key'] = ADMIN_KEY;
+      h['Content-Type'] = 'application/json';
+      const r = await fetch(path, {...opts, headers: h});
+      const t = await r.text();
+      let j = {};
+      try{ j = t? JSON.parse(t) : {}; }catch{ throw new Error('Balikkan bukan JSON'); }
+      if (!r.ok || j.ok===false) throw new Error(j.message || t || 'Error');
+      return j;
+    }
 
-      tb.innerHTML = list.map(u=>`
-        <tr>
-          <td class="py-3">${u.name}</td>
-          <td class="py-3 text-right">
-            <button data-del="${u.name}" class="px-3 py-1.5 rounded-lg chip touch">Hapus</button>
-          </td>
-        </tr>`).join('');
-      tb.querySelectorAll('button[data-del]').forEach(b=>{
-        b.addEventListener('click', async ()=>{
-          if(!confirm('Hapus pengguna "'+b.dataset.del+'"?')) return;
-          await fetch('/api/users', {
-            method:'DELETE',
-            headers: { 'Content-Type':'application/json','x-admin-key': keyStore.get() },
-            body: JSON.stringify({ name: b.dataset.del })
-          });
-          loadUsers();
+    const loginErr = document.getElementById('loginErr');
+    document.getElementById('btnLogin').onclick = async () => {
+      loginErr.textContent='';
+      ADMIN_KEY = document.getElementById('admKey').value.trim();
+      if (!ADMIN_KEY) { loginErr.textContent='Isi admin key.'; return; }
+      try{
+        // test minimal ke env
+        await admFetch('/api/admin/env');
+        document.getElementById('mgmt').classList.remove('hidden');
+        document.getElementById('stat').classList.remove('hidden');
+        loadUsers(); loadUsage();
+      }catch(e){
+        loginErr.textContent = 'Server tidak merespons dengan benar';
+      }
+    };
+
+    async function loadUsers(){
+      try{
+        const j = await admFetch('/api/admin/users');
+        const body = document.getElementById('userRows');
+        body.innerHTML='';
+        (j.users || []).forEach(name=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `<td>${escapeHtml(name)}</td>
+                          <td class="text-right"><button class="btn" data-del="${escapeAttr(name)}">Hapus</button></td>`;
+          tr.querySelector('[data-del]').onclick = ()=> delUser(name);
+          body.appendChild(tr);
         });
-      });
-    }catch(e){
-      tb.innerHTML = `<tr><td class="py-3 text-rose-300" colspan="2">Gagal memuat pengguna</td></tr>`;
+      }catch(e){ /* abaikan di UI */ }
     }
-  }
-
-  // ====== tambah user ======
-  async function addUser(){
-    const name = ($('#newUser').value||'').trim();
-    if(!name) return;
-    $('#btnAdd').disabled = true; $('#btnAdd').textContent = 'Menambah…';
-    try{
-      await fetch('/api/users', {
-        method:'POST',
-        headers: { 'Content-Type':'application/json', 'x-admin-key': keyStore.get() },
-        body: JSON.stringify({ name })
-      });
-      $('#newUser').value = '';
+    async function delUser(name){
+      if(!confirm(`Hapus user "${name}"?`)) return;
+      await admFetch('/api/admin/users', { method:'DELETE', body: JSON.stringify({ name }) });
       loadUsers();
-    }finally{
-      $('#btnAdd').disabled = false; $('#btnAdd').textContent = 'Tambah';
     }
-  }
-
-  // ====== state & wiring ======
-  async function afterLogin(){
-    show($('#loginCard'), false);
-    show($('#dash'), true);
-    await Promise.all([loadUsage(), loadUsers()]);
-  }
-
-  $('#btnLogin').addEventListener('click', async ()=>{
-    const ok = await tryLogin(($('#admKey').value||'').trim());
-    if(ok) afterLogin();
-  });
-  $('#btnRecheck').addEventListener('click', checkEnv);
-  $('#btnRefreshAll').addEventListener('click', ()=>{ loadUsage(); loadUsers(); });
-  $('#btnLogout').addEventListener('click', ()=>{
-    keyStore.clear();
-    location.reload();
-  });
-  $('#btnAdd').addEventListener('click', addUser);
-  $('#newUser').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addUser(); });
-
-  // inisialisasi
-  (async ()=>{
-    await checkEnv();
-    const saved = keyStore.get();
-    if(saved){
-      const ok = await tryLogin(saved);
-      if(ok) afterLogin();
+    document.getElementById('btnAdd').onclick = async ()=>{
+      const name = document.getElementById('newUser').value.trim().toLowerCase();
+      if(!name) return;
+      await admFetch('/api/admin/users', { method:'POST', body: JSON.stringify({ name }) });
+      document.getElementById('newUser').value='';
+      loadUsers();
     }
-  })();
+
+    async function loadUsage(){
+      try{
+        const j = await admFetch('/api/admin/usage');
+        document.getElementById('quota').textContent = j.quota_daily;
+        document.getElementById('tgl').textContent = j.date;
+        const body = document.getElementById('usageRows');
+        body.innerHTML='';
+        body.appendChild(row('Global', j.global_used));
+        (j.per_user || []).sort((a,b)=>b.used-a.used).forEach(u=>{
+          body.appendChild(row(u.name, u.used));
+        });
+      }catch(e){}
+      function row(name, used){
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<td>${escapeHtml(name)}</td><td class="text-right">${used}</td>`;
+        return tr;
+      }
+    }
+
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m]))}
+    function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
   </script>
 </body>
 </html>
