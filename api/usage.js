@@ -1,42 +1,55 @@
-// /api/usage.js
-import { json, getRedis, ALLOW_SET, isAdmin } from "./_utils.js";
+// api/usage.js
+// GET /api/usage
+const { j, requireAdmin, getRedis } = require("./_utils");
 
-function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
-}
-
-export default async function handler(req, res) {
-  if (req.method !== "GET") return json(res, 405, { ok: false, message: "Method Not Allowed" });
-  if (!isAdmin(req)) return json(res, 401, { ok: false, message: "Unauthorized" });
-
-  const redis = getRedis();
-  if (!redis) return json(res, 500, { ok: false, message: "Store belum dikonfigurasi" });
-
+module.exports = async (req, res) => {
   try {
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const date = url.searchParams.get("date") || todayStr();
+    if (req.method !== "GET") return j(res, 405, { ok: false, message: "Method Not Allowed" });
+    if (!requireAdmin(req, res)) return;
 
-    const globalUsed = Number(await redis.get(`aff:global:used:${date}`)) || 0;
-    const maxDaily = Number(process.env.MAX_GLOBAL_PER_DAY || 1000);
-    const remaining = Math.max(0, maxDaily - globalUsed);
+    const redis = getRedis();
+    const today = new Date();
+    const yyyymmdd = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,"0")}${String(today.getDate()).padStart(2,"0")}`;
 
-    // gunakan set yang sama dengan users.js
-    const users = (await redis.smembers(ALLOW_SET)) || [];
-    const perUser = await Promise.all(
-      users.map(async (u) => {
-        const c = Number(await redis.get(`aff:user:used:${date}:${u}`)) || 0;
-        return { user: u, used: c };
-      })
-    );
+    if (!redis) {
+      return j(res, 200, {
+        ok: true,
+        date: yyyymmdd,
+        quota_daily: Number(process.env.QUOTA_DAILY_LIMIT || 1000),
+        global_used: 0,
+        per_user: []
+      });
+    }
 
-    // tampilkan yang >0 saja, urut desc
-    const perUserUsed = perUser.filter((x) => x.used > 0).sort((a, b) => b.used - a.used);
+    const globalKey = `aff:global:used:${yyyymmdd}`;
+    const usersKeyPattern = `aff:user:used:${yyyymmdd}:*`;
 
-    return json(res, 200, { ok: true, date, globalUsed, remaining, perUser: perUserUsed });
+    const globalUsed = Number(await redis.get(globalKey)) || 0;
+
+    // scan per-user
+    const per_user = [];
+    let cursor = 0;
+    do {
+      const resp = await redis.scan(cursor, { match: usersKeyPattern, count: 100 });
+      cursor = Number(resp[0]);
+      const keys = resp[1] || [];
+      if (keys.length) {
+        const vals = await redis.mget(...keys);
+        keys.forEach((k, idx) => {
+          const name = k.split(":").pop();
+          per_user.push({ name, used: Number(vals[idx] || 0) });
+        });
+      }
+    } while (cursor !== 0);
+
+    return j(res, 200, {
+      ok: true,
+      date: yyyymmdd,
+      quota_daily: Number(process.env.QUOTA_DAILY_LIMIT || 1000),
+      global_used: globalUsed,
+      per_user
+    });
   } catch (e) {
-    return json(res, 500, { ok: false, message: String(e?.message || e) });
+    return j(res, 500, { ok: false, message: String(e?.message || e) });
   }
-}
+};

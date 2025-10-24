@@ -2,255 +2,135 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel — Affiliate Script Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel - Affiliate Script Maker</title>
   <style>
-    :root{
-      --bg:#0b132b; --panel:#1c2541; --muted:rgba(255,255,255,.72);
-      --accent:#5bc0be; --accent2:#6fffe9; --danger:#ff4f5a; --text:#fff;
+    body {
+      background: radial-gradient(circle at top, #0b132b, #1c2541);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      color:var(--text);
-      background:linear-gradient(160deg,var(--bg),var(--panel));
-      min-height:100svh; display:flex; flex-direction:column; align-items:center;
-      padding:16px;
+    h1 {
+      font-size: 2rem;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
     }
-    h1{margin:8px 0 12px; font-size:28px; letter-spacing:.3px; text-align:center}
-    .card{
-      width:100%; max-width:760px; background:rgba(255,255,255,.08);
-      border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,.35);
-      padding:14px; margin:12px 0;
-      animation:fade .35s ease;
+    .panel {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     }
-    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-    .row{display:grid; grid-template-columns:1fr; gap:10px}
-    @media(min-width:560px){ .row--inline{grid-template-columns:1fr auto} }
-
-    input,button{
-      width:100%; padding:12px 14px; border:none; border-radius:10px; font-size:16px;
-      transition:.2s ease; outline:none;
+    input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      outline: none;
     }
-    input{
-      background:rgba(255,255,255,.14); color:#fff;
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(90deg, #00b4d8, #48cae4);
+      border: none;
+      border-radius: 0.5rem;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    input::placeholder{color:var(--muted)}
-    input:focus{background:rgba(255,255,255,.22)}
-
-    .btn{background:var(--accent); color:#012a36; font-weight:700; cursor:pointer}
-    .btn:hover{background:var(--accent2); transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
-    .btn--danger{background:var(--danger); color:#fff}
-    .btn--ghost{background:transparent; border:1px solid rgba(255,255,255,.2); color:#fff}
-
-    table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14.5px}
-    th,td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.15)}
-    th{text-align:left; text-transform:uppercase; font-size:12px; letter-spacing:.6px; color:var(--muted); background:rgba(255,255,255,.06)}
-
-    .muted{color:var(--muted)}
-    .center{text-align:center}
-    .footer{margin:18px 0 4px; text-align:center; color:var(--muted); font-size:13.5px}
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 180, 216, 0.4);
+    }
+    .error {
+      color: #ff9b9b;
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+    }
+    footer {
+      position: absolute;
+      bottom: 1rem;
+      width: 100%;
+      text-align: center;
+      color: #9baec8;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 600px) {
+      .panel {
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>⚙️ Admin Panel</h1>
-
-  <!-- LOGIN -->
-  <section id="loginCard" class="card">
-    <h3 class="muted" style="margin:4px 0 10px">Masukkan Admin Key</h3>
-    <div class="row row--inline">
-      <input id="adminKey" type="password" placeholder="Kunci admin rahasia…" autocomplete="current-password" />
-      <button id="loginBtn" class="btn">🔑 Masuk</button>
-    </div>
-    <p id="loginErr" class="muted" style="margin:6px 2px 0;color:#ffd6d9;display:none"></p>
-  </section>
-
-  <!-- DASHBOARD -->
-  <section id="dash" class="card" style="display:none">
-    <h3 style="margin:0 0 8px">📊 Statistik Kuota</h3>
-    <p id="quotaStats" class="muted">Memuat…</p>
-    <div class="row row--inline">
-      <button id="refreshUsage" class="btn btn--ghost">🔄 Perbarui</button>
-    </div>
-    <div id="usageUsers" class="muted" style="margin-top:10px; font-size:14px;"></div>
-  </section>
-
-  <!-- USERS -->
-  <section id="usersCard" class="card" style="display:none">
-    <h3 style="margin:0 0 10px">👥 Manajemen Pengguna</h3>
-
-    <div class="row row--inline">
-      <input id="newUser" type="text" placeholder="Nama pengguna baru (huruf/angka, tanpa spasi)" />
-      <button id="addUser" class="btn">➕ Tambah User</button>
-    </div>
-
-    <table>
-      <thead>
-        <tr><th>Nama Pengguna</th><th style="width:120px">Aksi</th></tr>
-      </thead>
-      <tbody id="userTbody">
-        <tr><td colspan="2" class="center muted">Memuat…</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <div class="footer">
-    © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
+  <div class="panel">
+    <label for="adminKey"><strong>Masukkan Admin Key</strong></label>
+    <input type="password" id="adminKey" placeholder="Ketik admin key Anda" />
+    <button id="btnLogin">🔑 Masuk</button>
+    <div class="error" id="err"></div>
   </div>
+  <footer>
+    © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
+  </footer>
 
   <script>
-    // ====== KONFIG ENDPOINT (pakai /api/users & /api/usage yang memang ada di project-mu)
-    const API_USERS = "/api/users";
-    const API_USAGE = "/api/usage";
+    const keyInput = document.getElementById('adminKey');
+    const errBox = document.getElementById('err');
 
-    // ====== ELEMEN
-    const loginCard = document.getElementById("loginCard");
-    const adminKeyEl = document.getElementById("adminKey");
-    const loginBtn = document.getElementById("loginBtn");
-    const loginErr = document.getElementById("loginErr");
-
-    const dash = document.getElementById("dash");
-    const quotaStats = document.getElementById("quotaStats");
-    const usageUsers = document.getElementById("usageUsers");
-    const refreshBtn = document.getElementById("refreshUsage");
-
-    const usersCard = document.getElementById("usersCard");
-    const newUserEl = document.getElementById("newUser");
-    const addUserBtn = document.getElementById("addUser");
-    const userTbody = document.getElementById("userTbody");
-
-    let ADMIN_KEY = "";
-
-    // ====== HELPER: PARSE JSON DENGAN FALLBACK
-    async function safeJson(res){
-      const txt = await res.text();
-      try { return JSON.parse(txt) } catch(e){
-        // kirim error yang mudah dipahami
-        throw new Error((txt || "").slice(0,120) || "Non-JSON response");
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+      errBox.textContent = '';
+      const key = keyInput.value.trim();
+      if (!key) {
+        errBox.textContent = 'Admin key wajib diisi';
+        return;
       }
-    }
-    async function api(method, url, body){
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "x-admin-key": ADMIN_KEY,
-          ...(body ? {"Content-Type":"application/json"} : {})
-        },
-        body: body ? JSON.stringify(body) : undefined
-      });
-      const data = await safeJson(res);
-      if(!res.ok || data?.ok === false){
-        throw new Error(data?.message || `HTTP ${res.status}`);
-      }
-      return data;
-    }
 
-    // ====== LOGIN
-    loginBtn.addEventListener("click", async ()=>{
-      loginErr.style.display="none";
-      const key = adminKeyEl.value.trim();
-      if(!key){ loginErr.textContent = "Admin Key wajib diisi."; loginErr.style.display="block"; return; }
-      ADMIN_KEY = key;
-      loginBtn.disabled = true; loginBtn.textContent = "🔄 Memverifikasi…";
-      try{
-        // panggil /api/usage sebagai health check (lebih murah daripada GET /api/users yang lebih besar)
-        await api("GET", API_USAGE);
-        loginCard.style.display = "none";
-        dash.style.display = "block";
-        usersCard.style.display = "block";
-        await Promise.all([loadUsage(), loadUsers()]);
-      }catch(e){
-        loginErr.textContent = "Gagal masuk: " + e.message;
-        loginErr.style.display="block";
-      }finally{
-        loginBtn.disabled = false; loginBtn.textContent = "🔑 Masuk";
-      }
-    });
+      localStorage.setItem('aff_admin_key', key);
 
-    // ====== USAGE
-    refreshBtn.addEventListener("click", loadUsage);
-
-    async function loadUsage(){
-      quotaStats.textContent = "Memuat…";
-      usageUsers.textContent = "";
-      try{
-        const j = await api("GET", API_USAGE);
-        // dukung dua bentuk respons:
-        // { ok:true, date, globalUsed, remaining, usedByToday:['nama', ...] }
-        // / atau { ok:true, remaining }
-        const line = j.date
-          ? `📅 ${j.date} — Dipakai: ${j.globalUsed ?? "?"} • Sisa: ${j.remaining}`
-          : `Sisa kuota hari ini: ${j.remaining}`;
-        quotaStats.textContent = line;
-
-        if (Array.isArray(j.usedByToday) && j.usedByToday.length){
-          usageUsers.innerHTML = "👤 Pengguna yang menggunakan hari ini: " +
-            j.usedByToday.map(x=>`<code style="background:rgba(255,255,255,.15);padding:.2rem .45rem;border-radius:6px;margin-right:6px;display:inline-block">${x}</code>`).join("");
-        } else {
-          usageUsers.innerHTML = `<span class="muted">Tidak ada daftar user harian dari API. (Opsional)</span>`;
-        }
-      }catch(e){
-        quotaStats.textContent = "❌ " + e.message;
-      }
-    }
-
-    // ====== USERS
-    async function loadUsers(){
-      userTbody.innerHTML = `<tr><td colspan="2" class="center muted">Memuat…</td></tr>`;
-      try{
-        const j = await api("GET", API_USERS);
-        const items = (j.users || j.ids || []).map(u => typeof u === "string" ? u : (u.id || u.name || "")); // fleksibel
-        if(!items.length){
-          userTbody.innerHTML = `<tr><td colspan="2" class="center muted">Belum ada pengguna.</td></tr>`;
+      try {
+        // Tes koneksi _echo
+        const echoResp = await fetch('/api/_echo', {
+          headers: { 'x-admin-key': key }
+        });
+        const echoJson = await echoResp.json();
+        if (!echoJson.ok) {
+          errBox.textContent = 'Server tidak merespons dengan benar';
           return;
         }
-        userTbody.innerHTML = "";
-        items.forEach(name=>{
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${escapeHtml(name)}</td>
-            <td><button class="btn btn--danger" data-del="${escapeHtml(name)}">🗑️ Hapus</button></td>
-          `;
-          userTbody.appendChild(tr);
-        });
-        // delegasi click hapus
-        userTbody.querySelectorAll("[data-del]").forEach(btn=>{
-          btn.addEventListener("click", ()=> deleteUser(btn.getAttribute("data-del")));
-        });
-      }catch(e){
-        userTbody.innerHTML = `<tr><td colspan="2" class="center" style="color:#ffd6d9">❌ Gagal memuat pengguna: ${escapeHtml(e.message)}</td></tr>`;
-      }
-    }
 
-    addUserBtn.addEventListener("click", async ()=>{
-      const name = (newUserEl.value || "").trim().toLowerCase();
-      if(!name){ alert("Nama pengguna wajib diisi"); return; }
-      if(!/^[a-z0-9_\-\.]{3,32}$/.test(name)){ alert("Nama hanya huruf/angka/._- (3–32)"); return; }
-      addUserBtn.disabled = true; addUserBtn.textContent = "⏳ Menambah…";
-      try{
-        await api("POST", API_USERS, { name });
-        newUserEl.value = "";
-        await loadUsers();
-      }catch(e){
-        alert("Gagal menambah user: " + e.message);
-      }finally{
-        addUserBtn.disabled = false; addUserBtn.textContent = "➕ Tambah User";
+        // Tes akses admin di /api/usage
+        const r = await fetch('/api/usage', {
+          headers: { 'x-admin-key': key }
+        });
+
+        if (!r.ok) {
+          const j = await r.json().catch(() => ({ message: 'Unauthorized' }));
+          errBox.textContent = `Gagal masuk: ${j.message || r.status}`;
+          return;
+        }
+
+        // Jika sukses
+        location.href = '/admin-dashboard.html';
+      } catch (e) {
+        errBox.textContent = 'Terjadi kesalahan koneksi';
       }
     });
-
-    async function deleteUser(name){
-      if(!confirm(`Hapus akses: ${name}?`)) return;
-      try{
-        await api("DELETE", API_USERS, { name });
-        await loadUsers();
-      }catch(e){
-        alert("Gagal menghapus: " + e.message);
-      }
-    }
-
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]))}
   </script>
 </body>
 </html>

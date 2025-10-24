@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin - Affiliate Script Maker</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #0b132b, #1c2541);
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 1.2rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    section {
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    h2 {
+      color: #90e0ef;
+      margin-bottom: 1rem;
+    }
+    input, button {
+      border: none;
+      border-radius: 0.4rem;
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+    input {
+      width: 65%;
+      margin-right: 0.5rem;
+    }
+    button {
+      background: linear-gradient(90deg, #00b4d8, #48cae4);
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 10px rgba(72, 202, 228, 0.4);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.8rem;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    th {
+      color: #ade8f4;
+    }
+    tr:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    footer {
+      color: #9baec8;
+      margin: 2rem 0;
+      font-size: 0.85rem;
+    }
+    .error {
+      color: #ffb3b3;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>🧩 Dashboard Admin</header>
+  <main>
+    <section>
+      <h2>📊 Statistik Penggunaan</h2>
+      <div id="usageStats">Memuat data...</div>
+    </section>
+
+    <section>
+      <h2>👥 Manajemen Pengguna</h2>
+      <div>
+        <input type="text" id="newUser" placeholder="Masukkan nama pengguna baru" />
+        <button id="addUser">+ Tambah</button>
+      </div>
+      <div class="error" id="errUser"></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nama Pengguna</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="userTable">
+          <tr><td colspan="2">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>© 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)</footer>
+
+  <script>
+    const key = localStorage.getItem("aff_admin_key");
+    const usageEl = document.getElementById("usageStats");
+    const userTable = document.getElementById("userTable");
+    const errUser = document.getElementById("errUser");
+
+    if (!key) {
+      alert("Admin key tidak ditemukan. Silakan login ulang.");
+      location.href = "/admin.html";
+    }
+
+    async function loadUsage() {
+      try {
+        const res = await fetch("/api/usage", { headers: { "x-admin-key": key } });
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.message);
+        usageEl.innerHTML = `
+          <b>Tanggal:</b> ${j.date}<br>
+          <b>Global Used:</b> ${j.global_used || 0}<br>
+          <b>Quota Harian:</b> ${j.quota_daily}<br>
+          <b>Pengguna Aktif:</b> ${j.per_user.length}
+        `;
+      } catch (e) {
+        usageEl.textContent = "Gagal memuat statistik.";
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const res = await fetch("/api/users");
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.message);
+        userTable.innerHTML = "";
+        j.users.forEach(u => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${u.id}</td>
+            <td><button onclick="deleteUser('${u.id}')">🗑️ Hapus</button></td>
+          `;
+          userTable.appendChild(tr);
+        });
+        if (j.users.length === 0) {
+          userTable.innerHTML = "<tr><td colspan='2'>Belum ada pengguna</td></tr>";
+        }
+      } catch (e) {
+        userTable.innerHTML = "<tr><td colspan='2'>Gagal memuat pengguna</td></tr>";
+      }
+    }
+
+    document.getElementById("addUser").addEventListener("click", async () => {
+      errUser.textContent = "";
+      const name = document.getElementById("newUser").value.trim();
+      if (!name) {
+        errUser.textContent = "Nama tidak boleh kosong.";
+        return;
+      }
+      try {
+        const res = await fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "x-admin-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name })
+        });
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.message);
+        await loadUsers();
+        document.getElementById("newUser").value = "";
+      } catch (e) {
+        errUser.textContent = "Gagal menambah pengguna: " + e.message;
+      }
+    });
+
+    async function deleteUser(name) {
+      if (!confirm("Hapus pengguna: " + name + "?")) return;
+      try {
+        const res = await fetch("/api/users", {
+          method: "DELETE",
+          headers: {
+            "x-admin-key": key,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name })
+        });
+        const j = await res.json();
+        if (!j.ok) throw new Error(j.message);
+        await loadUsers();
+      } catch (e) {
+        alert("Gagal menghapus: " + e.message);
+      }
+    }
+
+    loadUsage();
+    loadUsers();
+  </script>
+</body>
+</html>
