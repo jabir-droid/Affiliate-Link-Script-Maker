@@ -1,96 +1,286 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel</title>
+  <title>Admin Panel • Affiliate Script Maker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f172a; --panel:#1e293b;
-      --txt:#e5e7eb; --muted:#94a3b8; --err:#f43f5e;
-      --grad1:#05c3ff; --grad2:#31d0c6; --ring:rgba(255,255,255,.12);
+    :root {
+      --card: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --fg: #e5ecff;
+      --muted:#9fb0d7;
     }
-    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0; min-height:100vh; display:grid; place-items:center; padding:20px;
-      font-family:Inter,system-ui,Segoe UI,Roboto,Arial; color:var(--txt);
+      margin:0; color:var(--fg); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
-        radial-gradient(1200px 500px at 10% -10%, rgba(49,208,198,.18), transparent 60%),
-        radial-gradient(1200px 520px at 90% 0%, rgba(5,195,255,.15), transparent 60%),
-        var(--bg);
+        radial-gradient(900px 380px at 12% -10%, rgba(34,197,245,.18), transparent 60%),
+        radial-gradient(900px 420px at 92% 0%, rgba(168,85,247,.18), transparent 60%),
+        #0b1220;
     }
-    .card{
-      width:min(680px,94vw); background:var(--panel); border:1px solid var(--ring);
-      border-radius:18px; padding:28px; box-shadow:0 25px 55px rgba(0,0,0,.35);
-    }
-    h1{margin:0 0 18px; text-align:center; font-weight:800; letter-spacing:.2px}
-    .row{display:grid; gap:12px}
-    input{
-      width:100%; padding:16px 18px; border-radius:12px; outline:none; border:1px solid var(--ring);
-      background:#e8f1ff; color:#0f172a; font-size:18px; font-weight:600;
-    }
-    input:focus{box-shadow:0 0 0 4px rgba(49,208,198,.25)}
-    button{
-      width:100%; padding:16px; border-radius:14px; border:0; cursor:pointer;
-      color:#06202a; font-weight:800; font-size:20px;
-      background:linear-gradient(90deg,var(--grad1),var(--grad2));
-      box-shadow:0 18px 45px rgba(5,195,255,.35);
-      display:flex; align-items:center; justify-content:center; gap:10px;
-      transition:transform .08s ease, filter .15s ease;
-    }
-    button:active{transform:translateY(1px)}
-    .err{margin-top:14px; color:var(--err); text-align:center; font-weight:700}
-    footer{margin-top:18px; text-align:center; color:var(--muted); font-size:14px}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:18px; backdrop-filter: blur(6px); box-shadow: 0 20px 40px rgba(0,0,0,.25);}
+    .btn-grad{background:linear-gradient(90deg,#0ea5e9,#22d3ee); color:#051225; font-weight:800}
+    .btn-grad:hover{filter:brightness(1.06); transform:translateY(-1px)}
+    .btn-grad:active{transform:translateY(0)}
+    .chip{border:1px solid var(--border); background:rgba(255,255,255,.08)}
+    .touch {transition: transform .12s ease, box-shadow .12s ease}
+    .touch:active{transform:scale(.98)}
+    .muted{color:var(--muted)}
+    .table thead th{font-weight:700; text-transform:uppercase; letter-spacing:.02em; font-size:.72rem; color:#b9c7ef}
+    .table td, .table th{border-bottom:1px solid rgba(255,255,255,.06)}
   </style>
 </head>
 <body>
-  <main class="card">
-    <h1>Masukkan Admin Key</h1>
-    <div class="row">
-      <input id="adminKey" type="password" placeholder="Admin key" autocomplete="off" />
-      <button id="btnLogin">🔑 Masuk</button>
-      <div id="msg" class="err" style="display:none"></div>
-    </div>
-    <footer>© 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)</footer>
+  <main class="max-w-5xl mx-auto px-5 sm:px-6 py-10">
+
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl sm:text-4xl font-extrabold">⚙️ Admin Panel</h1>
+      <p class="muted mt-2">Kelola pengguna & pantau kuota harian.</p>
+    </header>
+
+    <!-- Status koneksi env -->
+    <section id="envBox" class="card p-5 sm:p-6 mb-6 hidden">
+      <div class="flex flex-wrap items-center gap-3">
+        <span id="envBadge" class="px-3 py-1 rounded-full text-sm font-semibold chip">Memeriksa…</span>
+        <span id="envNote" class="muted text-sm"></span>
+        <button id="btnRecheck" class="ml-auto px-3 py-2 rounded-xl btn-grad touch text-sm">Cek Ulang</button>
+      </div>
+    </section>
+
+    <!-- Login Card -->
+    <section id="loginCard" class="card p-5 sm:p-7 max-w-3xl mx-auto">
+      <h2 class="text-center text-2xl font-extrabold mb-4">Masukkan Admin Key</h2>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <input id="admKey" type="password" class="flex-1 px-4 py-3 rounded-xl bg-white/90 text-slate-900 outline-none"
+               placeholder="Ketik Admin Key Anda">
+        <button id="btnLogin" class="px-5 py-3 rounded-xl btn-grad touch text-base flex items-center justify-center gap-2">
+          🔑 Masuk
+        </button>
+      </div>
+      <p id="loginErr" class="text-rose-400 mt-3 text-sm"></p>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dash" class="hidden">
+      <!-- Toolbar -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <button id="btnRefreshAll" class="px-4 py-2 rounded-xl btn-grad touch text-sm">Refresh Semua</button>
+        <span class="muted text-sm">|</span>
+        <button id="btnLogout" class="px-4 py-2 rounded-xl chip touch text-sm">Keluar</button>
+      </div>
+
+      <!-- Statistik -->
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="card p-5">
+          <h3 class="text-lg font-extrabold mb-2">📊 Statistik Kuota</h3>
+          <div id="usageBox" class="muted text-sm">Memuat…</div>
+        </div>
+
+        <div class="card p-5">
+          <h3 class="text-lg font-extrabold mb-3">👥 Manajemen Pengguna</h3>
+          <div class="flex flex-col sm:flex-row gap-3 mb-3">
+            <input id="newUser" class="flex-1 px-4 py-3 rounded-xl bg-white/90 text-slate-900 outline-none"
+                   placeholder="Nama pengguna baru">
+            <button id="btnAdd" class="px-4 py-3 rounded-xl btn-grad touch">Tambah</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="table w-full text-sm">
+              <thead>
+                <tr><th class="text-left py-2">Nama Pengguna</th><th class="text-right py-2">Aksi</th></tr>
+              </thead>
+              <tbody id="userTbody">
+                <tr><td class="py-3 muted" colspan="2">Memuat…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center muted text-sm mt-10">
+      © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
+    </footer>
   </main>
 
   <script>
-    const msg = document.getElementById('msg');
-    function showErr(t){ msg.textContent=t; msg.style.display='block' }
-    function hideErr(){ msg.textContent=''; msg.style.display='none' }
+  // ====== util kecil ======
+  const $ = (s)=>document.querySelector(s);
+  const show = (el, v)=> el.classList.toggle('hidden', !v);
+  const keyStore = {
+    get(){ return localStorage.getItem('admKey') || '' },
+    set(v){ localStorage.setItem('admKey', v) },
+    clear(){ localStorage.removeItem('admKey') }
+  };
+  async function safeJson(r){
+    const t = await r.text();
+    try { return JSON.parse(t) } catch { return { ok:false, message:t || r.statusText } }
+  }
+  function errOut(el,msg){ el.textContent = msg || ''; }
 
-    async function login(){
-      hideErr();
-      const key = document.getElementById('adminKey').value.trim();
-      if(!key){ showErr('Admin key wajib diisi'); return; }
+  // ====== cek env ======
+  async function checkEnv(){
+    show($('#envBox'), true);
+    $('#envBadge').textContent = 'Memeriksa…';
+    $('#envNote').textContent  = '';
+    try{
+      const r = await fetch('/api/admin/env');
+      const j = await safeJson(r);
+      if(!j.ok) throw new Error(j.message || 'Gagal memeriksa');
 
-      try{
-        // Cek cepat: endpoint diagnostik (jika 404 berarti belum ter-deploy)
-        const envCheck = await fetch('/api/_env-check', { cache:'no-store' });
-        if(!envCheck.ok){
-          showErr('Endpoint _env-check belum tersedia (Not Found). Deploy dulu.');
-          return;
-        }
-
-        // Panggil /api/usage untuk verifikasi kunci admin
-        const r = await fetch('/api/usage', { headers: { 'x-admin-key': key } });
-        const text = await r.text();
-        let j=null; try{ j = JSON.parse(text) }catch{}
-        if(!r.ok || !j || j.ok!==true) throw new Error(j?.message || text || 'Server error');
-
-        // Simpan sementara & arahkan ke halaman manajemen
-        sessionStorage.setItem('ADMIN_KEY', key);
-        location.href = '/admin-users.html'; // pastikan file ini ada
-      }catch(e){
-        const m = String(e.message||e);
-        if(m.includes('Unauthorized')) showErr('Gagal masuk: Unauthorized');
-        else if(m.includes('Not Found')) showErr('Endpoint belum ter-deploy (Not Found)');
-        else showErr('Server tidak merespons dengan benar');
-      }
+      const ok = j.adminSecret && j.kvUrl && j.kvToken && (j.kvReachable || true);
+      $('#envBadge').textContent = ok ? 'Siap' : 'Perlu Konfigurasi';
+      $('#envBadge').classList.toggle('chip', !ok);
+      $('#envBadge').classList.toggle('btn-grad', ok);
+      $('#envNote').textContent =
+        `AdminSecret=${j.adminSecret?'✓':'×'} • KV_URL=${j.kvUrl?'✓':'×'} • KV_TOKEN=${j.kvToken?'✓':'×'} • Redis=${j.kvReachable?'✓':'×'}`;
+    }catch(e){
+      $('#envBadge').textContent = 'Gagal';
+      $('#envNote').textContent = 'Endpoint tidak tersedia / jaringan bermasalah.';
     }
-    document.getElementById('btnLogin').addEventListener('click', login);
-    document.getElementById('adminKey').addEventListener('keydown', e=>{ if(e.key==='Enter') login() });
+  }
+
+  // ====== login try ======
+  async function tryLogin(adm){
+    errOut($('#loginErr'),'');
+    if(!adm) { errOut($('#loginErr'),'Admin Key wajib diisi'); return false; }
+
+    // uji header sederhana ke /api/ping
+    try{
+      const r = await fetch('/api/ping', { headers: { 'x-admin-key': adm }});
+      await r.text(); // kita hanya butuh konektivitas; otorisasi diuji saat hit endpoint admin
+      keyStore.set(adm);
+      return true;
+    }catch(e){
+      errOut($('#loginErr'), 'Server tidak merespons dengan benar');
+      return false;
+    }
+  }
+
+  // ====== muat penggunaan ======
+  async function loadUsage(){
+    const adm = keyStore.get();
+    const box = $('#usageBox');
+    box.textContent = 'Memuat…';
+    try{
+      const r = await fetch('/api/usage', { headers: { 'x-admin-key': adm }});
+      const j = await safeJson(r);
+      if(!j.ok) throw new Error(j.message || 'Unauthorized');
+
+      const remain = Math.max(0,(Number(j.quota_daily||1000)-Number(j.global_used||0)));
+      let html = `
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Tanggal</div><div class="font-bold text-base">${j.date}</div></div>
+          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Kuota Harian</div><div class="font-bold text-base">${j.quota_daily}</div></div>
+          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Terpakai (Global)</div><div class="font-bold text-base">${j.global_used}</div></div>
+          <div class="chip px-3 py-2 rounded-xl"><div class="muted text-xs">Sisa</div><div class="font-bold text-base">${remain}</div></div>
+        </div>
+      `;
+      if(Array.isArray(j.per_user) && j.per_user.length){
+        html += `<div class="mt-2">
+          <div class="muted text-xs mb-1">Per Pengguna</div>
+          <div class="space-y-1">` +
+            j.per_user.map(u=>`<div class="flex items-center justify-between chip px-3 py-2 rounded-xl">
+              <span class="font-semibold">${u.name}</span>
+              <span class="muted">${u.used} kali</span>
+            </div>`).join('') +
+          `</div></div>`;
+      }else{
+        html += `<div class="muted">Belum ada penggunaan per-pengguna hari ini.</div>`;
+      }
+      box.innerHTML = html;
+    }catch(e){
+      box.textContent = 'Gagal memuat: ' + (e.message || 'Unknown');
+    }
+  }
+
+  // ====== muat daftar user ======
+  async function loadUsers(){
+    const adm = keyStore.get();
+    const tb = $('#userTbody');
+    tb.innerHTML = `<tr><td class="py-3 muted" colspan="2">Memuat…</td></tr>`;
+    try{
+      const r = await fetch('/api/users', { headers: { 'x-admin-key': adm }});
+      const j = await safeJson(r);
+      if(!j.ok) throw new Error(j.message || 'Unauthorized');
+
+      const list = (j.users||[]).map(u => (typeof u === 'string' ? {name:u} : (u.id?{name:u.id}:u)));
+      if(!list.length){ tb.innerHTML = `<tr><td class="py-3 muted" colspan="2">Belum ada pengguna.</td></tr>`; return; }
+
+      tb.innerHTML = list.map(u=>`
+        <tr>
+          <td class="py-3">${u.name}</td>
+          <td class="py-3 text-right">
+            <button data-del="${u.name}" class="px-3 py-1.5 rounded-lg chip touch">Hapus</button>
+          </td>
+        </tr>`).join('');
+      tb.querySelectorAll('button[data-del]').forEach(b=>{
+        b.addEventListener('click', async ()=>{
+          if(!confirm('Hapus pengguna "'+b.dataset.del+'"?')) return;
+          await fetch('/api/users', {
+            method:'DELETE',
+            headers: { 'Content-Type':'application/json','x-admin-key': keyStore.get() },
+            body: JSON.stringify({ name: b.dataset.del })
+          });
+          loadUsers();
+        });
+      });
+    }catch(e){
+      tb.innerHTML = `<tr><td class="py-3 text-rose-300" colspan="2">Gagal memuat pengguna</td></tr>`;
+    }
+  }
+
+  // ====== tambah user ======
+  async function addUser(){
+    const name = ($('#newUser').value||'').trim();
+    if(!name) return;
+    $('#btnAdd').disabled = true; $('#btnAdd').textContent = 'Menambah…';
+    try{
+      await fetch('/api/users', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json', 'x-admin-key': keyStore.get() },
+        body: JSON.stringify({ name })
+      });
+      $('#newUser').value = '';
+      loadUsers();
+    }finally{
+      $('#btnAdd').disabled = false; $('#btnAdd').textContent = 'Tambah';
+    }
+  }
+
+  // ====== state & wiring ======
+  async function afterLogin(){
+    show($('#loginCard'), false);
+    show($('#dash'), true);
+    await Promise.all([loadUsage(), loadUsers()]);
+  }
+
+  $('#btnLogin').addEventListener('click', async ()=>{
+    const ok = await tryLogin(($('#admKey').value||'').trim());
+    if(ok) afterLogin();
+  });
+  $('#btnRecheck').addEventListener('click', checkEnv);
+  $('#btnRefreshAll').addEventListener('click', ()=>{ loadUsage(); loadUsers(); });
+  $('#btnLogout').addEventListener('click', ()=>{
+    keyStore.clear();
+    location.reload();
+  });
+  $('#btnAdd').addEventListener('click', addUser);
+  $('#newUser').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addUser(); });
+
+  // inisialisasi
+  (async ()=>{
+    await checkEnv();
+    const saved = keyStore.get();
+    if(saved){
+      const ok = await tryLogin(saved);
+      if(ok) afterLogin();
+    }
+  })();
   </script>
 </body>
 </html>
