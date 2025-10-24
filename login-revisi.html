@@ -14,29 +14,37 @@
     html,body{height:100%}
     body{
       margin:0; color:var(--txt); font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-      /* background beda dari index/generator */
       background:
         radial-gradient(800px 360px at 15% -10%, rgba(219,234,254,.9) 0%, transparent 60%),
         radial-gradient(900px 400px at 90% 0%, rgba(233,213,255,.88) 0%, transparent 60%),
         linear-gradient(180deg,#f8fbff, #eef2ff);
     }
 
-    /* Kartu login ramping */
     .card{ background:var(--panel); border:1px solid var(--border); border-radius:18px;
            box-shadow:0 18px 40px rgba(15,23,42,.08); }
 
-    .title-grad{background:linear-gradient(90deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .title-grad{
+      background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      /* REVISI: Menjamin huruf 'g' terlihat */
+      padding-bottom: 5px; 
+      margin-bottom: -5px;
+    }
     .title-size{font-size:clamp(28px,5.5vw,40px); line-height:1.08}
 
     .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
     .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
 
-    /* Efek sentuhan konsisten */
-    .touch-card { transition: transform .18s ease, box-shadow .18s ease; }
+    .touch-card { transition: transform .18s ease, box-shadow .18s ease; will-change: transform, box-shadow; }
     .touch-card:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(15,23,42,.15); }
     .touch-card:active { transform: translateY(-1px) scale(.997); }
 
-    .touch-btn { transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; }
+    .touch-btn { 
+        transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; 
+        will-change: transform, box-shadow;
+    }
     .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
     .touch-btn:active { transform: translateY(1px) scale(.99); }
 
@@ -45,18 +53,17 @@
 </head>
 <body>
   <div class="max-w-6xl mx-auto px-5 sm:px-6 py-6">
-    <!-- tombol kembali atas -->
     <button onclick="history.back()" class="back-btn touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">
       ←
     </button>
 
-    <!-- header -->
     <section class="text-center mt-6">
       <h1 class="title-grad title-size font-extrabold">Login</h1>
-      <p class="text-slate-600 mt-2">Masukkan data sesuai pembelian untuk melanjutkan.</p>
+      <p class="text-slate-600 mt-2">
+        Masukkan data sesuai pembelian Anda di <strong>Lynk.id</strong> untuk melanjutkan ke AI Generator.
+      </p>
     </section>
 
-    <!-- form card -->
     <section class="max-w-md mx-auto mt-6 p-5 sm:p-6 card touch-card">
       <form id="loginForm" class="grid gap-5">
         <div>
@@ -107,7 +114,8 @@
       btn.disabled = true; btn.textContent = 'Memproses...';
 
       try{
-        const r = await fetch('/api/login-name', {
+        // PENTING: Ganti URL API Anda di sini jika berbeda!
+        const r = await fetch('/api/login-name', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone })
@@ -125,7 +133,6 @@
       }
     });
 
-    // Enter di input juga submit
     ['name','phone'].forEach(id=>{
       const el=document.getElementById(id);
       el.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ form.requestSubmit(); }});

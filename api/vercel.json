@@ -1,5 +1,7 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/app.js" }
+  "functions": { "api/app.js": { "runtime": "nodejs20.x" } },
+  "routes": [
+    { "src": "/api/ping", "dest": "/api/ping.js" },
+    { "src": "/api/(.*)", "dest": "/api/app.js" }
   ]
 }
