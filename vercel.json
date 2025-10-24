@@ -5,12 +5,8 @@
   ],
   "routes": [
     { "src": "^/api/(.*)$", "dest": "/api/app.js" },
-
-    // akses nyaman tanpa .html
     { "src": "^/admin$", "dest": "/admin.html" },
-    { "src": "^/login$",  "dest": "/login.html" },
+    { "src": "^/login$", "dest": "/login.html" },
     { "src": "^/generator$", "dest": "/generator.html" }
-
-    // sisanya akan dilayani sebagai file statis (index.html, admin.html, dll.)
   ]
 }
