@@ -1,7 +1,16 @@
 {
   "version": 2,
-  "builds": [{ "src": "api/app.js", "use": "@vercel/node" }],
+  "builds": [
+    { "src": "api/app.js", "use": "@vercel/node" }
+  ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/app.js" }
+    { "src": "^/api/(.*)$", "dest": "/api/app.js" },
+
+    // akses nyaman tanpa .html
+    { "src": "^/admin$", "dest": "/admin.html" },
+    { "src": "^/login$",  "dest": "/login.html" },
+    { "src": "^/generator$", "dest": "/generator.html" }
+
+    // sisanya akan dilayani sebagai file statis (index.html, admin.html, dll.)
   ]
 }
