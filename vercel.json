@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "api/app.js", "use": "@vercel/node" }
-  ],
+  "builds": [{ "src": "api/app.js", "use": "@vercel/node" }],
   "routes": [
     { "src": "^/api/(.*)$", "dest": "/api/app.js" },
-
     { "src": "^/admin$", "dest": "/admin.html" },
     { "src": "^/login$", "dest": "/login.html" },
     { "src": "^/generator$", "dest": "/generator.html" }
