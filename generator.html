@@ -10,8 +10,6 @@
     :root{
       --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
       --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff;
-      --neon-blue: #00bfff;
-      --neon-purple: #7b5cff;
     }
     html,body{height:100%}
     body{
@@ -27,14 +25,11 @@
       background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
       background-size: 22px 22px; opacity:.45; mix-blend-mode:multiply;
     }
-    /* PERBAIKAN: Menjamin huruf 'g' terlihat */
+    /* Pastikan huruf “g” tidak kepotong */
     .g-title{
       background:linear-gradient(90deg,#3b82f6,#8b5cf6);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      padding-bottom: 5px; 
-      margin-bottom: -5px;
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      padding-bottom:5px; margin-bottom:-5px;
     }
     .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
     .pill{background:#f3f6ff;border:1px solid var(--border);border-radius:12px}
@@ -48,73 +43,29 @@
     .section-pad{padding:clamp(16px, 3vw, 28px)}
     .btn-soft{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff}
     .btn-grad{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border:0}
-    
-    /* Efek sentuhan universal */
-    .touch-btn { 
-        transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; 
-        will-change: transform, box-shadow;
-    }
-    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
-    .touch-btn:active { transform: translateY(1px) scale(.99); }
-    .back-btn-style { border:1px solid var(--border); background:#ffffffd9; }
+    .touch-btn{transition:transform .14s ease, box-shadow .14s ease, opacity .14s ease; will-change:transform,box-shadow}
+    .touch-btn:hover{box-shadow:0 14px 36px rgba(123,92,255,.28)}
+    .touch-btn:active{transform:translateY(1px) scale(.99)}
+    .back-btn-style{border:1px solid var(--border); background:#ffffffd9}
 
-    /* Tombol Tambah Keunggulan (Revisi Desain) */
-    .btn-add-desc {
-        background: linear-gradient(90deg, var(--blue), var(--purple));
-        color: #fff;
-        padding: 10px 18px;
-        border-radius: 12px;
-        font-weight: 700;
-        box-shadow: 0 8px 16px rgba(123, 92, 255, .3);
-        transition: transform .14s ease, box-shadow .14s ease;
-    }
-    .btn-add-desc:hover {
-        box-shadow: 0 10px 20px rgba(123, 92, 255, .4);
-        transform: translateY(-1px);
+    .btn-add-desc{
+      background:linear-gradient(90deg,var(--blue),var(--purple));
+      color:#fff; padding:10px 18px; border-radius:12px; font-weight:700;
+      box-shadow:0 8px 16px rgba(123,92,255,.3)
     }
 
-    /* Progress Bar & Status - DIBIARKAN ADA */
-    .progress-container{
-      margin-top: 18px; 
-      transition: opacity .3s ease;
-    }
-    .progress-bar{
-      height: 6px; 
-      background: #eef2ff;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-    .progress-fill{
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--blue), var(--purple));
-      transition: width .4s ease-out;
-      will-change: width;
-      box-shadow: 0 0 8px rgba(123,92,255,.5);
-    }
-    /* .progress-step dan .active DIHILANGKAN */
-    
-    /* Kursor Berkedip untuk Animasi Mengetik */
-    .typing-cursor {
-      display: inline-block;
-      width: 0.15em;
-      height: 1em; 
-      margin-left: 2px;
-      vertical-align: middle;
-      background-color: #1e40af; 
-      animation: blink-cursor 0.75s step-end infinite;
-    }
+    .progress-container{margin-top:18px; transition:opacity .3s ease}
+    .progress-bar{height:6px; background:#eef2ff; border-radius:999px; overflow:hidden}
+    .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--purple)); transition:width .4s ease-out; box-shadow:0 0 8px rgba(123,92,255,.5)}
 
-    @keyframes blink-cursor {
-      from, to { opacity: 0 }
-      50% { opacity: 1 }
-    }
-
+    /* Cursor animasi mengetik */
+    .typing-cursor{display:inline-block; width:.15em; height:1em; margin-left:2px; vertical-align:middle; background:#1e40af; animation:blink .75s step-end infinite}
+    @keyframes blink{from,to{opacity:0}50%{opacity:1}}
 
     @media (max-width:640px){
       .seg-style,.seg-length{display:grid;grid-template-columns:1fr;gap:12px}
-      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
-      main{padding-bottom:180px} /* Menambah padding untuk mobile progress/status */
+      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom)+14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
+      main{padding-bottom:180px}
       #chips{display:flex;flex-wrap:wrap;gap:8px}
     }
     @media (min-width:641px) and (max-width:1024px){
@@ -133,9 +84,7 @@
   <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
     <div class="flex items-start justify-between gap-4">
       <div class="flex items-start gap-3 sm:gap-4">
-        <button onclick="history.back()" class="back-btn-style touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">
-          ←
-        </button>
+        <button onclick="history.back()" class="back-btn-style touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">←</button>
         <div>
           <h1 class="g-title title-size font-extrabold">AI Generator</h1>
           <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
@@ -234,17 +183,13 @@
           </div>
         </div>
 
-        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta touch-btn">
-          ✨ Mulai Hasilkan
-        </button>
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta touch-btn">✨ Mulai Hasilkan</button>
         <span id="err" class="text-rose-600"></span>
 
         <div id="progressStatusDesktop" class="progress-container hidden">
           <p id="statusTitleDesktop" class="text-center font-bold text-slate-700 mb-3 text-sm">...</p>
-          <div class="progress-bar mb-2">
-            <div id="progressFillDesktop" class="progress-fill"></div>
-          </div>
-          </div>
+          <div class="progress-bar mb-2"><div id="progressFillDesktop" class="progress-fill"></div></div>
+        </div>
       </div>
     </section>
 
@@ -263,17 +208,14 @@
   </main>
 
   <div class="sm:hidden sticky-cta">
-    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta touch-btn">
-      ✨ Mulai Hasilkan
-    </button>
+    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta touch-btn">✨ Mulai Hasilkan</button>
     <div id="progressStatusMobile" class="progress-container hidden">
       <p id="statusTitleMobile" class="text-center font-bold text-slate-700 mb-3 text-sm">...</p>
-      <div class="progress-bar mb-2">
-        <div id="progressFillMobile" class="progress-fill"></div>
-      </div>
-      </div>
+      <div class="progress-bar mb-2"><div id="progressFillMobile" class="progress-fill"></div></div>
+    </div>
   </div>
 
+  <!-- Modal Edit -->
   <div id="editModal" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/40"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
@@ -283,8 +225,7 @@
           <button id="editClose" class="btn-soft touch-btn">✕</button>
         </div>
         <div class="p-5">
-          <textarea id="editArea" class="w-full h-64 p-4 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-indigo-100"
-            style="font-family: Inter, system-ui; line-height: 1.6; font-size: 14px;"></textarea>
+          <textarea id="editArea" class="w-full h-64 p-4 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-indigo-100" style="font-family:Inter,system-ui; line-height:1.6; font-size:14px;"></textarea>
         </div>
         <div class="px-5 pb-5 flex justify-end gap-2">
           <button id="editCancel" class="btn-soft touch-btn">Batal</button>
@@ -295,16 +236,17 @@
   </div>
 
   <script>
-    // ============== PANDUAN TOGGLER ==============
+    /* ---------- Panduan ---------- */
     const panel = document.getElementById('guidePanel');
     const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
-    openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
+    openBtns.forEach(b=> b.addEventListener('click',()=> panel.classList.toggle('hidden')));
     document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
 
-    // ============== KUOTA (sinkron mobile & desktop) ==============
+    /* ---------- Kuota ---------- */
     async function loadQuota(){
       try{
-        const r=await fetch('/api/quota'); const j=await r.json();
+        const r = await fetch('/api/quota');
+        const j = await r.json();
         const val = j?.remaining ?? '—';
         ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
       }catch{
@@ -316,7 +258,7 @@
     });
     loadQuota();
 
-    // ============== CHIPS KELEBIHAN ==============
+    /* ---------- Chips kelebihan ---------- */
     const chipsEl=document.getElementById('chips'); 
     const inputEl=document.getElementById('descInput');
     const btnTop=document.getElementById('addDescTop'); 
@@ -326,71 +268,35 @@
     inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChip(); }});
     btnTop?.addEventListener('click', addChip);
 
-
-    // ============== PROGRESS / STATUS CONSTANTS (STEP HANYA UNTUK LOGIKA INTERNAL) ==============
+    /* ---------- Progress + animasi mengetik ---------- */
     const P_STEPS = [
       { step: 1, title: 'AI sedang menganalisis link…', percent: 33 },
       { step: 2, title: 'Menulis skrip yang menjual…', percent: 66 },
       { step: 3, title: 'Merapikan & memfinalisasi naskah…', percent: 100 }
     ];
-
-    // ============== TYPING ANIMATION ==============
-    async function startTypingAnimation(targetElement, text) {
-        targetElement.innerHTML = ''; // Clear content
-        
-        // Create text span and cursor
-        const textSpan = document.createElement('span');
-        const cursorSpan = document.createElement('span');
-        cursorSpan.className = 'typing-cursor'; 
-
-        targetElement.appendChild(textSpan);
-        targetElement.appendChild(cursorSpan);
-
-        const speed = 45; // ms per character
-        let i = 0;
-
-        return new Promise(resolve => {
-            function type() {
-                if (i < text.length) {
-                    textSpan.textContent += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    // Typing complete, remove cursor after a brief pause
-                    setTimeout(() => {
-                        cursorSpan.remove();
-                        resolve();
-                    }, 500); 
-                }
-            }
-            type();
-        });
-    }
-
-    // ============== PROGRESS / STATUS UI UPDATE (DISIMPLIFIKASI) ==============
     function updateProgress(stepIndex, isMobile = false) {
-      const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
-      const container = document.getElementById(`progressStatus${S_PREFIX}`);
-      const fillEl = document.getElementById(`progressFill${S_PREFIX}`);
-      
-      if (stepIndex === -1) { // Hide and reset
-        container.classList.add('hidden');
-        fillEl.style.width = '0%';
-        document.getElementById(`statusTitle${S_PREFIX}`).textContent = '...'; // Reset text
-        return;
-      }
-      
-      const currentStep = P_STEPS[stepIndex];
-      if (!currentStep) return;
+      const S = isMobile ? 'Mobile' : 'Desktop';
+      const container = document.getElementById(`progressStatus${S}`);
+      const fillEl = document.getElementById(`progressFill${S}`);
+      const titleEl = document.getElementById(`statusTitle${S}`);
 
+      if (stepIndex === -1) { container.classList.add('hidden'); fillEl.style.width='0%'; titleEl.textContent='...'; return; }
       container.classList.remove('hidden');
-      fillEl.style.width = currentStep.percent + '%';
-      
-      // Catatan: Tidak ada lagi update highlight step 1,2,3
+      fillEl.style.width = (P_STEPS[stepIndex]?.percent||0) + '%';
+    }
+    function typeStatus(el, text){
+      el.innerHTML='';
+      const span=document.createElement('span');
+      const cursor=document.createElement('span'); cursor.className='typing-cursor';
+      el.appendChild(span); el.appendChild(cursor);
+      let i=0; const speed=45;
+      return new Promise(r=>{
+        (function loop(){ if(i<text.length){ span.textContent+=text[i++]; setTimeout(loop,speed); }
+          else { setTimeout(()=>{cursor.remove(); r();}, 400); } })();
+      });
     }
 
-
-    // ============== GENERATE (MODIFIED) ==============
+    /* ---------- Generate ---------- */
     async function doGenerate(btn, isMobile = false){
       const err=document.getElementById('err'); err.textContent='';
       const url=document.getElementById('productUrl').value.trim();
@@ -404,205 +310,126 @@
       if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
       if((descriptions||[]).length < 2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
 
-      const original=btn.innerHTML; 
-      btn.disabled=true; 
-      btn.innerHTML='✨ Mulai Hasilkan'; // Tetap terlihat
-      
-      const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
-      const titleEl = document.getElementById(`statusTitle${S_PREFIX}`);
-      
-      // Helper function to advance step and type
-      const advanceStepAndType = async (stepIndex, pauseAfterTyping = 0) => {
-          const currentStep = P_STEPS[stepIndex];
-          updateProgress(stepIndex, isMobile); // Update bar/steps
-          await startTypingAnimation(titleEl, currentStep.title);
-          if (pauseAfterTyping > 0) {
-              await new Promise(r => setTimeout(r, pauseAfterTyping));
-          }
-      };
+      const original=btn.innerHTML; btn.disabled=true;
+
+      const S = isMobile ? 'Mobile' : 'Desktop';
+      const titleEl = document.getElementById(`statusTitle${S}`);
 
       try{
-        // Step 1: Analyze Link
-        await advanceStepAndType(0, 800); 
+        updateProgress(0,isMobile); await typeStatus(titleEl,P_STEPS[0].title);
+        updateProgress(1,isMobile); await typeStatus(titleEl,P_STEPS[1].title);
+        updateProgress(2,isMobile); const typingPromise = typeStatus(titleEl,P_STEPS[2].title);
 
-        // Step 2: Write Script
-        await advanceStepAndType(1, 800); 
+        const r = await fetch('/api/generate',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            linkProduk:url, topik:topic, deskripsi:descriptions,
+            gaya:style, panjang:length, jumlah:count
+          })
+        });
 
-        // Step 3: API Call & Typing
-        
-        // Start typing for Step 3 and run API call concurrently for speed
-        const typingPromise = advanceStepAndType(2); // No pause needed, will wait for API
+        const raw = await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}
+        if(!r.ok || !j || !j.ok){
+          // Tunjukkan pesan yang lebih jelas bila 404/Not Found
+          const msg = r.status===404 ? 
+            'Not Found — Pastikan fungsi /api/generate sudah dirutekan ke api/app.js di Vercel.' :
+            (j?.message || raw || 'Gagal generate');
+          throw new Error(msg);
+        }
 
-        const [r] = await Promise.all([
-          fetch('/api/generate',{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count, link:url, topic, descriptions, style, length, generateCount:count, count })
-          }),
-          typingPromise // Ensure typing finishes before proceeding
-        ]);
-
-        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}
-        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
-        
-        // Final UI Update
+        await typingPromise;
         renderResults(j.scripts||[]); loadQuota();
 
-      }catch(e){ 
-        err.textContent=e.message; 
-      }
-      finally{ 
-        btn.disabled=false; 
-        btn.innerHTML=original; 
-        // Reset progress UI after a short delay
-        setTimeout(() => updateProgress(-1, isMobile), 1500); 
+      }catch(e){ err.textContent=String(e.message||e); }
+      finally{
+        btn.disabled=false; btn.innerHTML=original;
+        setTimeout(()=>updateProgress(-1,isMobile),1200);
       }
     }
-    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this, false) });
-    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this, true) });
+    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this,false) });
+    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this,true) });
 
-    // ============== EMOJI KONTEKSTUAL (REVISI FINAL DENGAN LINK) ==============
-    function decorateContent(raw) {
-      if (!raw) return '';
-      let text = String(raw); 
-      let lines = text.split('\n');
-      
-      const emojiMap = {
-          'link': '🔗',      
-          'positif': '✨',   
-          'ajakan': '👉',    
-      };
-      
-      // Kata kunci untuk deteksi kalimat positif/penekanan
-      const positiveKeywords = /(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i;
-      // Kata kunci untuk deteksi kalimat CTA/ajakan
-      const ctaKeywords = /(dapatkan|beli|pesan|ceklah|klik di sini|tonton videonya)/i;
-      // Emoji pembuka
-      const startEmojis = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
+    /* ---------- Emoji kontekstual + Render hasil + Aksi massal ---------- */
+    function decorateContent(raw){
+      if(!raw) return '';
+      const lines = String(raw).split('\n');
+      const emoji = { link:'🔗', positif:'✨', ajakan:'👉' };
+      const positiveRe = /(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i;
+      const ctaRe = /(dapatkan|beli|pesan|cek|klik di sini|tonton)/i;
+      const openers = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
 
-      let decoratedLines = lines.map((line, lineIndex) => {
-          let trimmedLine = line.trim(); 
-          if (!trimmedLine) return line; 
+      return lines.map((line, idx)=>{
+        const leading = (line.match(/^\s*/)||[''])[0];
+        let t = line.trim(); if(!t) return line;
 
-          // Dapatkan spasi di awal baris asli untuk mempertahankan indentasi
-          let leadingSpaces = line.match(/^\s*/)[0];
-          let finalLine = trimmedLine;
+        if (/(https?:\/\/\S+)/i.test(t))       t = t.replace(/\s*$/, '') + ' ' + emoji.link;
+        else if (ctaRe.test(t))               t = t.replace(/([.!?…])?\s*$/, ' ' + emoji.ajakan);
+        else if (positiveRe.test(t))          t = t.replace(/([.!?…])?\s*$/, ' ' + emoji.positif);
+        if (idx===0 && !/^[✨🚀]/.test(t))     t = openers[Math.floor(Math.random()*openers.length)] + ' ' + t;
 
-          // Cek apakah baris sudah diakhiri dengan emoji untuk mencegah duplikasi
-          const endsWithEmoji = Object.values(emojiMap).some(emoji => trimmedLine.endsWith(emoji));
-          if (endsWithEmoji) return line;
-          
-          // 1. Tambahkan emoji LINK (🔗) jika ada URL
-          if (/(https?:\/\/\S+)/i.test(trimmedLine)) {
-              finalLine = trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
-          }
-
-          // 2. Tambahkan emoji AJAKAN (👉) di akhir kalimat CTA
-          else if (ctaKeywords.test(trimmedLine)) {
-              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
-          } 
-          
-          // 3. Tambahkan emoji POSITIF (✨) di akhir kalimat penekanan
-          else if (positiveKeywords.test(trimmedLine)) {
-              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
-          }
-          
-          // 4. Tambahkan emoji pembuka di baris pertama (jika baris pertama dan belum ada emoji)
-          if (lineIndex === 0 && !finalLine.startsWith('✨') && !finalLine.startsWith('🚀')) {
-            finalLine = startEmojis[Math.floor(Math.random()*startEmojis.length)] + ' ' + finalLine;
-          }
-          
-          return leadingSpaces + finalLine; 
-      });
-
-      // Gabungkan kembali menggunakan line break yang sama
-      return decoratedLines.join('\n').trim();
+        return leading + t;
+      }).join('\n').trim();
     }
 
-
-    // ============== MODAL EDIT ==============
     const modal = document.getElementById('editModal');
     const editArea = document.getElementById('editArea');
     const editClose = document.getElementById('editClose');
     const editCancel = document.getElementById('editCancel');
     const editSave = document.getElementById('editSave');
     let onSaveEdit = null;
+    function openEdit(initial, cb){ editArea.value=initial||''; onSaveEdit=cb; modal.classList.remove('hidden'); editArea.focus(); }
+    function closeEdit(){ modal.classList.add('hidden'); onSaveEdit=null; }
+    editClose.onclick=closeEdit; editCancel.onclick=closeEdit;
+    editSave.onclick=()=>{ if(onSaveEdit) onSaveEdit(editArea.value); closeEdit(); };
 
-    function openEdit(initialText, saveCb){
-      editArea.value = initialText || '';
-      onSaveEdit = saveCb;
-      modal.classList.remove('hidden');
-      editArea.focus();
-    }
-    function closeEdit(){
-      modal.classList.add('hidden'); onSaveEdit = null;
-    }
-    editClose.onclick = closeEdit; editCancel.onclick = closeEdit;
-    editSave.onclick = ()=>{ if(onSaveEdit) onSaveEdit(editArea.value); closeEdit(); };
-
-    // ============== RENDER HASIL + AKSI MASSAL (REVISI) ==============
     let _lastScripts = [];
     function renderResults(scripts){
-      _lastScripts = (scripts||[]).map(s => ({ ...s }));
+      _lastScripts = (scripts||[]).map(s=>({...s}));
       const box=document.getElementById('results'); 
       const bulk=document.getElementById('bulkActions');
       box.innerHTML='';
 
-      if (!_lastScripts.length){ bulk.classList.add('hidden'); return; }
+      if(!_lastScripts.length){ bulk.classList.add('hidden'); return; }
       bulk.classList.remove('hidden');
 
-      _lastScripts.forEach((s, i) => {
-        const decorated = decorateContent(s.content || '');
-        const titleSafe = escapeHtml(s.title || '');
-
-        const card=document.createElement('div'); 
-        card.className='glass p-5 sm:p-6';
+      _lastScripts.forEach((s,i)=>{
+        const decorated = decorateContent(s.content||'');
+        const titleSafe = escapeHtml(s.title||'');
+        const card=document.createElement('div'); card.className='glass p-5 sm:p-6';
         card.innerHTML=`
-          <h3 class="text-xl sm:text-2xl font-extrabold mb-3" style="color:#1e40af">${titleSafe}</h3> 
+          <h3 class="text-xl sm:text-2xl font-extrabold mb-3" style="color:#1e40af">${titleSafe}</h3>
           <p class="whitespace-pre-wrap leading-relaxed text-base sm:text-lg text-slate-700">${escapeHtml(decorated)}</p>
           <div class="mt-5 flex flex-wrap gap-3 justify-end">
             <button class="px-5 py-2.5 rounded-xl text-white touch-btn text-sm" style="background:#334155" data-copy>Salin</button>
             <button class="btn-soft touch-btn px-5 py-2.5 text-sm" data-edit>Edit</button>
           </div>`;
-
-        card.querySelector('[data-copy]').onclick=()=>{ 
-          navigator.clipboard.writeText(s.content||'').then(()=>{
-            const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500);
-          }); 
-        };
-        card.querySelector('[data-edit]').onclick=()=>{ 
-          openEdit(s.content||'', (val)=>{ _lastScripts[i].content = val; renderResults(_lastScripts); });
-        };
+        card.querySelector('[data-copy]').onclick=()=>{ navigator.clipboard.writeText(s.content||'').then(()=>{
+          const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1400);
+        })};
+        card.querySelector('[data-edit]').onclick=()=> openEdit(s.content||'', val=>{ _lastScripts[i].content=val; renderResults(_lastScripts);});
         box.appendChild(card);
       });
 
-      // Unduh semua (.txt)
-      document.getElementById('btnDownloadAll').onclick = ()=>{
-        const allText = _lastScripts.map((s, idx)=>`[${idx+1}] ${s.title||''}\n${s.content||''}`).join('\n\n---\n\n');
-        const blob=new Blob([allText],{type:'text/plain'});
-        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='skrip-semua.txt'; a.click(); URL.revokeObjectURL(a.href);
+      document.getElementById('btnDownloadAll').onclick=()=>{
+        const all=_lastScripts.map((s,idx)=>`[${idx+1}] ${s.title||''}\n${s.content||''}`).join('\n\n---\n\n');
+        const blob=new Blob([all],{type:'text/plain'}); const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob); a.download='skrip-semua.txt'; a.click(); URL.revokeObjectURL(a.href);
       };
-      // Export semua ke PDF (via print)
-      document.getElementById('btnPdfAll').onclick = ()=>{
-        const html = _lastScripts.map((s, idx)=>`
-          <h3 style="margin:0 0 8px 0; color:#1e40af; font-size:18px; font-weight:800">${idx+1}. ${escapeHtml(s.title||'')}</h3>
-          <div style="white-space:pre-wrap; line-height:1.6; font-size:16px; margin:0 0 18px 0">${escapeHtml(s.content||'')}</div>
+      document.getElementById('btnPdfAll').onclick=()=>{
+        const html=_lastScripts.map((s,idx)=>`
+          <h3 style="margin:0 0 8px 0;color:#1e40af;font-size:18px;font-weight:800">${idx+1}. ${escapeHtml(s.title||'')}</h3>
+          <div style="white-space:pre-wrap;line-height:1.6;font-size:16px;margin:0 0 18px 0">${escapeHtml(s.content||'')}</div>
         `).join('');
         const w=window.open('','_blank');
-        w.document.write(`
-          <html><head><title>Hasil Script</title>
-          <style>body{font-family:Inter,system-ui; padding:24px}</style></head>
-          <body>${html}</body></html>`);
+        w.document.write(`<html><head><title>Hasil Script</title><style>body{font-family:Inter,system-ui;padding:24px}</style></head><body>${html}</body></html>`);
         w.document.close(); w.focus(); w.print();
       };
 
-      // Scroll ke hasil di HP
-      if (window.innerWidth <= 640 && _lastScripts.length)
-        window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
+      if (window.innerWidth<=640 && _lastScripts.length) window.scrollTo({top:box.offsetTop-64,behavior:'smooth'});
     }
 
-    // Util HTML escape
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
   </script>
 </body>
 </html>
