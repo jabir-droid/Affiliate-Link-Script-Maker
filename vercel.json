@@ -1,18 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/app.js", "use": "@vercel/node" }
+    { "src": "api/app.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "^/api/(.*)$", "dest": "/api/app.js" },
-
-    { "src": "^/admin(?:/)?$", "dest": "/admin.html" },
-    { "src": "^/admin\\.html$", "dest": "/admin.html" },
-
-    { "src": "^/login(?:/)?$", "dest": "/login.html" },
-    { "src": "^/login\\.html$", "dest": "/login.html" },
-
-    { "src": "^/generator(?:/)?$", "dest": "/generator.html" },
-    { "src": "^/generator\\.html$", "dest": "/generator.html" }
+    { "src": "^/admin$", "dest": "/admin.html" },
+    { "src": "^/login$", "dest": "/login.html" },
+    { "src": "^/generator$", "dest": "/generator.html" }
   ]
 }
