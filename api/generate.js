@@ -19,22 +19,19 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return send(res, 405, { ok: false, message: "Method Not Allowed" });
 
   const body = await readBody(req);
-  const link = String(body.linkProduk || "").trim();
-  const topik = String(body.topik || "").trim();
-  const deskripsi = Array.isArray(body.deskripsi) ? body.deskripsi : [];
+  const link       = String(body.linkProduk || body.link || "").trim();
+  const topik      = String(body.topik || body.namaProduk || "").trim();
+  const deskripsi  = Array.isArray(body.deskripsi) ? body.deskripsi : [];
 
-  if (!link) return send(res, 400, { ok: false, message: "linkProduk wajib diisi" });
-  if (!topik) return send(res, 400, { ok: false, message: "Nama/Jenis Produk wajib diisi" });
-  if (deskripsi.length < 2) return send(res, 400, { ok: false, message: "Minimal 2 kelebihan/keunggulan." });
+  if (!link)  return send(res, 400, { ok:false, message:"linkProduk wajib diisi" });
+  if (!topik) return send(res, 400, { ok:false, message:"Nama/Jenis Produk wajib diisi" });
+  if (deskripsi.length < 2) return send(res, 400, { ok:false, message:"Minimal 2 kelebihan/keunggulan." });
 
-  // --- Dummy result sementara ---
-  const scripts = [];
-  for (let i = 1; i <= Math.min(Number(body.jumlah || 3), 10); i++) {
-    scripts.push({
-      title: `${topik} — Variasi ${i}`,
-      content: `✨ ${topik} dengan fitur ${deskripsi.join(", ")}.\nTemukan selengkapnya di ${link} 🔗`
-    });
-  }
+  const count = Math.max(1, Math.min(10, Number(body.jumlah || 3)));
+  const scripts = Array.from({length: count}).map((_,i) => ({
+    title: `${topik} — Variasi ${i+1}`,
+    content: `✨ ${topik} dengan ${deskripsi.join(", ")}.\nLihat di ${link} 🔗`
+  }));
 
-  return send(res, 200, { ok: true, scripts });
+  return send(res, 200, { ok:true, scripts });
 };
