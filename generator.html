@@ -1,261 +1,608 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Generator — Buat Skrip Afiliasi</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>AI Generator | Script Engine AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#0f172a; --card:#0b1225; --muted:#8aa0c7; --text:#e6eeff;
-      --primaryA:#10b5ff; --primaryB:#7a5af8; --danger:#ff4d4d;
-      --chip:#e8f1ff; --chipText:#1f2d4d;
+      --bg1:#ffffff; --bg2:#f5f9ff; --panel:#ffffff; --border:#e3e8f4;
+      --txt:#0f172a; --muted:#475569; --blue:#12b3ff; --purple:#7b5cff;
+      --neon-blue: #00bfff;
+      --neon-purple: #7b5cff;
     }
-    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0;background:
-        radial-gradient(1200px 600px at 10% -10%, #1a2652 0%, transparent 50%),
-        radial-gradient(1200px 600px at 110% 0%, #1b2a60 0%, transparent 50%),
-        radial-gradient(900px 400px at 50% 120%, #172048 0%, transparent 50%),
-        var(--bg);
-      color:var(--text); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial
+      margin:0;color:var(--txt);font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1800px 800px at 50% -20%, rgba(231,241,255,.85) 0%, transparent 65%),
+        radial-gradient(1800px 900px at 50% 120%, rgba(239,230,255,.85) 0%, transparent 65%),
+        url("/bg/generator-code.jpg") center/cover no-repeat fixed;
+      position:relative; isolation:isolate;
     }
-    .wrap{max-width:980px;margin:28px auto;padding:0 16px}
-    .title{display:flex;gap:10px;align-items:center;margin:6px 0 4px}
-    .title h1{margin:0;font-size:28px;letter-spacing:.3px}
-    .panel{background:linear-gradient(180deg,#0d1631 0%, #0a1329 100%);
-      border:1px solid #12204c;border-radius:18px;padding:18px 18px 6px;
-      box-shadow:0 10px 40px rgba(0,0,0,.35)}
-    .panel h3{margin:0 0 16px;font-size:16px;color:#cdd8f8}
-    label.small{display:block;font-size:13px;color:#9db0d9;margin:10px 0 6px}
-    .in{width:100%;padding:14px 14px;border-radius:12px;border:1px solid #203266;
-      background:#0b1430;color:var(--text);outline:none}
-    .in:focus{border-color:#2f56ff;box-shadow:0 0 0 3px rgba(53,108,255,.18)}
-    .row{display:grid;grid-template-columns:1fr auto;gap:10px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:12px 16px;border-radius:12px;border:0;color:white;cursor:pointer}
-    .btn-grad{width:100%;
-      background:linear-gradient(90deg,var(--primaryA),var(--primaryB));
-      box-shadow:0 12px 40px rgba(102,122,255,.35)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    .chip{display:inline-flex;align-items:center;gap:8px;background:var(--chip);
-      color:var(--chipText);padding:8px 12px;border-radius:999px;font-size:13px}
-    .chip button{all:unset; cursor:pointer; color:#48608f}
-    .hint{font-size:12px;color:#88a0ce;margin-top:6px}
-    .tools{display:flex;flex-wrap:wrap; gap:10px; margin:12px 0}
-    .pill{padding:10px 14px;border-radius:12px;background:#0d193b;border:1px solid #213064;
-      color:#cfe0ff;cursor:pointer;user-select:none}
-    .pill.active{background:#172453;border-color:#2f56ff;box-shadow:0 0 0 2px rgba(53,108,255,.18)}
-    .danger{color:var(--danger)}
-    .results{margin-top:22px;display:grid;gap:16px}
-    .card{background:linear-gradient(180deg,#0d1631 0%, #0a1329 100%);
-      border:1px solid #19295a;border-radius:16px;padding:16px}
-    .card h4{margin:0 0 8px}
-    .card .actions{display:flex;gap:10px;margin-top:10px}
-    .btn-outline{background:#0f1a3a;border:1px solid #28418a}
-    .msg{margin-top:10px;font-size:14px}
-    .center{display:flex;justify-content:center;align-items:center}
+    body::before{
+      content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image: radial-gradient(circle at 1px 1px, rgba(93,109,169,.10) 1px, transparent 1.2px);
+      background-size: 22px 22px; opacity:.45; mix-blend-mode:multiply;
+    }
+    /* PERBAIKAN: Menjamin huruf 'g' terlihat */
+    .g-title{
+      background:linear-gradient(90deg,#3b82f6,#8b5cf6);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      padding-bottom: 5px; 
+      margin-bottom: -5px;
+    }
+    .glass{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 18px 40px rgba(15,23,42,.08)}
+    .pill{background:#f3f6ff;border:1px solid var(--border);border-radius:12px}
+    .inp{width:100%;border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:14px;color:var(--txt);outline:none}
+    .inp:focus{border-color:#4ea8ff;box-shadow:0 0 0 3px rgba(78,168,255,.18)}
+    .seg input{display:none}
+    .seg label{border:1px solid var(--border);background:#f9fbff;padding:14px 16px;border-radius:16px;cursor:pointer;text-align:center;font-weight:600}
+    .seg input:checked + label{background:linear-gradient(90deg, rgba(18,179,255,.18), rgba(124,92,255,.18));border-color:#7c5cff;box-shadow:0 0 18px rgba(124,92,255,.20)}
+    .cta{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 12px 36px rgba(123,92,255,.28);color:#fff}
+    .title-size{font-size:clamp(26px, 4.5vw, 44px); line-height:1.08}
+    .section-pad{padding:clamp(16px, 3vw, 28px)}
+    .btn-soft{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#fff}
+    .btn-grad{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--blue),var(--purple));color:#fff;border:0}
+    
+    /* Efek sentuhan universal */
+    .touch-btn { 
+        transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease; 
+        will-change: transform, box-shadow;
+    }
+    .touch-btn:hover { box-shadow: 0 14px 36px rgba(123,92,255,.28); }
+    .touch-btn:active { transform: translateY(1px) scale(.99); }
+    .back-btn-style { border:1px solid var(--border); background:#ffffffd9; }
+
+    /* Tombol Tambah Keunggulan (Revisi Desain) */
+    .btn-add-desc {
+        background: linear-gradient(90deg, var(--blue), var(--purple));
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        box-shadow: 0 8px 16px rgba(123, 92, 255, .3);
+        transition: transform .14s ease, box-shadow .14s ease;
+    }
+    .btn-add-desc:hover {
+        box-shadow: 0 10px 20px rgba(123, 92, 255, .4);
+        transform: translateY(-1px);
+    }
+
+    /* Progress Bar & Status - DIBIARKAN ADA */
+    .progress-container{
+      margin-top: 18px; 
+      transition: opacity .3s ease;
+    }
+    .progress-bar{
+      height: 6px; 
+      background: #eef2ff;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill{
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      transition: width .4s ease-out;
+      will-change: width;
+      box-shadow: 0 0 8px rgba(123,92,255,.5);
+    }
+    /* .progress-step dan .active DIHILANGKAN */
+    
+    /* Kursor Berkedip untuk Animasi Mengetik */
+    .typing-cursor {
+      display: inline-block;
+      width: 0.15em;
+      height: 1em; 
+      margin-left: 2px;
+      vertical-align: middle;
+      background-color: #1e40af; 
+      animation: blink-cursor 0.75s step-end infinite;
+    }
+
+    @keyframes blink-cursor {
+      from, to { opacity: 0 }
+      50% { opacity: 1 }
+    }
+
+
+    @media (max-width:640px){
+      .seg-style,.seg-length{display:grid;grid-template-columns:1fr;gap:12px}
+      .sticky-cta{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(180deg,rgba(255,255,255,0),rgba(245,249,255,.95));backdrop-filter:blur(10px);border-top:1px solid var(--border)}
+      main{padding-bottom:180px} /* Menambah padding untuk mobile progress/status */
+      #chips{display:flex;flex-wrap:wrap;gap:8px}
+    }
+    @media (min-width:641px) and (max-width:1024px){
+      .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+      .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+      main{padding-bottom:32px}
+    }
+    @media (min-width:1025px){
+      .seg-style{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+      .seg-length{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+      main{padding-bottom:32px}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="title">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2l2.39 4.84 5.34.78-3.86 3.77.91 5.31-4.78-2.51-4.78 2.51.91-5.31L4.27 7.62l5.34-.78L12 2z" fill="#76b3ff"/>
-      </svg>
-      <h1>AI Generator</h1>
+  <main class="max-w-6xl mx-auto px-5 sm:px-6 pt-6 lg:pt-8 pb-24">
+    <div class="flex items-start justify-between gap-4">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <button onclick="history.back()" class="back-btn-style touch-btn grid place-items-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl">
+          ←
+        </button>
+        <div>
+          <h1 class="g-title title-size font-extrabold">AI Generator</h1>
+          <p class="text-[var(--muted)] mt-0.5 sm:mt-1 text-sm sm:text-base">Buat skrip promosi afiliasi Anda</p>
+
+          <div class="mt-3 flex flex-col sm:flex-row gap-2 sm:gap-3 lg:hidden">
+            <button id="btnGuide_m" class="btn-grad touch-btn">ℹ Panduan</button>
+            <div class="pill px-4 py-2 text-sm flex items-center justify-center gap-2">
+              Kuota: <b id="quotaNow_m">—</b> / 1000
+              <button id="btnRefreshQuota_m" class="ml-2 btn-soft touch-btn">Refresh</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-3">
+        <button id="btnGuide" class="btn-grad touch-btn">ℹ Panduan</button>
+        <div class="pill px-4 py-2 text-sm flex items-center gap-2">
+          Kuota: <b id="quotaNow">—</b> / 1000
+          <button id="btnRefreshQuota" class="btn-soft touch-btn">Refresh</button>
+        </div>
+      </div>
     </div>
 
-    <div class="panel">
-      <h3>Form Input Produk</h3>
-
-      <label class="small">Link Produk *</label>
-      <input id="link" class="in" type="url" placeholder="https://tokopedia.com/..." />
-
-      <label class="small">Nama / Jenis Produk *</label>
-      <input id="topik" class="in" type="text" placeholder="Contoh: Smartwatch X Pro" />
-
-      <label class="small">Kelebihan / Keunggulan Produk *</label>
-      <div class="row">
-        <input id="featInput" class="in" type="text" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari" />
-        <button id="btnAddFeat" class="btn btn-outline">+ Tambah</button>
+    <section id="guidePanel" class="glass mt-4 hidden">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-4 h-4 rounded-sm" style="background:linear-gradient(90deg,#60a5fa,#8b5cf6)"></span>
+          <h3 class="text-lg sm:text-xl font-extrabold">Panduan Penggunaan</h3>
+        </div>
+        <button id="closeGuide" class="btn-soft touch-btn">✕</button>
       </div>
-      <div id="chips" class="chips"></div>
-      <div class="hint">Minimal <b>2</b> kelebihan. Tekan <i>Enter</i> atau klik <b>+ Tambah</b> untuk menambah.</div>
+      <div class="section-pad">
+        <ol class="space-y-4 sm:space-y-5 text-[15px] sm:text-[17px] leading-relaxed">
+          <li>1. Masukkan <b>link produk</b> & info dasar.</li>
+          <li>2. Tambahkan <b>kelebihan/keunggulan</b> (minimal <b>2</b>).</li>
+          <li>3. Pilih <b>gaya bahasa</b> yang sesuai.</li>
+          <li>4. Tentukan <b>panjang tulisan</b>.</li>
+          <li>5. Klik <b>Mulai Hasilkan</b>.</li>
+          <li>6. <b>Salin</b>, <b>Edit</b>, <b>Unduh Semua</b> atau <b>Export PDF</b>.</li>
+        </ol>
+      </div>
+    </section>
 
-      <label class="small">Jumlah Variasi Konten</label>
-      <input id="jumlah" class="in" type="number" min="1" max="10" value="3" />
-
-      <div class="tools">
-        <div class="pill active" data-group="style" data-val="Santai & Ramah">Santai & Ramah</div>
-        <div class="pill" data-group="style" data-val="Formal & Informatif">Formal & Informatif</div>
-        <div class="pill" data-group="style" data-val="Promosi Soft Selling">Promosi Soft Selling</div>
-        <div class="pill" data-group="style" data-val="AIDA/PAS">Penulisan Naskah Iklan (AIDA/PAS)</div>
+    <section class="glass mt-5">
+      <div class="px-5 py-3 border-b border-[var(--border)] flex items-center gap-2 bg-white/60">
+        <span>📝</span><h2 class="text-[18px] sm:text-[22px] font-extrabold">Form Input Produk</h2>
       </div>
 
-      <div class="tools">
-        <div class="pill" data-group="length" data-val="Pendek">Pendek (1 paragraf)</div>
-        <div class="pill active" data-group="length" data-val="Sedang">Sedang (2–3 paragraf)</div>
-        <div class="pill" data-group="length" data-val="Panjang">Panjang (artikel mini)</div>
-      </div>
+      <div class="section-pad grid gap-5 sm:gap-6">
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Link Produk <span class="text-sky-600">*</span></label>
+          <input id="productUrl" type="url" placeholder="https://tokopedia.com/..." class="inp">
+        </div>
 
-      <div class="center" style="margin:18px 0 2px">
-        <button id="btnGen" class="btn btn-grad" style="width:100%;height:56px;font-size:18px;">
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Nama / Jenis Produk <span class="text-sky-600">*</span></label>
+          <input id="productTopic" type="text" placeholder="Contoh: Smartwatch X Pro" class="inp">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-[var(--muted)] font-semibold text-sm sm:text-base">Kelebihan / Keunggulan Produk <span class="text-sky-600">*</span></label>
+            <button id="addDescTop" class="hidden sm:inline-flex items-center gap-1 btn-add-desc touch-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Tambah
+            </button>
+          </div>
+          <input id="descInput" class="inp" placeholder="Contoh: Tahan Air IP68, Baterai 7 Hari, dll (Enter untuk tambah)">
+          <div id="chips" class="mt-2 flex flex-wrap gap-2"></div>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-[var(--muted)] font-semibold text-sm sm:text-base">Jumlah Variasi Konten</label>
+          <input id="count" type="number" min="1" max="10" value="3" class="inp">
+          <p class="text-xs mt-1 text-[var(--muted)]">Antara 1–10 variasi</p>
+        </div>
+
+        <div class="grid gap-6 sm:gap-8">
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Gaya Bahasa</label>
+            <div class="seg seg-style">
+              <input type="radio" name="style" id="sty1" value="Santai & Ramah" checked><label for="sty1" class="touch-btn">Santai & Ramah</label>
+              <input type="radio" name="style" id="sty2" value="Formal & Informatif"><label for="sty2" class="touch-btn">Formal & Informatif</label>
+              <input type="radio" name="style" id="sty3" value="Promosi Soft Selling"><label for="sty3" class="touch-btn">Promosi Soft Selling</label>
+              <input type="radio" name="style" id="sty4" value="Penulisan Naskah Iklan (AIDA/PAS)"><label for="sty4" class="touch-btn">Penulisan Naskah Iklan (AIDA/PAS)</label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block mb-3 text-[var(--muted)] font-semibold">Panjang Tulisan</label>
+            <div class="seg seg-length">
+              <input type="radio" name="length" id="len1" value="Pendek (1 paragraf)"><label for="len1" class="touch-btn">Pendek (1 paragraf)</label>
+              <input type="radio" name="length" id="len2" value="Sedang (2-3 paragraf)" checked><label for="len2" class="touch-btn">Sedang (2-3 paragraf)</label>
+              <input type="radio" name="length" id="len3" value="Panjang (artikel mini)"><label for="len3" class="touch-btn">Panjang (artikel mini)</label>
+            </div>
+          </div>
+        </div>
+
+        <button id="btnGenerate" class="hidden sm:inline-flex mt-2 w-full items-center justify-center gap-3 px-7 py-5 rounded-2xl text-lg font-extrabold cta touch-btn">
           ✨ Mulai Hasilkan
         </button>
+        <span id="err" class="text-rose-600"></span>
+
+        <div id="progressStatusDesktop" class="progress-container hidden">
+          <p id="statusTitleDesktop" class="text-center font-bold text-slate-700 mb-3 text-sm">...</p>
+          <div class="progress-bar mb-2">
+            <div id="progressFillDesktop" class="progress-fill"></div>
+          </div>
+          </div>
       </div>
-      <div id="msg" class="msg"></div>
+    </section>
+
+    <div id="bulkActions" class="mt-8 hidden">
+      <div class="glass flex flex-wrap items-center justify-end gap-3 p-4">
+        <button id="btnDownloadAll" class="btn-soft touch-btn">Unduh Semua (.txt)</button>
+        <button id="btnPdfAll" class="btn-soft touch-btn">Export Semua ke PDF</button>
+      </div>
     </div>
 
-    <div id="results" class="results"></div>
+    <section id="results" class="mt-8 grid gap-6"></section>
+
+    <footer class="text-center text-slate-600 mt-12">
+      © 2025 Script Engine AI. All Rights Reserved
+    </footer>
+  </main>
+
+  <div class="sm:hidden sticky-cta">
+    <button id="btnGenerateMobile" class="w-full inline-flex items-center justify-center gap-2 px-5 py-4 rounded-2xl text-base font-extrabold cta touch-btn">
+      ✨ Mulai Hasilkan
+    </button>
+    <div id="progressStatusMobile" class="progress-container hidden">
+      <p id="statusTitleMobile" class="text-center font-bold text-slate-700 mb-3 text-sm">...</p>
+      <div class="progress-bar mb-2">
+        <div id="progressFillMobile" class="progress-fill"></div>
+      </div>
+      </div>
   </div>
 
-<script>
-(() => {
-  const el = (sel, root=document) => root.querySelector(sel);
-  const els = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-  const link   = el('#link');
-  const topik  = el('#topik');
-  const featIn = el('#featInput');
-  const chipsC = el('#chips');
-  const jumlah = el('#jumlah');
-  const btnAdd = el('#btnAddFeat');
-  const btnGen = el('#btnGen');
-  const msg    = el('#msg');
-  const results= el('#results');
-
-  let features = [];
-
-  // ---------- pill select ----------
-  els('.pill').forEach(p => {
-    p.addEventListener('click', () => {
-      const group = p.getAttribute('data-group');
-      els(`.pill[data-group="${group}"]`).forEach(x => x.classList.remove('active'));
-      p.classList.add('active');
-    });
-  });
-
-  function activeVal(group){
-    const a = el(`.pill[data-group="${group}"].active`);
-    return a ? a.getAttribute('data-val') : '';
-  }
-
-  // ---------- chips ----------
-  function renderChips(){
-    chipsC.innerHTML = '';
-    features.forEach((t, i) => {
-      const div = document.createElement('div');
-      div.className = 'chip';
-      div.innerHTML = `<span>${escapeHtml(t)}</span><button title="hapus">&times;</button>`;
-      div.querySelector('button').onclick = () => {
-        features.splice(i,1);
-        renderChips();
-      };
-      chipsC.appendChild(div);
-    });
-  }
-  function addFeat(){
-    const v = (featIn.value || '').trim();
-    if(!v) return;
-    if(!features.includes(v)) features.push(v);
-    featIn.value = '';
-    renderChips();
-  }
-  featIn.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); addFeat(); }
-  });
-  btnAdd.addEventListener('click', (e) => {
-    e.preventDefault(); addFeat();
-  });
-
-  // ---------- helper ----------
-  function setMsg(text, type=''){
-    msg.innerHTML = text ? (type==='err' ? `<span class="danger">${escapeHtml(text)}</span>` : escapeHtml(text)) : '';
-  }
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
-  function copyText(s){
-    navigator.clipboard?.writeText(s).catch(()=>{});
-  }
-
-  // ---------- render hasil ----------
-  function showResults(items){
-    results.innerHTML = '';
-    items.forEach((it, idx) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <h4>${escapeHtml(it.title || `Variasi ${idx+1}`)}</h4>
-        <div class="content" style="white-space:pre-wrap;color:#dce6ff">${escapeHtml(it.content || '')}</div>
-        <div class="actions">
-          <button class="btn btn-outline" data-act="copy">Salin</button>
-          <button class="btn btn-outline" data-act="edit">Edit</button>
+  <div id="editModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-slate-200">
+        <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+          <h3 class="font-bold text-lg">Edit Konten</h3>
+          <button id="editClose" class="btn-soft touch-btn">✕</button>
         </div>
-      `;
-      card.querySelector('[data-act="copy"]').onclick = () => {
-        const text = card.querySelector('.content').textContent;
-        copyText(text);
-      };
-      card.querySelector('[data-act="edit"]').onclick = async () => {
-        const cur = card.querySelector('.content').textContent;
-        const next = prompt('Edit konten:', cur);
-        if(next != null) card.querySelector('.content').textContent = next;
-      };
-      results.appendChild(card);
+        <div class="p-5">
+          <textarea id="editArea" class="w-full h-64 p-4 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-indigo-100"
+            style="font-family: Inter, system-ui; line-height: 1.6; font-size: 14px;"></textarea>
+        </div>
+        <div class="px-5 pb-5 flex justify-end gap-2">
+          <button id="editCancel" class="btn-soft touch-btn">Batal</button>
+          <button id="editSave" class="px-4 py-2 rounded-lg text-white touch-btn" style="background:#334155">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============== PANDUAN TOGGLER ==============
+    const panel = document.getElementById('guidePanel');
+    const openBtns = [document.getElementById('btnGuide'), document.getElementById('btnGuide_m')].filter(Boolean);
+    openBtns.forEach(b=> b.addEventListener('click',()=>{ panel.classList.toggle('hidden'); }));
+    document.getElementById('closeGuide').addEventListener('click',()=> panel.classList.add('hidden'));
+
+    // ============== KUOTA (sinkron mobile & desktop) ==============
+    async function loadQuota(){
+      try{
+        const r=await fetch('/api/quota'); const j=await r.json();
+        const val = j?.remaining ?? '—';
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent=val;});
+      }catch{
+        ['quotaNow','quotaNow_m'].forEach(id=>{const el=document.getElementById(id); if(el) el.textContent='—';});
+      }
+    }
+    ;['btnRefreshQuota','btnRefreshQuota_m'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.addEventListener('click', loadQuota);
     });
-  }
+    loadQuota();
 
-  // ---------- generate ----------
-  btnGen.addEventListener('click', async () => {
-    setMsg('');
-    results.innerHTML = '';
+    // ============== CHIPS KELEBIHAN ==============
+    const chipsEl=document.getElementById('chips'); 
+    const inputEl=document.getElementById('descInput');
+    const btnTop=document.getElementById('addDescTop'); 
+    let chips=[];
+    const renderChips=()=>{chipsEl.innerHTML='';chips.forEach((t,i)=>{const s=document.createElement('span');s.className='inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm';s.style.cssText='background:#eef2ff;border:1px solid var(--border)';s.innerHTML=`${escapeHtml(t)} <button data-i="${i}" class="text-[var(--muted)] touch-btn">✕</button>`;s.querySelector('button').onclick=e=>{chips.splice(+e.target.dataset.i,1);renderChips()};chipsEl.appendChild(s);})};
+    const addChip=()=>{const v=inputEl.value.trim(); if(!v) return; chips.push(v); inputEl.value=''; renderChips();};
+    inputEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChip(); }});
+    btnTop?.addEventListener('click', addChip);
 
-    const payload = {
-      linkProduk: (link.value || '').trim(),
-      topik:      (topik.value || '').trim(),
-      deskripsi:  features.slice(0),
-      gaya:       activeVal('style') || 'Santai & Ramah',
-      panjang:    activeVal('length') || 'Sedang',
-      jumlah:     Math.max(1, Math.min(10, Number(jumlah.value || 1)))
-    };
 
-    // Validasi
-    if(!payload.linkProduk) return setMsg('Link produk wajib diisi', 'err');
-    if(!payload.topik)      return setMsg('Nama/Jenis produk wajib diisi', 'err');
-    if(payload.deskripsi.length < 2) return setMsg('Minimal 2 kelebihan/keunggulan.', 'err');
+    // ============== PROGRESS / STATUS CONSTANTS (STEP HANYA UNTUK LOGIKA INTERNAL) ==============
+    const P_STEPS = [
+      { step: 1, title: 'AI sedang menganalisis link…', percent: 33 },
+      { step: 2, title: 'Menulis skrip yang menjual…', percent: 66 },
+      { step: 3, title: 'Merapikan & memfinalisasi naskah…', percent: 100 }
+    ];
 
-    btnGen.disabled = true; btnGen.textContent = '⏳ Memproses...';
-    try{
-      const r = await fetch('/api/generate', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
+    // ============== TYPING ANIMATION ==============
+    async function startTypingAnimation(targetElement, text) {
+        targetElement.innerHTML = ''; // Clear content
+        
+        // Create text span and cursor
+        const textSpan = document.createElement('span');
+        const cursorSpan = document.createElement('span');
+        cursorSpan.className = 'typing-cursor'; 
 
-      let dataText = await r.text();
-      let data;
-      try{ data = JSON.parse(dataText); }catch{ data = { ok:false, message:dataText || 'Invalid JSON' }; }
+        targetElement.appendChild(textSpan);
+        targetElement.appendChild(cursorSpan);
 
-      if(!r.ok || !data.ok){
-        // 404 => fungsi belum ada
-        if(r.status === 404){
-          setMsg('Not Found — Pastikan fungsi /api/generate sudah ada di server (file api/generate.js).', 'err');
-        }else{
-          setMsg(data.message || 'Gagal memproses permintaan.', 'err');
-        }
+        const speed = 45; // ms per character
+        let i = 0;
+
+        return new Promise(resolve => {
+            function type() {
+                if (i < text.length) {
+                    textSpan.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Typing complete, remove cursor after a brief pause
+                    setTimeout(() => {
+                        cursorSpan.remove();
+                        resolve();
+                    }, 500); 
+                }
+            }
+            type();
+        });
+    }
+
+    // ============== PROGRESS / STATUS UI UPDATE (DISIMPLIFIKASI) ==============
+    function updateProgress(stepIndex, isMobile = false) {
+      const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
+      const container = document.getElementById(`progressStatus${S_PREFIX}`);
+      const fillEl = document.getElementById(`progressFill${S_PREFIX}`);
+      
+      if (stepIndex === -1) { // Hide and reset
+        container.classList.add('hidden');
+        fillEl.style.width = '0%';
+        document.getElementById(`statusTitle${S_PREFIX}`).textContent = '...'; // Reset text
         return;
       }
+      
+      const currentStep = P_STEPS[stepIndex];
+      if (!currentStep) return;
 
-      const items = Array.isArray(data.scripts) ? data.scripts : [];
-      if(!items.length) { setMsg('Tidak ada hasil dikembalikan.', 'err'); return; }
-      showResults(items);
-      setMsg(`Berhasil menghasilkan ${items.length} variasi.`);
-    }catch(e){
-      setMsg(String(e?.message || e), 'err');
-    }finally{
-      btnGen.disabled = false; btnGen.textContent = '✨ Mulai Hasilkan';
+      container.classList.remove('hidden');
+      fillEl.style.width = currentStep.percent + '%';
+      
+      // Catatan: Tidak ada lagi update highlight step 1,2,3
     }
-  });
-})();
-</script>
+
+
+    // ============== GENERATE (MODIFIED) ==============
+    async function doGenerate(btn, isMobile = false){
+      const err=document.getElementById('err'); err.textContent='';
+      const url=document.getElementById('productUrl').value.trim();
+      const topic=document.getElementById('productTopic').value.trim();
+      const style=document.querySelector('input[name="style"]:checked')?.value || 'Santai & Ramah';
+      const length=document.querySelector('input[name="length"]:checked')?.value || 'Sedang (2-3 paragraf)';
+      const count=Math.max(1,Math.min(10, Number(document.getElementById('count').value || 3)));
+      const descriptions=[...chips];
+
+      if(!url)   return err.textContent='Link Produk wajib diisi.';
+      if(!topic) return err.textContent='Nama / Jenis Produk wajib diisi.';
+      if((descriptions||[]).length < 2) return err.textContent='Minimal 2 kelebihan / keunggulan.';
+
+      const original=btn.innerHTML; 
+      btn.disabled=true; 
+      btn.innerHTML='✨ Mulai Hasilkan'; // Tetap terlihat
+      
+      const S_PREFIX = isMobile ? 'Mobile' : 'Desktop';
+      const titleEl = document.getElementById(`statusTitle${S_PREFIX}`);
+      
+      // Helper function to advance step and type
+      const advanceStepAndType = async (stepIndex, pauseAfterTyping = 0) => {
+          const currentStep = P_STEPS[stepIndex];
+          updateProgress(stepIndex, isMobile); // Update bar/steps
+          await startTypingAnimation(titleEl, currentStep.title);
+          if (pauseAfterTyping > 0) {
+              await new Promise(r => setTimeout(r, pauseAfterTyping));
+          }
+      };
+
+      try{
+        // Step 1: Analyze Link
+        await advanceStepAndType(0, 800); 
+
+        // Step 2: Write Script
+        await advanceStepAndType(1, 800); 
+
+        // Step 3: API Call & Typing
+        
+        // Start typing for Step 3 and run API call concurrently for speed
+        const typingPromise = advanceStepAndType(2); // No pause needed, will wait for API
+
+        const [r] = await Promise.all([
+          fetch('/api/generate',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ linkProduk:url, topik:topic, deskripsi:descriptions, gaya:style, panjang:length, jumlah:count, link:url, topic, descriptions, style, length, generateCount:count, count })
+          }),
+          typingPromise // Ensure typing finishes before proceeding
+        ]);
+
+        const raw=await r.text(); let j=null; try{ j=raw? JSON.parse(raw): null }catch{}
+        if(!r.ok || !j || !j.ok) throw new Error(j?.message || raw || 'Gagal generate');
+        
+        // Final UI Update
+        renderResults(j.scripts||[]); loadQuota();
+
+      }catch(e){ 
+        err.textContent=e.message; 
+      }
+      finally{ 
+        btn.disabled=false; 
+        btn.innerHTML=original; 
+        // Reset progress UI after a short delay
+        setTimeout(() => updateProgress(-1, isMobile), 1500); 
+      }
+    }
+    document.getElementById('btnGenerate')?.addEventListener('click', function(){ doGenerate(this, false) });
+    document.getElementById('btnGenerateMobile')?.addEventListener('click', function(){ doGenerate(this, true) });
+
+    // ============== EMOJI KONTEKSTUAL (REVISI FINAL DENGAN LINK) ==============
+    function decorateContent(raw) {
+      if (!raw) return '';
+      let text = String(raw); 
+      let lines = text.split('\n');
+      
+      const emojiMap = {
+          'link': '🔗',      
+          'positif': '✨',   
+          'ajakan': '👉',    
+      };
+      
+      // Kata kunci untuk deteksi kalimat positif/penekanan
+      const positiveKeywords = /(terbaik|mantap|unggul|worth it|keren|solusi|hemat|cepat)/i;
+      // Kata kunci untuk deteksi kalimat CTA/ajakan
+      const ctaKeywords = /(dapatkan|beli|pesan|ceklah|klik di sini|tonton videonya)/i;
+      // Emoji pembuka
+      const startEmojis = ['✨','🚀','💡','🎯','⚡','🔥','🧠','💎','🌟','📈'];
+
+      let decoratedLines = lines.map((line, lineIndex) => {
+          let trimmedLine = line.trim(); 
+          if (!trimmedLine) return line; 
+
+          // Dapatkan spasi di awal baris asli untuk mempertahankan indentasi
+          let leadingSpaces = line.match(/^\s*/)[0];
+          let finalLine = trimmedLine;
+
+          // Cek apakah baris sudah diakhiri dengan emoji untuk mencegah duplikasi
+          const endsWithEmoji = Object.values(emojiMap).some(emoji => trimmedLine.endsWith(emoji));
+          if (endsWithEmoji) return line;
+          
+          // 1. Tambahkan emoji LINK (🔗) jika ada URL
+          if (/(https?:\/\/\S+)/i.test(trimmedLine)) {
+              finalLine = trimmedLine.replace(/\s*$/, '') + ' ' + emojiMap.link; 
+          }
+
+          // 2. Tambahkan emoji AJAKAN (👉) di akhir kalimat CTA
+          else if (ctaKeywords.test(trimmedLine)) {
+              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.ajakan);
+          } 
+          
+          // 3. Tambahkan emoji POSITIF (✨) di akhir kalimat penekanan
+          else if (positiveKeywords.test(trimmedLine)) {
+              finalLine = trimmedLine.replace(/([.!?…])?\s*$/, ' ' + emojiMap.positif);
+          }
+          
+          // 4. Tambahkan emoji pembuka di baris pertama (jika baris pertama dan belum ada emoji)
+          if (lineIndex === 0 && !finalLine.startsWith('✨') && !finalLine.startsWith('🚀')) {
+            finalLine = startEmojis[Math.floor(Math.random()*startEmojis.length)] + ' ' + finalLine;
+          }
+          
+          return leadingSpaces + finalLine; 
+      });
+
+      // Gabungkan kembali menggunakan line break yang sama
+      return decoratedLines.join('\n').trim();
+    }
+
+
+    // ============== MODAL EDIT ==============
+    const modal = document.getElementById('editModal');
+    const editArea = document.getElementById('editArea');
+    const editClose = document.getElementById('editClose');
+    const editCancel = document.getElementById('editCancel');
+    const editSave = document.getElementById('editSave');
+    let onSaveEdit = null;
+
+    function openEdit(initialText, saveCb){
+      editArea.value = initialText || '';
+      onSaveEdit = saveCb;
+      modal.classList.remove('hidden');
+      editArea.focus();
+    }
+    function closeEdit(){
+      modal.classList.add('hidden'); onSaveEdit = null;
+    }
+    editClose.onclick = closeEdit; editCancel.onclick = closeEdit;
+    editSave.onclick = ()=>{ if(onSaveEdit) onSaveEdit(editArea.value); closeEdit(); };
+
+    // ============== RENDER HASIL + AKSI MASSAL (REVISI) ==============
+    let _lastScripts = [];
+    function renderResults(scripts){
+      _lastScripts = (scripts||[]).map(s => ({ ...s }));
+      const box=document.getElementById('results'); 
+      const bulk=document.getElementById('bulkActions');
+      box.innerHTML='';
+
+      if (!_lastScripts.length){ bulk.classList.add('hidden'); return; }
+      bulk.classList.remove('hidden');
+
+      _lastScripts.forEach((s, i) => {
+        const decorated = decorateContent(s.content || '');
+        const titleSafe = escapeHtml(s.title || '');
+
+        const card=document.createElement('div'); 
+        card.className='glass p-5 sm:p-6';
+        card.innerHTML=`
+          <h3 class="text-xl sm:text-2xl font-extrabold mb-3" style="color:#1e40af">${titleSafe}</h3> 
+          <p class="whitespace-pre-wrap leading-relaxed text-base sm:text-lg text-slate-700">${escapeHtml(decorated)}</p>
+          <div class="mt-5 flex flex-wrap gap-3 justify-end">
+            <button class="px-5 py-2.5 rounded-xl text-white touch-btn text-sm" style="background:#334155" data-copy>Salin</button>
+            <button class="btn-soft touch-btn px-5 py-2.5 text-sm" data-edit>Edit</button>
+          </div>`;
+
+        card.querySelector('[data-copy]').onclick=()=>{ 
+          navigator.clipboard.writeText(s.content||'').then(()=>{
+            const b=card.querySelector('[data-copy]'); b.textContent='Tersalin!'; setTimeout(()=>b.textContent='Salin',1500);
+          }); 
+        };
+        card.querySelector('[data-edit]').onclick=()=>{ 
+          openEdit(s.content||'', (val)=>{ _lastScripts[i].content = val; renderResults(_lastScripts); });
+        };
+        box.appendChild(card);
+      });
+
+      // Unduh semua (.txt)
+      document.getElementById('btnDownloadAll').onclick = ()=>{
+        const allText = _lastScripts.map((s, idx)=>`[${idx+1}] ${s.title||''}\n${s.content||''}`).join('\n\n---\n\n');
+        const blob=new Blob([allText],{type:'text/plain'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='skrip-semua.txt'; a.click(); URL.revokeObjectURL(a.href);
+      };
+      // Export semua ke PDF (via print)
+      document.getElementById('btnPdfAll').onclick = ()=>{
+        const html = _lastScripts.map((s, idx)=>`
+          <h3 style="margin:0 0 8px 0; color:#1e40af; font-size:18px; font-weight:800">${idx+1}. ${escapeHtml(s.title||'')}</h3>
+          <div style="white-space:pre-wrap; line-height:1.6; font-size:16px; margin:0 0 18px 0">${escapeHtml(s.content||'')}</div>
+        `).join('');
+        const w=window.open('','_blank');
+        w.document.write(`
+          <html><head><title>Hasil Script</title>
+          <style>body{font-family:Inter,system-ui; padding:24px}</style></head>
+          <body>${html}</body></html>`);
+        w.document.close(); w.focus(); w.print();
+      };
+
+      // Scroll ke hasil di HP
+      if (window.innerWidth <= 640 && _lastScripts.length)
+        window.scrollTo({ top: box.offsetTop - 64, behavior: 'smooth' });
+    }
+
+    // Util HTML escape
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+  </script>
 </body>
 </html>
