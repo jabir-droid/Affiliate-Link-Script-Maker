@@ -1,187 +1,439 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin - Affiliate Script Maker</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f9fafb;
-      color: #222;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #111;
-    }
-    .card {
-      max-width: 700px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      margin: 20px auto;
-    }
-    input, button {
-      font-size: 15px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-    input {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    button {
-      cursor: pointer;
-      background: #0d6efd;
-      color: white;
-      border: none;
-      transition: 0.2s;
-    }
-    button:hover { background: #0b5ed7; }
-    .btn-red { background: #dc3545; }
-    .btn-red:hover { background: #bb2d3b; }
-    pre {
-      background: #f4f4f4;
-      padding: 12px;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-size: 13px;
-    }
-    .error {
-      color: #c00;
-      font-weight: 500;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Admin Panel — Affiliate Script Maker</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1724; --card:#0f172c; --muted:#94a3b8; --accent1:#06b6d4; --accent2:#7c3aed;
+    --success:#16a34a; --danger:#ef4444; --glass: rgba(255,255,255,0.03);
+    --radius:14px;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter,system-ui,Arial,sans-serif;
+    background: linear-gradient(180deg,#071027 0%, #071827 40%);
+    color:#e6eef8;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:28px;
+  }
+
+  .container{max-width:1100px;margin:0 auto;}
+
+  header{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:22px}
+  h1{font-size:26px;margin:0}
+  .subtitle{color:var(--muted);font-size:14px}
+
+  .panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow: 0 6px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+    margin-bottom:18px;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+
+  input[type="text"], input[type="password"]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.02);
+    color: #e6eef8;
+    box-sizing:border-box;
+    font-size:14px;
+  }
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:10px 14px;border-radius:10px;border:0;cursor:pointer;
+    font-weight:600;font-size:14px;
+    box-shadow: 0 6px 18px rgba(12,18,36,0.45);
+  }
+  .btn-primary{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+  .btn-danger{background:linear-gradient(90deg,#ef5f5f,#e03b3b);color:white}
+
+  .flex-between{display:flex;justify-content:space-between;align-items:center}
+
+  #statusBar{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);color:var(--muted);display:flex;gap:12px;align-items:center}
+  .error{color:var(--danger)}
+  .ok{color:var(--success)}
+
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+  th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left}
+  th{color:var(--muted);font-weight:600}
+  tr:hover td{background:rgba(255,255,255,0.01)}
+
+  .small{font-size:13px;color:var(--muted)}
+
+  /* responsive */
+  @media (max-width:900px){
+    header{flex-direction:column;align-items:flex-start;gap:8px}
+    .row{flex-direction:column}
+  }
+</style>
 </head>
 <body>
-  <h1>Panel Admin</h1>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Admin Panel</h1>
+        <div class="subtitle">Kelola pengguna & pantau kuota harian — Admin use only</div>
+      </div>
+      <div class="flex-between" style="gap:12px">
+        <div id="statusBar">🔌 <span id="serverStatus">Memeriksa koneksi...</span></div>
+      </div>
+    </header>
 
-  <div class="card">
-    <h3>Login Admin</h3>
-    <p>Masukkan <b>ADMIN_SECRET</b> (dari environment Vercel) untuk autentikasi.</p>
-    <input type="password" id="adminKey" placeholder="Masukkan admin secret...">
-    <button id="saveKeyBtn">Simpan & Gunakan</button>
-    <p id="loginMsg"></p>
+    <!-- LOGIN / ADMIN KEY -->
+    <section class="panel" id="panelLogin">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="flex:1;min-width:220px">
+          <label>Admin Secret (disimpan di browser)</label>
+          <input id="adminKeyInput" type="password" placeholder="Masukkan ADMIN_SECRET dari Vercel">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="btnSaveKey" class="btn btn-primary">🔐 Simpan & Gunakan</button>
+          <button id="btnClearKey" class="btn btn-ghost">✖ Hapus</button>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="small">Tip: kunci disimpan hanya di browser Anda. Server tidak menyimpan kunci ini.</div>
+    </section>
+
+    <!-- USERS -->
+    <section class="panel">
+      <div class="flex-between">
+        <div>
+          <h3 style="margin:0">Daftar User Terdaftar</h3>
+          <div class="small">Muat & kelola daftar user yang diizinkan membuka link.</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="btnReloadUsers" class="btn btn-ghost">🔄 Muat Ulang</button>
+          <button id="btnExportCSV" class="btn">📥 Unduh CSV</button>
+        </div>
+      </div>
+
+      <div id="usersArea" style="margin-top:12px">
+        <div class="small" id="usersMsg">Tekan "Muat Ulang" untuk melihat user.</div>
+        <table id="usersTable" style="display:none">
+          <thead><tr><th>#</th><th>Nama</th><th>Aksi</th></tr></thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <div style="flex:1;min-width:220px">
+          <label>Nama Pengguna (untuk tambah/hapus)</label>
+          <input id="userNameInput" type="text" placeholder="Contoh: contohuser123">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button id="btnAddUser" class="btn btn-primary">➕ Tambah User</button>
+          <button id="btnRemoveUser" class="btn btn-danger">🗑 Hapus User</button>
+        </div>
+      </div>
+      <div id="userActionMsg" class="small" style="margin-top:8px"></div>
+    </section>
+
+    <!-- USAGE -->
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h3 style="margin:0">Statistik Pemakaian</h3>
+          <div class="small">Kuota harian, pemakaian global & per-user.</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button id="btnCheckUsage" class="btn btn-ghost">🔍 Cek Pemakaian</button>
+          <button id="btnClearUsage" class="btn btn-ghost">♻ Reset view</button>
+        </div>
+      </div>
+
+      <div id="usageArea" style="margin-top:12px">
+        <div id="usageMsg" class="small">Belum dicek.</div>
+
+        <table id="usageTable" style="display:none;margin-top:10px">
+          <thead><tr><th>#</th><th>Nama</th><th>Dipakai</th></tr></thead>
+          <tbody id="usageTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer style="text-align:center;margin-top:18px;color:var(--muted);font-size:13px">
+      © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
+    </footer>
   </div>
 
-  <div class="card">
-    <h3>Daftar User Terdaftar</h3>
-    <button id="loadUsersBtn">Muat Daftar User</button>
-    <ul id="usersList"></ul>
-  </div>
+<script>
+/* Admin dashboard script
+   - Menyimpan adminKey di localStorage
+   - Selalu mengirim x-admin-key header
+   - GET /api/admin/users, POST/DELETE /api/admin/users
+   - GET /api/usage
+*/
+(() => {
+  const API_BASE = '/api';
+  const LS_KEY = 'aff_admin_key_v1';
 
-  <div class="card">
-    <h3>Tambah / Hapus User</h3>
-    <input type="text" id="userName" placeholder="Nama pengguna (Lynk.id)">
-    <button id="addUserBtn">Tambah User</button>
-    <button id="delUserBtn" class="btn-red">Hapus User</button>
-    <p id="userMsg"></p>
-  </div>
+  const $ = id => document.getElementById(id);
+  const adminKeyInput = $('adminKeyInput');
+  const btnSaveKey = $('btnSaveKey');
+  const btnClearKey = $('btnClearKey');
+  const serverStatus = $('serverStatus');
 
-  <div class="card">
-    <h3>Statistik Pemakaian</h3>
-    <button id="checkUsageBtn">Cek Pemakaian Hari Ini</button>
-    <pre id="usageOutput">Belum ada data.</pre>
-  </div>
+  const btnReloadUsers = $('btnReloadUsers');
+  const usersMsg = $('usersMsg');
+  const usersTable = $('usersTable');
+  const usersTbody = $('usersTbody');
+  const btnExportCSV = $('btnExportCSV');
+  const userNameInput = $('userNameInput');
+  const btnAddUser = $('btnAddUser');
+  const btnRemoveUser = $('btnRemoveUser');
+  const userActionMsg = $('userActionMsg');
 
-  <script>
-    const apiBase = "/api";
-    let adminKey = localStorage.getItem("adminKey") || "";
+  const btnCheckUsage = $('btnCheckUsage');
+  const btnClearUsage = $('btnClearUsage');
+  const usageMsg = $('usageMsg');
+  const usageTable = $('usageTable');
+  const usageTbody = $('usageTbody');
 
-    function setMsg(el, msg, isError = false) {
-      el.textContent = msg;
-      el.className = isError ? "error" : "";
+  // helpers
+  function showStatus(text, ok=false) {
+    serverStatus.textContent = text;
+    serverStatus.className = ok ? 'ok' : '';
+  }
+  function showErrorBar(el, text) {
+    el.textContent = text;
+    el.className = 'error';
+  }
+  function clearMsg(el){ el.textContent=''; el.className=''; }
+
+  function getKey() {
+    const k = localStorage.getItem(LS_KEY) || '';
+    return k;
+  }
+  function saveKey(k){
+    if(!k) return;
+    localStorage.setItem(LS_KEY, k);
+  }
+  function clearKey(){
+    localStorage.removeItem(LS_KEY);
+  }
+
+  function headersWithKey() {
+    const key = getKey();
+    const headers = { 'Content-Type': 'application/json' };
+    if (key) {
+      headers['x-admin-key'] = key;
+      headers['x-admin-secret'] = key;
+      headers['x-admin'] = key;
     }
+    return headers;
+  }
 
-    // simpan admin key
-    document.getElementById("saveKeyBtn").onclick = () => {
-      const keyInput = document.getElementById("adminKey");
-      adminKey = keyInput.value.trim();
-      if (!adminKey) return alert("Masukkan ADMIN_SECRET!");
-      localStorage.setItem("adminKey", adminKey);
-      setMsg(document.getElementById("loginMsg"), "✅ Kunci admin disimpan di browser lokal.");
-      keyInput.value = "";
-    };
-
-    // load users
-    document.getElementById("loadUsersBtn").onclick = async () => {
-      const list = document.getElementById("usersList");
-      list.innerHTML = "Memuat...";
-      try {
-        const res = await fetch(`${apiBase}/admin/users`, { headers: { "x-admin-key": adminKey } });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
-        list.innerHTML = "";
-        if (!data.users?.length) {
-          list.innerHTML = "<li>(Belum ada user)</li>";
-        } else {
-          for (const name of data.users) {
-            const li = document.createElement("li");
-            li.textContent = name;
-            list.appendChild(li);
-          }
-        }
-      } catch (err) {
-        list.innerHTML = `<li class='error'>❌ ${err.message}</li>`;
+  async function fetchJson(url, opts = {}) {
+    const controller = new AbortController();
+    const id = setTimeout(()=>controller.abort(), 25000);
+    opts.signal = controller.signal;
+    try {
+      const res = await fetch(url, opts);
+      clearTimeout(id);
+      const txt = await res.text();
+      // try to parse JSON, but include raw text in errors
+      let j = null;
+      try { j = txt ? JSON.parse(txt) : null; } catch(e){ j = null; }
+      if (!res.ok) {
+        const msg = j?.message || txt || res.statusText || `HTTP ${res.status}`;
+        throw new Error(msg);
       }
-    };
+      return j;
+    } catch (e) {
+      clearTimeout(id);
+      throw e;
+    }
+  }
 
-    // tambah user
-    document.getElementById("addUserBtn").onclick = async () => {
-      const name = document.getElementById("userName").value.trim().toLowerCase();
-      const msg = document.getElementById("userMsg");
-      if (!name) return setMsg(msg, "Nama tidak boleh kosong", true);
-      try {
-        const res = await fetch(`${apiBase}/admin/users`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
-          body: JSON.stringify({ name })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
-        setMsg(msg, "✅ User berhasil ditambahkan: " + data.added);
-      } catch (err) {
-        setMsg(msg, "❌ " + err.message, true);
-      }
-    };
+  // init input with stored key
+  adminKeyInput.value = getKey() || '';
 
-    // hapus user
-    document.getElementById("delUserBtn").onclick = async () => {
-      const name = document.getElementById("userName").value.trim().toLowerCase();
-      const msg = document.getElementById("userMsg");
-      if (!name) return setMsg(msg, "Nama tidak boleh kosong", true);
-      if (!confirm("Yakin hapus user " + name + "?")) return;
-      try {
-        const res = await fetch(`${apiBase}/admin/users`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
-          body: JSON.stringify({ name })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
-        setMsg(msg, "✅ User dihapus: " + data.removed);
-      } catch (err) {
-        setMsg(msg, "❌ " + err.message, true);
-      }
-    };
+  // server health probe
+  (async function probe() {
+    try {
+      const h = await fetchJson(API_BASE + '/health', { method: 'GET' });
+      if (h && h.ok) showStatus('Server online', true);
+      else showStatus('Server respons ada, tapi bukan OK');
+    } catch (e) {
+      showStatus('Server tidak merespons: ' + (e.message || e), false);
+    }
+  })();
 
-    // cek usage
-    document.getElementById("checkUsageBtn").onclick = async () => {
-      const out = document.getElementById("usageOutput");
-      out.textContent = "Memuat...";
-      try {
-        const res = await fetch(`${apiBase}/usage`, { headers: { "x-admin-key": adminKey } });
-        const data = await res.json();
-        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
-        out.textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        out.textContent = "❌ " + err.message;
+  // save/clear key
+  btnSaveKey.addEventListener('click', () => {
+    const v = adminKeyInput.value.trim();
+    if (!v) return alert('Masukkan ADMIN_SECRET terlebih dahulu.');
+    saveKey(v);
+    adminKeyInput.value = v;
+    showStatus('Kunci disimpan (dilocalStorage)', true);
+    clearMsg(userActionMsg);
+  });
+  btnClearKey.addEventListener('click', () => {
+    clearKey(); adminKeyInput.value='';
+    showStatus('Kunci dihapus', false);
+  });
+
+  // USERS: load
+  async function loadUsers() {
+    usersTbody.innerHTML = '';
+    usersTable.style.display = 'none';
+    usersMsg.textContent = 'Memuat...';
+    try {
+      const data = await fetchJson(API_BASE + '/admin/users', { method: 'GET', headers: headersWithKey() });
+      if (!data || !data.ok) throw new Error(data?.message || 'Tidak ada data');
+      const users = data.users || [];
+      if (!users.length) {
+        usersMsg.textContent = '(Belum ada user)';
+        return;
       }
-    };
-  </script>
+      usersMsg.textContent = '';
+      usersTable.style.display = '';
+      usersTbody.innerHTML = users.map((u,i)=>`
+        <tr>
+          <td style="width:48px">${i+1}</td>
+          <td>${escapeHtml(String(u))}</td>
+          <td style="width:220px">
+            <button data-name="${escapeAttr(u)}" class="btn btn-ghost" onclick="copyText('${escapeAttr(u)}')">📋 Salin</button>
+            <button data-name="${escapeAttr(u)}" class="btn btn-danger" onclick="deleteUserPrompt('${escapeAttr(u)}')">🗑 Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      usersMsg.textContent = '❌ ' + (e.message || e);
+      usersMsg.className = 'error';
+    }
+  }
+
+  // global functions used in generated buttons
+  window.copyText = (text) => {
+    navigator.clipboard?.writeText(text).then(()=>alert('Tersalin: '+text)).catch(()=>alert('Gagal menyalin'));
+  };
+  window.deleteUserPrompt = (name) => {
+    if (!confirm('Hapus user: ' + name + ' ?')) return;
+    doRemoveUser(name);
+  };
+
+  // add
+  async function doAddUser(name) {
+    userActionMsg.textContent = 'Menambah...';
+    try {
+      const body = { name: String(name).trim().toLowerCase() };
+      const data = await fetchJson(API_BASE + '/admin/users', { method:'POST', headers: headersWithKey(), body: JSON.stringify(body) });
+      userActionMsg.textContent = '✅ ' + (data?.added || 'Berhasil ditambahkan');
+      userActionMsg.className = '';
+      loadUsers();
+    } catch (e) {
+      userActionMsg.textContent = '❌ ' + (e.message || e);
+      userActionMsg.className = 'error';
+    }
+  }
+  btnAddUser.addEventListener('click', () => {
+    const name = userNameInput.value.trim();
+    if (!name) return alert('Isi nama user terlebih dahulu');
+    doAddUser(name);
+  });
+
+  // remove
+  async function doRemoveUser(nameArg){
+    const name = nameArg || userNameInput.value.trim();
+    if (!name) return alert('Nama kosong');
+    userActionMsg.textContent = 'Menghapus...';
+    try {
+      const data = await fetchJson(API_BASE + '/admin/users', { method:'DELETE', headers: headersWithKey(), body: JSON.stringify({name}) });
+      userActionMsg.textContent = '✅ ' + (data?.removed || 'Dihapus');
+      userActionMsg.className = '';
+      loadUsers();
+    } catch (e) {
+      userActionMsg.textContent = '❌ ' + (e.message || e);
+      userActionMsg.className = 'error';
+    }
+  }
+  btnRemoveUser.addEventListener('click', () => {
+    if (!confirm('Yakin hapus user ini?')) return;
+    doRemoveUser();
+  });
+
+  // export CSV
+  btnExportCSV.addEventListener('click', async () => {
+    try {
+      const data = await fetchJson(API_BASE + '/admin/users', { method:'GET', headers: headersWithKey() });
+      const users = data.users || [];
+      if (!users.length) return alert('Tidak ada user untuk diunduh');
+      const csv = 'name\\n' + users.map(u => `"${String(u).replace(/"/g,'""')}"`).join('\\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'users.csv'; document.body.appendChild(a); a.click();
+      a.remove(); URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Gagal unduh: ' + (e.message || e));
+    }
+  });
+
+  // USAGE
+  async function loadUsage() {
+    usageTbody.innerHTML = '';
+    usageTable.style.display = 'none';
+    usageMsg.textContent = 'Memuat...';
+    try {
+      const data = await fetchJson(API_BASE + '/usage', { method:'GET', headers: headersWithKey() });
+      if (!data || !data.ok) throw new Error(data?.message || 'Tidak ada data');
+      usageMsg.textContent = `Tanggal: ${data.date || '-'}  Kuota Harian: ${data.quota_daily || '-'}  Terpakai Global: ${data.global_used || 0}`;
+      const per = data.per_user || [];
+      if (per.length) {
+        usageTable.style.display = '';
+        usageTbody.innerHTML = per.map((u,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(u.name)}</td><td>${escapeHtml(String(u.used))}</td></tr>`).join('');
+      }
+    } catch (e) {
+      usageMsg.textContent = '❌ ' + (e.message || e);
+      usageMsg.className = 'error';
+    }
+  }
+  btnCheckUsage.addEventListener('click', loadUsage);
+  btnClearUsage.addEventListener('click', () => { usageMsg.textContent='Belum dicek'; usageTbody.innerHTML=''; usageTable.style.display='none'; });
+
+  // reload users
+  btnReloadUsers.addEventListener('click', loadUsers);
+
+  // on load: try to populate UI if key exists
+  (function init() {
+    if (getKey()) {
+      adminKeyInput.value = getKey();
+      showStatus('Kunci lokal terdeteksi', true);
+    } else {
+      showStatus('Kunci admin belum disimpan');
+    }
+  })();
+
+  // small utilities
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, function(m){ return ({'&':'&','<':'<','>':'>','"':'"',"'" : "'"})[m]; });
+  }
+  function escapeAttr(s) {
+    return String(s || '').replace(/'/g,"\\'").replace(/"/g,"\\\"");
+  }
+
+  // expose some internal fns for inline onclick use
+  window.doRemoveUser = doRemoveUser;
+  window.loadUsers = loadUsers;
+  window.loadUsage = loadUsage;
+
+})();
+</script>
 </body>
 </html>
