@@ -1,177 +1,187 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - Affiliate Script Maker</title>
   <style>
-    body{background:radial-gradient(1200px 500px at 10% -10%, #0ea5e922 0%, transparent 60%),
-                 radial-gradient(1200px 520px at 95% 0%, #8b5cf622 0%, transparent 60%),
-                 #0f172a;color:#e2e8f0}
-    .card{background:#0b1220cc;border:1px solid #1f2937;border-radius:16px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
-    .btn{background:linear-gradient(90deg,#06b6d4,#22c55e);color:#0b1220;font-weight:800;border-radius:12px;padding:.9rem 1.4rem}
-    .btn:active{transform:translateY(1px)}
-    .chip{background:#0ea5e933;border:1px solid #334155;padding:.35rem .6rem;border-radius:999px}
-    .input{width:100%;border:1px solid #334155;background:#0b1220;padding:.9rem 1rem;border-radius:12px;outline:none}
-    .input:focus{border-color:#22d3ee;box-shadow:0 0 0 3px #22d3ee33}
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    th,td{padding:.75rem 1rem;border-bottom:1px solid #1f2937}
-    .muted{color:#94a3b8}
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f9fafb;
+      color: #222;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #111;
+    }
+    .card {
+      max-width: 700px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin: 20px auto;
+    }
+    input, button {
+      font-size: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+    input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    button {
+      cursor: pointer;
+      background: #0d6efd;
+      color: white;
+      border: none;
+      transition: 0.2s;
+    }
+    button:hover { background: #0b5ed7; }
+    .btn-red { background: #dc3545; }
+    .btn-red:hover { background: #bb2d3b; }
+    pre {
+      background: #f4f4f4;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+    .error {
+      color: #c00;
+      font-weight: 500;
+    }
   </style>
 </head>
-<body class="min-h-screen">
-  <main class="max-w-4xl mx-auto px-5 py-10">
-    <h1 class="text-4xl sm:text-5xl font-extrabold text-center">⚙️ Admin Panel</h1>
-    <p class="text-center muted mt-2">Kelola pengguna & pantau kuota harian.</p>
+<body>
+  <h1>Panel Admin</h1>
 
-    <section class="card mt-6 p-4 flex items-center justify-between gap-3" id="statusBox">
-      <div><span id="statusBadge" class="chip">Memeriksa...</span>
-        <span id="statusText" class="ml-2">Mengecek koneksi API</span>
-      </div>
-      <button class="btn" id="btnRecheck">Cek Ulang</button>
-    </section>
+  <div class="card">
+    <h3>Login Admin</h3>
+    <p>Masukkan <b>ADMIN_SECRET</b> (dari environment Vercel) untuk autentikasi.</p>
+    <input type="password" id="adminKey" placeholder="Masukkan admin secret...">
+    <button id="saveKeyBtn">Simpan & Gunakan</button>
+    <p id="loginMsg"></p>
+  </div>
 
-    <section class="card mt-6 p-6">
-      <h2 class="text-2xl font-extrabold mb-3 text-center">Masukkan Admin Key</h2>
-      <div class="flex gap-3 items-center">
-        <input id="admKey" type="password" class="input" placeholder="Masukkan admin key (rahasia)" />
-        <button class="btn" id="btnLogin">🔑 Masuk</button>
-      </div>
-      <p id="loginErr" class="text-rose-400 mt-2"></p>
-    </section>
+  <div class="card">
+    <h3>Daftar User Terdaftar</h3>
+    <button id="loadUsersBtn">Muat Daftar User</button>
+    <ul id="usersList"></ul>
+  </div>
 
-    <section class="card mt-6 p-6 hidden" id="mgmt">
-      <h2 class="text-xl font-bold">Manajemen Pengguna</h2>
-      <div class="mt-3 flex gap-3">
-        <input id="newUser" class="input" placeholder="Nama pengguna baru (huruf/angka, tanpa spasi)" />
-        <button class="btn" id="btnAdd">Tambah</button>
-      </div>
-      <div class="overflow-x-auto mt-5">
-        <table>
-          <thead><tr><th class="text-left">Nama Pengguna</th><th class="text-right">Aksi</th></tr></thead>
-          <tbody id="userRows"></tbody>
-        </table>
-      </div>
-    </section>
+  <div class="card">
+    <h3>Tambah / Hapus User</h3>
+    <input type="text" id="userName" placeholder="Nama pengguna (Lynk.id)">
+    <button id="addUserBtn">Tambah User</button>
+    <button id="delUserBtn" class="btn-red">Hapus User</button>
+    <p id="userMsg"></p>
+  </div>
 
-    <section class="card mt-6 p-6 hidden" id="stat">
-      <h2 class="text-xl font-bold">Statistik Harian</h2>
-      <p class="muted mt-1">Kuota harian: <b id="quota"></b> • Tanggal: <b id="tgl"></b></p>
-      <div class="overflow-x-auto mt-5">
-        <table>
-          <thead><tr><th class="text-left">Nama</th><th class="text-right">Dipakai</th></tr></thead>
-          <tbody id="usageRows"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <footer class="mt-10 text-center muted">
-      © 2025 Affiliate Script Maker. All Rights Reserved. (Admin Use Only)
-    </footer>
-  </main>
+  <div class="card">
+    <h3>Statistik Pemakaian</h3>
+    <button id="checkUsageBtn">Cek Pemakaian Hari Ini</button>
+    <pre id="usageOutput">Belum ada data.</pre>
+  </div>
 
   <script>
-    const sBadge = document.getElementById('statusBadge');
-    const sText  = document.getElementById('statusText');
-    const btnRe  = document.getElementById('btnRecheck');
+    const apiBase = "/api";
+    let adminKey = localStorage.getItem("adminKey") || "";
 
-    async function check() {
-      try{
-        const r = await fetch('/api/ping');
-        const j = await r.json();
-        if (j.ok) {
-          sBadge.textContent = 'OK';
-          sBadge.style.background = '#22c55e33';
-          sText.textContent = 'Endpoint tersedia.';
-        } else throw new Error('no ok');
-      }catch{
-        sBadge.textContent='Gagal';
-        sBadge.style.background='#ef444433';
-        sText.textContent='Endpoint tidak tersedia / jaringan bermasalah.';
-      }
-    }
-    btnRe.onclick = check;
-    check();
-
-    let ADMIN_KEY = "";
-
-    async function admFetch(path, opts={}){
-      const h = opts.headers || {};
-      h['x-admin-key'] = ADMIN_KEY;
-      h['Content-Type'] = 'application/json';
-      const r = await fetch(path, {...opts, headers: h});
-      const t = await r.text();
-      let j = {};
-      try{ j = t? JSON.parse(t) : {}; }catch{ throw new Error('Balikkan bukan JSON'); }
-      if (!r.ok || j.ok===false) throw new Error(j.message || t || 'Error');
-      return j;
+    function setMsg(el, msg, isError = false) {
+      el.textContent = msg;
+      el.className = isError ? "error" : "";
     }
 
-    const loginErr = document.getElementById('loginErr');
-    document.getElementById('btnLogin').onclick = async () => {
-      loginErr.textContent='';
-      ADMIN_KEY = document.getElementById('admKey').value.trim();
-      if (!ADMIN_KEY) { loginErr.textContent='Isi admin key.'; return; }
-      try{
-        // test minimal ke env
-        await admFetch('/api/admin/env');
-        document.getElementById('mgmt').classList.remove('hidden');
-        document.getElementById('stat').classList.remove('hidden');
-        loadUsers(); loadUsage();
-      }catch(e){
-        loginErr.textContent = 'Server tidak merespons dengan benar';
+    // simpan admin key
+    document.getElementById("saveKeyBtn").onclick = () => {
+      const keyInput = document.getElementById("adminKey");
+      adminKey = keyInput.value.trim();
+      if (!adminKey) return alert("Masukkan ADMIN_SECRET!");
+      localStorage.setItem("adminKey", adminKey);
+      setMsg(document.getElementById("loginMsg"), "✅ Kunci admin disimpan di browser lokal.");
+      keyInput.value = "";
+    };
+
+    // load users
+    document.getElementById("loadUsersBtn").onclick = async () => {
+      const list = document.getElementById("usersList");
+      list.innerHTML = "Memuat...";
+      try {
+        const res = await fetch(`${apiBase}/admin/users`, { headers: { "x-admin-key": adminKey } });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
+        list.innerHTML = "";
+        if (!data.users?.length) {
+          list.innerHTML = "<li>(Belum ada user)</li>";
+        } else {
+          for (const name of data.users) {
+            const li = document.createElement("li");
+            li.textContent = name;
+            list.appendChild(li);
+          }
+        }
+      } catch (err) {
+        list.innerHTML = `<li class='error'>❌ ${err.message}</li>`;
       }
     };
 
-    async function loadUsers(){
-      try{
-        const j = await admFetch('/api/admin/users');
-        const body = document.getElementById('userRows');
-        body.innerHTML='';
-        (j.users || []).forEach(name=>{
-          const tr=document.createElement('tr');
-          tr.innerHTML = `<td>${escapeHtml(name)}</td>
-                          <td class="text-right"><button class="btn" data-del="${escapeAttr(name)}">Hapus</button></td>`;
-          tr.querySelector('[data-del]').onclick = ()=> delUser(name);
-          body.appendChild(tr);
+    // tambah user
+    document.getElementById("addUserBtn").onclick = async () => {
+      const name = document.getElementById("userName").value.trim().toLowerCase();
+      const msg = document.getElementById("userMsg");
+      if (!name) return setMsg(msg, "Nama tidak boleh kosong", true);
+      try {
+        const res = await fetch(`${apiBase}/admin/users`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+          body: JSON.stringify({ name })
         });
-      }catch(e){ /* abaikan di UI */ }
-    }
-    async function delUser(name){
-      if(!confirm(`Hapus user "${name}"?`)) return;
-      await admFetch('/api/admin/users', { method:'DELETE', body: JSON.stringify({ name }) });
-      loadUsers();
-    }
-    document.getElementById('btnAdd').onclick = async ()=>{
-      const name = document.getElementById('newUser').value.trim().toLowerCase();
-      if(!name) return;
-      await admFetch('/api/admin/users', { method:'POST', body: JSON.stringify({ name }) });
-      document.getElementById('newUser').value='';
-      loadUsers();
-    }
-
-    async function loadUsage(){
-      try{
-        const j = await admFetch('/api/admin/usage');
-        document.getElementById('quota').textContent = j.quota_daily;
-        document.getElementById('tgl').textContent = j.date;
-        const body = document.getElementById('usageRows');
-        body.innerHTML='';
-        body.appendChild(row('Global', j.global_used));
-        (j.per_user || []).sort((a,b)=>b.used-a.used).forEach(u=>{
-          body.appendChild(row(u.name, u.used));
-        });
-      }catch(e){}
-      function row(name, used){
-        const tr=document.createElement('tr');
-        tr.innerHTML = `<td>${escapeHtml(name)}</td><td class="text-right">${used}</td>`;
-        return tr;
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
+        setMsg(msg, "✅ User berhasil ditambahkan: " + data.added);
+      } catch (err) {
+        setMsg(msg, "❌ " + err.message, true);
       }
-    }
+    };
 
-    function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m]))}
-    function escapeAttr(s){return String(s).replace(/"/g,'&quot;')}
+    // hapus user
+    document.getElementById("delUserBtn").onclick = async () => {
+      const name = document.getElementById("userName").value.trim().toLowerCase();
+      const msg = document.getElementById("userMsg");
+      if (!name) return setMsg(msg, "Nama tidak boleh kosong", true);
+      if (!confirm("Yakin hapus user " + name + "?")) return;
+      try {
+        const res = await fetch(`${apiBase}/admin/users`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
+        setMsg(msg, "✅ User dihapus: " + data.removed);
+      } catch (err) {
+        setMsg(msg, "❌ " + err.message, true);
+      }
+    };
+
+    // cek usage
+    document.getElementById("checkUsageBtn").onclick = async () => {
+      const out = document.getElementById("usageOutput");
+      out.textContent = "Memuat...";
+      try {
+        const res = await fetch(`${apiBase}/usage`, { headers: { "x-admin-key": adminKey } });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || res.statusText);
+        out.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        out.textContent = "❌ " + err.message;
+      }
+    };
   </script>
 </body>
 </html>
