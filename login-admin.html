@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin — Affiliate Script Maker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050d1a;
+      --card: #0b162b;
+      --accent: #3b82f6;
+      --accent2: #9333ea;
+      --error: #ef4444;
+      --success: #10b981;
+      --muted: #94a3b8;
+    }
+    * {box-sizing: border-box;}
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at 10% 10%, #0a1a33, #050d1a);
+      color: white;
+      overflow: hidden;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(11,22,43,0.9);
+      padding: 40px 32px;
+      border-radius: 18px;
+      box-shadow: 0 0 30px rgba(59,130,246,0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      text-align: center;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 0.4rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      margin-bottom: 1.4rem;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(59,130,246,0.4);
+    }
+    button {
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border: none;
+      padding: 14px;
+      color: white;
+      font-size: 1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    button:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 15px rgba(147,51,234,0.5);
+    }
+    .msg {
+      margin-top: 1rem;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .msg.error {background: rgba(239,68,68,0.15); color: var(--error);}
+    .msg.success {background: rgba(16,185,129,0.15); color: var(--success);}
+    .footer {
+      margin-top: 1rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <h1>Login Admin</h1>
+    <p>Masukkan Admin Secret Anda untuk mengakses dashboard.</p>
+    <input type="password" id="key" placeholder="Masukkan ADMIN_SECRET" />
+    <button id="loginBtn">Masuk</button>
+    <div id="msg" class="msg"></div>
+    <div class="footer">Kunci disimpan di browser (localStorage)</div>
+  </div>
+
+<script>
+(async () => {
+  const msg = document.getElementById("msg");
+  const btn = document.getElementById("loginBtn");
+  const input = document.getElementById("key");
+  const LS_KEY = "aff_admin_key_v1";
+
+  function showMessage(text, type="error") {
+    msg.style.display = "block";
+    msg.textContent = text;
+    msg.className = "msg " + type;
+  }
+
+  async function verifyKey(key) {
+    try {
+      const res = await fetch("/api/usage", {
+        headers: {
+          "x-admin-key": key,
+          "x-admin-secret": key,
+        },
+      });
+      if (!res.ok) throw new Error(res.statusText);
+      const json = await res.json();
+      if (json.ok || json.success) return true;
+      throw new Error("Tidak valid");
+    } catch (e) {
+      showMessage("Gagal memverifikasi: " + e.message, "error");
+      return false;
+    }
+  }
+
+  btn.addEventListener("click", async () => {
+    const key = input.value.trim();
+    if (!key) return showMessage("Masukkan kunci dulu!");
+    showMessage("Memeriksa kunci...", "success");
+    const ok = await verifyKey(key);
+    if (ok) {
+      localStorage.setItem(LS_KEY, key);
+      showMessage("Berhasil! Mengarahkan ke dashboard...", "success");
+      setTimeout(() => location.href = "/admin.html", 800);
+    }
+  });
+
+  // Auto login jika sudah ada
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) {
+    showMessage("Kunci tersimpan. Mengarahkan otomatis...", "success");
+    const ok = await verifyKey(saved);
+    if (ok) location.href = "/admin.html";
+  }
+})();
+</script>
+</body>
+</html>
